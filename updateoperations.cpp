@@ -56,8 +56,8 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         loop->exec();
         QFile::remove(filedirectory);
     }
-    //A faire: une callback spécifiant la fin de l'installation
-    qDebug() << "EndLoop";
+    //Callback spécifiant la fin de l'installation
+    ctrl->evaluateJavaScript(QString("fin_install()"));
 }
 
 void UdpdateOperations::updateWebshell(QString url){
@@ -103,12 +103,12 @@ void UdpdateOperations::updateWebshell(QString url){
 
     myProcess->start(program);
 
-        //Test de lancement du processus
-//        if (myProcess->waitForStarted(1000) == false)
-//        qDebug() << "Error starting external program";
+    //Test de lancement du processus
+//    if (myProcess->waitForStarted(1000) == false)
+//    qDebug() << "Error starting external program";
 
-//        else
-//        qDebug() << "external program running";
+//    else
+//    qDebug() << "external program running";
 
     ctrl->evaluateJavaScript(QString("maj_webshell()"));
 }

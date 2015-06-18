@@ -5,7 +5,6 @@
 #include "global.h"
 
 
-//Des warnings sont présents actuellement, il faudra résoudre ce problème
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)  {
     QFile file(QApplication::applicationDirPath()+"/"+qAppName()+".log");
     file.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -15,19 +14,19 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
     std::cout.flush();
     switch (type) {
     case QtDebugMsg:
-        file.write(QString("Debug: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        file.write(QString("Debug: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         break;
     case QtWarningMsg:
-        file.write(QString("Warning: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        file.write(QString("Warning: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         break;
     case QtCriticalMsg:
-        file.write(QString("Critical: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        file.write(QString("Critical: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         break;
     case QtFatalMsg:
-        file.write(QString("Fatal: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        file.write(QString("Fatal: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         abort();
     default:
-        file.write(QString("Other: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        file.write(QString("Other: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         break;
     }
 }
@@ -39,7 +38,7 @@ int main(int argc, char** argv) {
 
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr");
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr/VideoLiveAPI/inst_plugin.php?retour=http%253A//djanah.dev.ives.fr/client/menu.php%253Fl%253Dfr%2526PHPSESSID%253Db2ui2vusdc0nug99befbkjmjv1");
-    QUrl launch = QUrl("file:///c:/Users/phvdev64/Documents/Test/index.html");
+    QUrl launch = QUrl("file:///"+QApplication::applicationDirPath()+"/"+"index.html");
     if(argc==2){
         QString str;
         str = argv[1];

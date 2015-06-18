@@ -26,31 +26,8 @@ MainWindow::MainWindow(const QUrl& url){
     setCentralWidget(view);
     setUnifiedTitleAndToolBarOnMac(true);
 
+    //On crée le controleur accessible depuis toutes les classes permettant d'accéder à la méthode evaluatejavascript
     ctrl = new Controleur(this);
-
-    //Test liste plugins utilisables
-//    int length = view->page()->mainFrame()->evaluateJavaScript("navigator.plugins.length").toInt();
-//    for(int i = 0; i < length; i++) {
-//        QString version = view->page()->mainFrame()->evaluateJavaScript(QString("navigator.plugins[%1].description").arg(i)).toString();
-
-//        QRegExp rx("\\d*");
-//        QStringList list;
-//        int pos = 0;
-
-//        while ((pos = rx.indexIn(version, pos)) != -1) {
-//            list << rx.cap(1);
-//            pos += rx.matchedLength();
-//        }
-//        // list: ["12", "14", "99", "231", "7"]
-//      qDebug() << view->page()->mainFrame()->evaluateJavaScript(QString("navigator.plugins[%1].name").arg(i)).toString()
-//        << " | " << view->page()->mainFrame()->evaluateJavaScript(QString("navigator.plugins[%1].filename").arg(i)).toString()
-//        << " | " << view->page()->mainFrame()->evaluateJavaScript(QString("window.navigator.plugins[%1].description").arg(i)).toString()
-//        << " | " << list[1];
-//    }
-
-    //Affichage du UserAgent
-//    qDebug() << this->view->page()->mainFrame()->evaluateJavaScript("navigator.userAgent").toString();
-
 }
 
 MainWindow::~MainWindow(){

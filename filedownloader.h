@@ -1,12 +1,11 @@
 #ifndef FILEDOWNLOADER_H
 #define FILEDOWNLOADER_H
- 
+
 #include <QObject>
 #include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QProgressBar>
  
 class FileDownloader : public QObject{
     Q_OBJECT
@@ -24,8 +23,6 @@ private slots:
  
 private:
     QNetworkAccessManager m_WebCtrl;
-    QNetworkReply *download;
-    QProgressBar *bar;
     QByteArray m_DownloadedData;
 };
  
