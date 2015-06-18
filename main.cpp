@@ -1,20 +1,33 @@
 #include <QString>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 #include "global.h"
 
 
+//Des warnings sont présents actuellement, il faudra résoudre ce problème
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)  {
     QFile file(QApplication::applicationDirPath()+"/"+qAppName()+".log");
     file.open(QIODevice::WriteOnly | QIODevice::Append);
-    file.write("["+QDateTime::currentDateTime().toString()+"] ");
+    file.write(QString("[").toLatin1()+QDateTime::currentDateTime().toString().toLatin1()+QString("] ").toLatin1());
+    std::string text = msg.toLatin1().constData();
+    std::cout << text << "\n";
+    std::cout.flush();
     switch (type) {
     case QtDebugMsg:
-        file.write("Debug: "+msg+" LogContext: "+logcontext.function+", "+logcontext.line+"\r\n");
+        file.write(QString("Debug: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
         break;
     case QtWarningMsg:
-        file.write("Warning: "+msg+" LogContext: "+logcontext.function+", "+logcontext.line+"\r\n");
+        file.write(QString("Warning: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
         break;
+    case QtCriticalMsg:
+        file.write(QString("Critical: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        break;
+    case QtFatalMsg:
+        file.write(QString("Fatal: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
+        abort();
     default:
-        file.write("Other: "+msg+" LogContext: "+logcontext.function+", "+logcontext.line+"\r\n");
+        file.write(QString("Other: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+logcontext.function+QString(", ").toLatin1()+logcontext.line+QString("\r\n").toLatin1());
         break;
     }
 }
@@ -41,8 +54,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    if(!QCoreApplication::arguments().contains("dvp"))
-            qInstallMessageHandler(myMessageOutput);
+    //Permet de placer dans un fichier .log ce qui est affiché dans la console
+    qInstallMessageHandler(myMessageOutput);
 
     //Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ
     //Sinon, on prend l'url spécifiée plus tôt
