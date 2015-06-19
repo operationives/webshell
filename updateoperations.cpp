@@ -48,7 +48,7 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
         if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
-            myProcess->startDetached(QLatin1String("open"),QStringList() << filedirectory);
+            myProcess->start(QLatin1String("open"),QStringList() << filedirectory);
         }
         else{
             myProcess->start(program);
@@ -113,7 +113,7 @@ void UdpdateOperations::updateWebshell(QString url){
     connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
     if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
-        myProcess->startDetached(QLatin1String("open"),QStringList() << filedirectory);
+        myProcess->start(QLatin1String("open"),QStringList() << filedirectory);
     }
     else{
         myProcess->start(program);
