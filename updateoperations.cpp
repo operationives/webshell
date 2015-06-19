@@ -15,8 +15,7 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
         QString filename = *i;
         filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-        //filedirectory: choisir une direction moins publique pour l'installation
-        QString filedirectory = "C:/Users/phvdev64/Desktop/";
+        QString filedirectory = QString(QApplication::applicationDirPath()+"/");
         filedirectory.append(filename);
         QFile file(filedirectory);
 
@@ -27,18 +26,22 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         //Lancement du fichier téléchargé
         //Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
         QString program;
+        QString tmp = QString(filedirectory);
         if(filename.endsWith(".msi")){
-            program = "msiexec.exe /i \"C:\\Users\\phvdev64\\Desktop\\";
+            tmp.replace("/","\\");
+            program = "msiexec.exe /i \""+tmp+"\"";
         }
         else if(filename.endsWith(".exe")){
+            tmp.replace("/","\\");
+            program = "\""+tmp+"\"";
+        }
+        else if(filename.endsWith(".pkg")){
             program = "\"C:\\Users\\phvdev64\\Desktop\\";
         }
-        else{
+        else {
             //Remplacer par une callback
             qDebug() << "Extension de fichier non répertoriée";
         }
-        program.append(filename);
-        program.append("\"");
 
         //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
         QProcess *myProcess = new QProcess();
@@ -72,8 +75,7 @@ void UdpdateOperations::updateWebshell(QString url){
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
     QString filename = url;
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-    //filedirectory: choisir une direction moins publique pour l'installation
-    QString filedirectory = "C:/Users/phvdev64/Desktop/";
+    QString filedirectory = QString(QApplication::applicationDirPath()+"/");
     filedirectory.append(filename);
     QFile file(filedirectory);
 
@@ -84,31 +86,28 @@ void UdpdateOperations::updateWebshell(QString url){
     //Lancement du fichier téléchargé
     //Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
     QString program;
+    QString tmp = QString(filedirectory);
     if(filename.endsWith(".msi")){
-        program = "msiexec.exe /i \"C:\\Users\\phvdev64\\Desktop\\";
+        tmp.replace("/","\\");
+        program = "msiexec.exe /i \""+tmp+"\"";
     }
     else if(filename.endsWith(".exe")){
+        tmp.replace("/","\\");
+        program = "\""+tmp+"\"";
+    }
+    else if(filename.endsWith(".pkg")){
         program = "\"C:\\Users\\phvdev64\\Desktop\\";
     }
-    else{
+    else {
         //Remplacer par une callback
         qDebug() << "Extension de fichier non répertoriée";
     }
-    program.append(filename);
-    program.append("\"");
 
     //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
     QProcess *myProcess = new QProcess();
     connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
     myProcess->start(program);
-
-    //Test de lancement du processus
-//    if (myProcess->waitForStarted(1000) == false)
-//    qDebug() << "Error starting external program";
-
-//    else
-//    qDebug() << "external program running";
 
     ctrl->evaluateJavaScript(QString("maj_webshell()"));
 }

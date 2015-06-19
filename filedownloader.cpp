@@ -1,5 +1,4 @@
 #include "filedownloader.h"
-#include "updateoperations.h"
 #include "global.h"
 
 FileDownloader::FileDownloader(QUrl Url){

@@ -1,10 +1,9 @@
-#include <QString>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include "global.h"
 
-
+//A faire: gestion de la taille maximale du fichier .log
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)  {
     QFile file(QApplication::applicationDirPath()+"/"+qAppName()+".log");
     file.open(QIODevice::WriteOnly | QIODevice::Append);
