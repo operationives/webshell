@@ -35,8 +35,8 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
             tmp.replace("/","\\");
             program = "\""+tmp+"\"";
         }
-        else if(filename.endsWith(".pkg")){
-            program = "\"C:\\Users\\phvdev64\\Desktop\\";
+        else if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+            //Rien à faire
         }
         else {
             //Remplacer par une callback
@@ -47,7 +47,12 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         QProcess *myProcess = new QProcess();
         connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
-        myProcess->start(program);
+        if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+            myProcess->startDetached(QLatin1String("open"),QStringList() << filedirectory);
+        }
+        else{
+            myProcess->start(program);
+        }
 
         //Test de lancement du processus
 //        if (myProcess->waitForStarted(1000) == false)
@@ -95,8 +100,8 @@ void UdpdateOperations::updateWebshell(QString url){
         tmp.replace("/","\\");
         program = "\""+tmp+"\"";
     }
-    else if(filename.endsWith(".pkg")){
-        program = "\"C:\\Users\\phvdev64\\Desktop\\";
+    else if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+        //Rien à faire
     }
     else {
         //Remplacer par une callback
@@ -107,7 +112,12 @@ void UdpdateOperations::updateWebshell(QString url){
     QProcess *myProcess = new QProcess();
     connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
-    myProcess->start(program);
+    if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+        myProcess->startDetached(QLatin1String("open"),QStringList() << filedirectory);
+    }
+    else{
+        myProcess->start(program);
+    }
 
     ctrl->evaluateJavaScript(QString("maj_webshell()"));
 }
