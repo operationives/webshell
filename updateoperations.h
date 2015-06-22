@@ -22,6 +22,7 @@ private slots:
 
 private:
     FileDownloader *data;
+    void updateProcess(QString url, int i);
 };
 
 #endif // UPDATEOPERATIONS_H
