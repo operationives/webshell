@@ -48,7 +48,7 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
         connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
         if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
-            myProcess->start(QLatin1String("open"),QStringList() << filedirectory);
+            myProcess->start("open "+filedirectory);
         }
         else{
             myProcess->start(program);
