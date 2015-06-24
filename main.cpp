@@ -62,15 +62,5 @@ int main(int argc, char** argv) {
     //Affichage de la page de démarrage
     mw->show();
 
-//        QWidget fenetre;
-//        fenetre.setMinimumSize(1000,1000);
-//        QLabel *label = new QLabel(&fenetre);
-//        //label->setPixmap(mw.loadImage());
-
-//        QVBoxLayout layout;
-//        fenetre.setLayout(&layout);
-//        layout.addWidget(label);
-//        fenetre.show();
-
     return app.exec();
 }
