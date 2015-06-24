@@ -14,7 +14,6 @@ class UdpdateOperations : public QObject{
 public:
     Q_INVOKABLE void updatePlugin(QStringList urlList);
     Q_INVOKABLE void updateWebshell(QString url);
-    QEventLoop *loop;
 
 private slots:
     void loadUpdate();
@@ -23,6 +22,7 @@ private slots:
 private:
     FileDownloader *data;
     void updateProcess(QString url, int i);
+    QEventLoop *loop;
 };
 
 #endif // UPDATEOPERATIONS_H
