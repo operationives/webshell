@@ -1,6 +1,10 @@
 #include "updateoperations.h"
 #include "global.h"
 
+/**
+ * Télécharge et exécute les installeurs en paramètre
+ * @param urlList   Liste des liens de téléchargement pour des installeurs à exécuter
+ */
 void UdpdateOperations::updatePlugin(QStringList urlList){
 
     loop = new QEventLoop();
@@ -11,11 +15,20 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
     ctrl->evaluateJavaScript(QString("fin_install()"));
 }
 
+/**
+ * Télécharge et exécute l'installeur de la webshell
+ * @param url   Lien du téléchargement pour la webshell à jour
+ */
 void UdpdateOperations::updateWebshell(QString url){
     loop = new QEventLoop();
     updateProcess(url,-1);
 }
 
+/**
+ * Téléchargement et exécution d'un installeur
+ * @param url   Lien du téléchargement vers un installeur
+ * @param i     Si i==-1, la fonction est appelée par updateWebshell, sinon par updatePlugin
+ */
 void UdpdateOperations::updateProcess(QString url, int i){
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
@@ -77,12 +90,20 @@ void UdpdateOperations::updateProcess(QString url, int i){
     }
 }
 
+/**
+ * Fonction appelée lors de la fin d'un téléchargement libérant la boucle
+ */
 void UdpdateOperations::loadUpdate(){
     //Libère loop mis en place après le lancement du téléchargement
     loop->quit();
     qDebug() << "Données reçues" << data->downloadedData().size();
 }
 
+/**
+ * Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
+ * @param exitCode      Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
+ * @param exitStatus    Indique si le processus a crashé ou non
+ */
 void UdpdateOperations::finishInstall(int exitCode, QProcess::ExitStatus exitStatus){
     if(exitCode!=0 || exitStatus == QProcess::CrashExit){
         ctrl->evaluateJavaScript(QString("erreur()"));
