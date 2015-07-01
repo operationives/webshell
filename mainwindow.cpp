@@ -2,6 +2,10 @@
 #include "updateoperations.h"
 #include "global.h"
 
+/**
+ * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
+ * @param url   Url avec laquelle le service est initialisé
+ */
 MainWindow::MainWindow(const QUrl& url){
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -30,10 +34,17 @@ MainWindow::MainWindow(const QUrl& url){
     ctrl = new Controleur(this);
 }
 
+/**
+ * @brief MainWindow::~MainWindow Destructeur de MainWindow
+ */
 MainWindow::~MainWindow(){
     delete view;
 }
 
+/**
+ * @brief MainWindow::evaluateJavaScript Méthode d'appel JavaScript
+ * @param code  Code à évaluer avec evaluateJavaScript
+ */
 void MainWindow::evaluateJavaScript(QString code){
     view->page()->mainFrame()->evaluateJavaScript(code);
 }

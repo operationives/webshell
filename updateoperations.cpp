@@ -64,8 +64,7 @@ void UdpdateOperations::updateProcess(QString url, int i){
         //Rien à faire
     }
     else {
-        //Remplacer par une callback
-        qDebug() << "Extension de fichier non répertoriée";
+        ctrl->evaluateJavaScript(QString("file_error()"));
     }
 
     //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
