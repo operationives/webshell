@@ -1,11 +1,15 @@
-#include "updateoperations.h"
+#include "wnavigator.h"
 #include "global.h"
+
+WNavigator::WNavigator(){
+    //ctrl->evaluateJavaScript(QString("navigator.toto=wnavigator.toto;"));
+}
 
 /**
  * Télécharge et exécute les installeurs en paramètre
  * @param urlList   Liste des liens de téléchargement pour des installeurs à exécuter
  */
-void UdpdateOperations::updatePlugin(QStringList urlList){
+void WNavigator::updatePlugin(QStringList urlList){
 
     loop = new QEventLoop();
     for (QStringList::iterator i = urlList.begin(); i != urlList.end(); ++i){
@@ -19,7 +23,7 @@ void UdpdateOperations::updatePlugin(QStringList urlList){
  * Télécharge et exécute l'installeur de la webshell
  * @param url   Lien du téléchargement pour la webshell à jour
  */
-void UdpdateOperations::updateWebshell(QString url){
+void WNavigator::updateWebshell(QString url){
     loop = new QEventLoop();
     updateProcess(url,-1);
 }
@@ -29,7 +33,7 @@ void UdpdateOperations::updateWebshell(QString url){
  * @param url   Lien du téléchargement vers un installeur
  * @param i     Si i==-1, la fonction est appelée par updateWebshell, sinon par updatePlugin
  */
-void UdpdateOperations::updateProcess(QString url, int i){
+void WNavigator::updateProcess(QString url, int i){
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
     data = new FileDownloader(updateUrl);
@@ -92,7 +96,7 @@ void UdpdateOperations::updateProcess(QString url, int i){
 /**
  * Fonction appelée lors de la fin d'un téléchargement libérant la boucle
  */
-void UdpdateOperations::loadUpdate(){
+void WNavigator::loadUpdate(){
     //Libère loop mis en place après le lancement du téléchargement
     loop->quit();
     qDebug() << "Données reçues" << data->downloadedData().size();
@@ -103,7 +107,7 @@ void UdpdateOperations::loadUpdate(){
  * @param exitCode      Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus    Indique si le processus a crashé ou non
  */
-void UdpdateOperations::finishInstall(int exitCode, QProcess::ExitStatus exitStatus){
+void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus){
     if(exitCode!=0 || exitStatus == QProcess::CrashExit){
         ctrl->evaluateJavaScript(QString("erreur()"));
     }
@@ -112,4 +116,9 @@ void UdpdateOperations::finishInstall(int exitCode, QProcess::ExitStatus exitSta
     }
     //Libère loop mis en place après le lancement de l'installation
     loop->quit();
+}
+
+
+void WNavigator::toto(){
+    ctrl->evaluateJavaScript(QString("alert('toto');"));
 }

@@ -1,5 +1,5 @@
-#ifndef UPDATEOPERATIONS_H
-#define UPDATEOPERATIONS_H
+#ifndef WNAVIGATOR_H
+#define WNAVIGATOR_H
 
 #include <QWebFrame>
 #include <QProcess>
@@ -7,13 +7,15 @@
 #include <QtNetwork>
 #include "filedownloader.h"
 
-class UdpdateOperations : public QObject{
+class WNavigator : public QObject{
 
     Q_OBJECT
 
 public:
+    WNavigator();
     Q_INVOKABLE void updatePlugin(QStringList urlList);
     Q_INVOKABLE void updateWebshell(QString url);
+    Q_INVOKABLE void toto();
 
 private slots:
     void loadUpdate();
@@ -25,4 +27,4 @@ private:
     QEventLoop *loop;
 };
 
-#endif // UPDATEOPERATIONS_H
+#endif // WNAVIGATOR_H

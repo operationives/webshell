@@ -1,12 +1,19 @@
 QT += webkitwidgets core network
 HEADERS =   mainwindow.h \
 	    filedownloader.h \
-	    updateoperations.h \
+	    wnavigator.h \
 	    global.h \
-	    controleur.h
+	    controleur.h \
+	    parametres.h \
+	    mywebview.h
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
-	    updateoperations.cpp \
+	    wnavigator.cpp \
 	    global.cpp \
-	    controleur.cpp
+	    controleur.cpp \
+	    parametres.cpp \
+	    mywebview.cpp
+
+#DISTFILES += \
+#    parameters.qml
