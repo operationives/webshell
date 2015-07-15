@@ -7,6 +7,7 @@
 #include <QtNetwork>
 #include "parametres.h"
 #include "mywebview.h"
+#include "configmanager.h"
 
 class MainWindow : public QMainWindow{
 
@@ -22,11 +23,10 @@ private:
     QSystemTrayIcon *trayIcon;
     QWebInspector *i;
     Parametres *params;
+    ConfigManager *config;
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
 
-    //L'attribut sera à placer dans configManager
-    bool minimization;
     bool stayOpen;
 
 private slots:
