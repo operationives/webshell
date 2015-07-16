@@ -5,13 +5,17 @@
  * @brief FileDownloader::FileDownloader Constructeur permettant d'initialiser le téléchargement
  * @param Url Lien à télécharger
  */
-FileDownloader::FileDownloader(QUrl Url){
+FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, int id){
+    this->url = Url.toString();
+    this->id = id;
+    this->listener = listener;
     connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
     this, SLOT (fileDownloaded(QNetworkReply*)));
 
     QNetworkRequest request(Url);
     QNetworkReply *download = m_WebCtrl.get(request);
     connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
+    connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
 }
  
 /**
@@ -26,7 +30,13 @@ FileDownloader::~FileDownloader() { }
 void FileDownloader::fileDownloaded(QNetworkReply* pReply){
     m_DownloadedData = pReply->readAll();
     pReply->deleteLater();
+    listener->fileDownloaded(id);
     emit downloaded();
+}
+
+void FileDownloader::downloadFailure(QNetworkReply::NetworkError error){
+    if(error != QNetworkReply::NoError)
+        listener->downloadFailure(id);
 }
  
 /**
@@ -43,5 +53,13 @@ QByteArray FileDownloader::downloadedData() const{
  * @param bytesTotal Nombre d'octets au total
  */
 void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal){
-    ctrl->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
+    listener->downloadProgress(bytesReceived,bytesTotal,id);
+}
+
+int FileDownloader::getId(){
+    return id;
+}
+
+QString FileDownloader::getUrl(){
+    return url;
 }

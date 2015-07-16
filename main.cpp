@@ -3,7 +3,6 @@
 #include <iostream>
 #include "global.h"
 
-
 //A faire: gestion de la taille maximale du fichier .log
 /**
  * @brief myMessageOutput Gestion des sorties consoles à placer dans les logs

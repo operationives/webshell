@@ -1,4 +1,4 @@
-QT += webkitwidgets core network xml
+QT += webkitwidgets core network xml winextras
 HEADERS =   mainwindow.h \
 	    filedownloader.h \
 	    wnavigator.h \
@@ -6,7 +6,10 @@ HEADERS =   mainwindow.h \
 	    controleur.h \
 	    parametres.h \
 	    mywebview.h \
-	    configmanager.h
+	    configmanager.h \
+	    downloadprogresslistener.h \
+	    winaddon.h \
+    webapp.h
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
@@ -15,4 +18,6 @@ SOURCES =   main.cpp \
 	    controleur.cpp \
 	    parametres.cpp \
 	    mywebview.cpp \
-	    configmanager.cpp
+	    configmanager.cpp \
+	    winaddon.cpp \
+    webapp.cpp

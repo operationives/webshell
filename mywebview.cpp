@@ -1,18 +1,29 @@
+#include <QWebFrame>
 #include "mywebview.h"
 
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent){
-    this->baseUrl = "http://www.qt.io/";
+    wnavigator = new WNavigator(qobject_cast<QWebView *>(this));
+    wapp = new WebApp(qobject_cast<QWebView *>(this));
+    //On permet l'accès aux méthodes dans WNavigator par les appels javascript
+    this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
+
+    wapp->baseUrl->append(QUrl("http://www.qt.io/"));
+    connect(wapp,SIGNAL(ChangeIcon(QIcon)),this,SIGNAL(ChangeIcon(QIcon)));
 
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
 }
 
+MyWebView::~MyWebView(){
+    delete wnavigator;
+    delete wapp;
+}
 
 /**
  * @brief MyWebView::handleRedirect    Redirige l'url dans la webview ou dans le navigateur en fonction de sa valeur
  * @param url   Url chargée
  */
 void MyWebView::handleRedirect(QUrl url){
-    if(!url.url().startsWith(this->baseUrl) && url.url().compare("file:///"+QApplication::applicationDirPath()+"/"+"index.html")!=0){
+    if(!wapp->ispageInApplication() && url.url()!=QString("file:///"+QApplication::applicationDirPath()+"/"+"index.html")){
             this->page()->triggerAction(QWebPage::Back);
             QDesktopServices::openUrl(url);
     }

@@ -16,8 +16,7 @@ MainWindow::MainWindow(const QUrl& url){
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 
     view = new MyWebView(this);
-    //On permet l'accès aux méthodes dans WNavigator par les appels javascript
-    view->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", new WNavigator());
+    connect(view,SIGNAL(ChangeIcon(QIcon)),this,SLOT(ChangeIcon(QIcon)));
     view->load(url);
     //Il faudra voir quelle taille de fenêtre minimale est autorisée
 //    view->setMinimumSize(int width,int height);
@@ -34,16 +33,9 @@ MainWindow::MainWindow(const QUrl& url){
     connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
 
     //On définit les actions du menu de trayIcon
-    QAction *minimizeAction = new QAction("Minimize", this);
-    QAction *restoreAction = new QAction("Restore", this);
-    QAction *quitAction = new QAction("Exit", this);
-    //Méthodes à appeler lors du clic à définir
-//    connect (minimizeAction, SIGNAL(triggered()), this, SLOT(hide()));
-//    connect (restoreAction, SIGNAL(triggered()),this,SLOT(showMaximized()));
-//    connect (quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    QAction *quitAction = new QAction("Quitter", this);
+    connect (quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     QMenu *trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction (minimizeAction);
-    trayIconMenu->addAction (restoreAction);
     trayIconMenu->addAction (quitAction);
     QIcon icon(QApplication::applicationDirPath()+"/djanah.png");
     trayIcon = new QSystemTrayIcon(icon,this);
@@ -64,6 +56,10 @@ MainWindow::MainWindow(const QUrl& url){
 //    connect(params,SIGNAL(screenMode(bool)),this,SLOT(changeScreenMode(bool)));
     connect(params,SIGNAL(closeButtonMode(bool)),this,SLOT(changeCloseButtonMode(bool)));
     connect(params,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+
+    //On ajoute les suppléments windows
+    WinAddon *waddon = new WinAddon();
+    if(waddon->isWidgetType()){}
 
     //On crée le controleur accessible depuis toutes les classes permettant d'accéder à la méthode evaluatejavascript
     ctrl = new Controleur(this);
@@ -129,8 +125,7 @@ void MainWindow::showContextMenu(const QPoint &pos){
         changeScreenMode(false);
     }
     if (selectedItem->text().compare("Fermer",Qt::CaseSensitive) == 0){
-        stayOpen = false;
-        this->close();
+        this->quit();
     }
     if (selectedItem->text().compare("Test",Qt::CaseSensitive) == 0){
        //view->load(QUrl("https://www.google.fr"));
@@ -194,4 +189,17 @@ void MainWindow::closeEvent (QCloseEvent *event){
         delete this;
         event->accept();
     }
+}
+
+/**
+ * @brief MainWindow::quit Quitte l'application
+ */
+void MainWindow::quit (){
+    stayOpen = false;
+    this->close();
+}
+
+void MainWindow::ChangeIcon(QIcon icon)
+{
+    this->trayIcon->setIcon(icon);
 }

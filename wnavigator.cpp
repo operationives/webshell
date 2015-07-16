@@ -1,48 +1,43 @@
+#include <QWebFrame>
+#include <QProcess>
+#include <QApplication>
 #include "wnavigator.h"
-#include "global.h"
 
-WNavigator::WNavigator(){
-    //ctrl->evaluateJavaScript(QString("navigator.toto=wnavigator.toto;"));
+WNavigator::WNavigator(QWebView *view){
+    this->view = view;
 }
 
 /**
- * Télécharge et exécute les installeurs en paramètre
- * @param urlList   Liste des liens de téléchargement pour des installeurs à exécuter
+ * @brief WNavigator::updateSoftware Met à jour le webshell
+ * @param url   Lien de téléchargement
  */
-void WNavigator::updatePlugin(QStringList urlList){
-
-    loop = new QEventLoop();
-    for (QStringList::iterator i = urlList.begin(); i != urlList.end(); ++i){
-        updateProcess(*i,0);
-    }
-    //Callback spécifiant la fin de l'installation
-    ctrl->evaluateJavaScript(QString("fin_install()"));
-}
-
-/**
- * Télécharge et exécute l'installeur de la webshell
- * @param url   Lien du téléchargement pour la webshell à jour
- */
-void WNavigator::updateWebshell(QString url){
-    loop = new QEventLoop();
-    updateProcess(url,-1);
-}
-
-/**
- * Téléchargement et exécution d'un installeur
- * @param url   Lien du téléchargement vers un installeur
- * @param i     Si i==-1, la fonction est appelée par updateWebshell, sinon par updatePlugin
- */
-void WNavigator::updateProcess(QString url, int i){
+void WNavigator::updateSoftware(QString url){
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
-    data = new FileDownloader(updateUrl);
-    connect(data, SIGNAL (downloaded()), this, SLOT (loadUpdate()));
+    data = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),-1);
+}
 
-    loop->exec();
+/**
+ * @brief WNavigator::downloadProgress Indique à l'application l'avancement du téléchargement
+ * @param bytesReceived Nombre d'octets reçus
+ * @param bytesTotal    Nombre d'octets au total
+ * @param id            Identifiant du FileDownloader
+ */
+void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id){
+    if(id!=0){}
+    view->page()->mainFrame()->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
+}
+
+/**
+ * @brief WNavigator::fileDownloaded Stocke et exécute l'installeur téléchargé
+ * @param id    Identifiant du FileDownloader
+ */
+void WNavigator::fileDownloaded(int id){
+    if(id!=0){}
+    view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
 
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
-    QString filename = url;
+    QString filename = data->getUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
     QString filedirectory = QString(QApplication::applicationDirPath()+"/");
     filedirectory.append(filename);
@@ -68,7 +63,7 @@ void WNavigator::updateProcess(QString url, int i){
         //Rien à faire
     }
     else {
-        ctrl->evaluateJavaScript(QString("file_error()"));
+        view->page()->mainFrame()->evaluateJavaScript(QString("file_error()"));
     }
 
     //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
@@ -82,43 +77,29 @@ void WNavigator::updateProcess(QString url, int i){
         myProcess->start(program);
     }
 
-    //Cas de updateWebshell
-    if(i==-1){
-        ctrl->evaluateJavaScript(QString("maj_webshell()"));
-    }
-    //Cas de updatePlugin
-    else{
-        loop->exec();
-        QFile::remove(filedirectory);
-    }
+    view->page()->mainFrame()->evaluateJavaScript(QString("maj_webshell()"));
 }
 
 /**
- * Fonction appelée lors de la fin d'un téléchargement libérant la boucle
+ * @brief WNavigator::downloadFailure Signale l'application de l'échec du téléchargement
+ * @param id    Identifiant du FileDownloader
  */
-void WNavigator::loadUpdate(){
-    //Libère loop mis en place après le lancement du téléchargement
-    loop->quit();
-    qDebug() << "Données reçues" << data->downloadedData().size();
+void WNavigator::downloadFailure(int id){
+    if(id!=0){}
+    view->page()->mainFrame()->evaluateJavaScript(QString("download_fail()"));
+
 }
 
 /**
- * Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
+ * @brief WNavigator::finishInstall Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
  * @param exitCode      Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus    Indique si le processus a crashé ou non
  */
 void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus){
     if(exitCode!=0 || exitStatus == QProcess::CrashExit){
-        ctrl->evaluateJavaScript(QString("erreur()"));
+        view->page()->mainFrame()->evaluateJavaScript(QString("erreur()"));
     }
     else{
-        ctrl->evaluateJavaScript(QString("success()"));
+        view->page()->mainFrame()->evaluateJavaScript(QString("success()"));
     }
-    //Libère loop mis en place après le lancement de l'installation
-    loop->quit();
-}
-
-
-void WNavigator::toto(){
-    ctrl->evaluateJavaScript(QString("alert('toto');"));
 }

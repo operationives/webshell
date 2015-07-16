@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "parametres.h"
 
 /**
