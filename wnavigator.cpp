@@ -3,27 +3,30 @@
 #include <QApplication>
 #include "wnavigator.h"
 
-WNavigator::WNavigator(QWebView *view){
+WNavigator::WNavigator(QWebView *view)
+{
     this->view = view;
 }
 
 /**
- * @brief WNavigator::updateSoftware Met à jour le webshell
+ * @brief WNavigator::UpdateSoftware Met à jour le webshell
  * @param url   Lien de téléchargement
  */
-void WNavigator::updateSoftware(QString url){
+void WNavigator::UpdateSoftware(QString url)
+{
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
     data = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
- * @brief WNavigator::downloadProgress Indique à l'application l'avancement du téléchargement
+ * @brief WNavigator::DownloadProgress Indique à l'application l'avancement du téléchargement
  * @param bytesReceived Nombre d'octets reçus
  * @param bytesTotal    Nombre d'octets au total
  * @param id            Identifiant du FileDownloader
  */
-void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type){
+void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+{
     if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
 }
@@ -32,34 +35,38 @@ void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QStri
  * @brief WNavigator::fileDownloaded Stocke et exécute l'installeur téléchargé
  * @param id    Identifiant du FileDownloader
  */
-void WNavigator::fileDownloaded(QString mime_type){
+void WNavigator::FileDownloaded(QString mime_type)
+{
     if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
 
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
-    QString filename = data->getUrl();
+    QString filename = data->GetUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
     QString filedirectory = QString(QApplication::applicationDirPath()+"/");
     filedirectory.append(filename);
     QFile file(filedirectory);
 
     file.open(QIODevice::WriteOnly);
-    file.write(data->downloadedData());
+    file.write(data->DownloadedData());
     file.close();
 
     //Lancement du fichier téléchargé
     //Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
     QString program;
     QString tmp = QString(filedirectory);
-    if(filename.endsWith(".msi")){
+    if(filename.endsWith(".msi"))
+    {
         tmp.replace("/","\\");
         program = "msiexec.exe /i \""+tmp+"\"";
     }
-    else if(filename.endsWith(".exe")){
+    else if(filename.endsWith(".exe"))
+    {
         tmp.replace("/","\\");
         program = "\""+tmp+"\"";
     }
-    else if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+    else if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
+    {
         //Rien à faire
     }
     else {
@@ -70,7 +77,8 @@ void WNavigator::fileDownloaded(QString mime_type){
     QProcess *myProcess = new QProcess();
     connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
 
-    if(filename.endsWith(".pkg") || filename.endsWith(".dmg")){
+    if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
+    {
         myProcess->start("open "+filedirectory);
     }
     else{
@@ -81,10 +89,11 @@ void WNavigator::fileDownloaded(QString mime_type){
 }
 
 /**
- * @brief WNavigator::downloadFailure Signale l'application de l'échec du téléchargement
+ * @brief WNavigator::DownloadFailure Signale l'application de l'échec du téléchargement
  * @param id    Identifiant du FileDownloader
  */
-void WNavigator::downloadFailure(QString mime_type){
+void WNavigator::DownloadFailure(QString mime_type)
+{
     if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("download_fail()"));
 
@@ -95,8 +104,10 @@ void WNavigator::downloadFailure(QString mime_type){
  * @param exitCode      Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus    Indique si le processus a crashé ou non
  */
-void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus){
-    if(exitCode!=0 || exitStatus == QProcess::CrashExit){
+void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitCode!=0 || exitStatus == QProcess::CrashExit)
+    {
         view->page()->mainFrame()->evaluateJavaScript(QString("erreur()"));
     }
     else{

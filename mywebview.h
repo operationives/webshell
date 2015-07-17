@@ -17,7 +17,7 @@ public:
     ~MyWebView();
 
 signals:
-    void ChangeIcon(QIcon icon);
+    void changeIcon(QIcon icon);
 
 private:
     WNavigator *wnavigator;

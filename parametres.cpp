@@ -7,7 +7,8 @@
  * @param toolsactivated    Vrai si les outils développeur sont activés
  * @param parent            Widget parent
  */
-Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent) : QDialog(parent){
+Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent) : QDialog(parent)
+{
 
     //On enlève le bouton "?" inutile
     this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -22,7 +23,7 @@ Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent) 
     tabWidget->addTab(closeOption, tr("Fermeture"));
     tabWidget->addTab(tools, tr("Outils"));
 
-//    connect(screen,SIGNAL(optionClicked(bool)),this,SIGNAL(screenMode(bool)));
+//    connect(screen,SIGNAL(OptionClicked(bool)),this,SIGNAL(screenMode(bool)));
     connect(closeOption,SIGNAL(optionClicked(bool)),this,SIGNAL(closeButtonMode(bool)));
     connect(tools,SIGNAL(optionClicked(bool)),this,SIGNAL(toolsMode(bool)));
 
@@ -78,13 +79,15 @@ Tab::Tab(QString title, QString button1Text, QString button2Text, bool buttonChe
 /**
  * @brief Tab::option1Clicked   Indique que l'option 1 est choisie
  */
-void Tab::option1Clicked(){
+void Tab::option1Clicked()
+{
     emit optionClicked(true);
 }
 
 /**
  * @brief Tab::option2Clicked   Indique que l'option 2 est choisie
  */
-void Tab::option2Clicked(){
+void Tab::option2Clicked()
+{
     emit optionClicked(false);
 }

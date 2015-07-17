@@ -10,14 +10,14 @@
 #include "configmanager.h"
 #include "winaddon.h"
 
-class MainWindow : public QMainWindow{
+class MainWindow : public QMainWindow
+{
 
     Q_OBJECT
 
 public:
     MainWindow(const QUrl& url);
     ~MainWindow();
-    void evaluateJavaScript(QString code);
 
 private:
     MyWebView *view;
@@ -35,8 +35,8 @@ private slots:
     void changeCloseButtonMode(bool minimization);
     void changeToolsMode(bool toolsActivated);
     void quit();
-    void Params ();
-    void ChangeIcon(QIcon icon);
+    void paramsWindow();
+    void changeIcon(QIcon icon);
 };
 
 #endif

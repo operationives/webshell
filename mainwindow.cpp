@@ -5,7 +5,8 @@
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
  * @param url   Url avec laquelle le service est initialisé
  */
-MainWindow::MainWindow(const QUrl& url){
+MainWindow::MainWindow(const QUrl& url)
+{
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
     //Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
@@ -15,7 +16,7 @@ MainWindow::MainWindow(const QUrl& url){
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 
     view = new MyWebView(this);
-    connect(view,SIGNAL(ChangeIcon(QIcon)),this,SLOT(ChangeIcon(QIcon)));
+    connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
     view->load(url);
     //Il faudra voir quelle taille de fenêtre minimale est autorisée
 //    view->setMinimumSize(int width,int height);
@@ -47,10 +48,10 @@ MainWindow::MainWindow(const QUrl& url){
 
     stayOpen = true;
     config = new ConfigManager();
-    params = new Parametres(config->getCloseButtonBehaviour(),config->getDeveloperToolsMode());
-    if(config->getScreenMode())
+    params = new Parametres(config->GetCloseButtonBehaviour(),config->GetDeveloperToolsMode());
+    if(config->GetScreenMode())
         this->showFullScreen();
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->getDeveloperToolsMode());
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
 //    connect(params,SIGNAL(screenMode(bool)),this,SLOT(changeScreenMode(bool)));
     connect(params,SIGNAL(closeButtonMode(bool)),this,SLOT(changeCloseButtonMode(bool)));
@@ -63,7 +64,7 @@ MainWindow::MainWindow(const QUrl& url){
     //Ajout du menu dans la barre de titre
     QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
     QAction* paramsAction = new QAction("Paramètres", this);
-    connect(paramsAction, SIGNAL(triggered()),this, SLOT(Params()));
+    connect(paramsAction, SIGNAL(triggered()),this, SLOT(paramsWindow()));
     fileMenu->addAction(paramsAction);
     fileMenu->addAction(quitAction);
 }
@@ -71,7 +72,8 @@ MainWindow::MainWindow(const QUrl& url){
 /**
  * @brief MainWindow::~MainWindow Destructeur de MainWindow
  */
-MainWindow::~MainWindow(){
+MainWindow::~MainWindow()
+{
     delete view;
     delete trayIcon;
     delete i;
@@ -79,25 +81,20 @@ MainWindow::~MainWindow(){
 }
 
 /**
- * @brief MainWindow::evaluateJavaScript Méthode d'appel JavaScript
- * @param code  Code à évaluer avec evaluateJavaScript
- */
-void MainWindow::evaluateJavaScript(QString code){
-    view->page()->mainFrame()->evaluateJavaScript(code);
-}
-
-/**
  * @brief MainWindow::showContextMenu Affichage du menu lors d'un clic droit sur la fenêtre principale
  * @param pos   Position du pointeur lors du clic
  */
-void MainWindow::showContextMenu(const QPoint &pos){
+void MainWindow::showContextMenu(const QPoint &pos)
+{
 
     QMenu myMenu;
     myMenu.addAction("Paramètres");
-    if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled)){
+    if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
+    {
         myMenu.addAction("Inspect");
     }
-    if(!this->isFullScreen()){
+    if(!this->isFullScreen())
+    {
         myMenu.addAction("Plein écran");
     }
     else{
@@ -112,25 +109,31 @@ void MainWindow::showContextMenu(const QPoint &pos){
     if(selectedItem == NULL)
         return;
 
-    if (selectedItem->text().compare("Paramètres",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Paramètres",Qt::CaseSensitive) == 0)
+    {
         params->show();
     }
 
-    if (selectedItem->text().compare("Inspect",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Inspect",Qt::CaseSensitive) == 0)
+    {
         i->show();
     }
 
-    if (selectedItem->text().compare("Plein écran",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Plein écran",Qt::CaseSensitive) == 0)
+    {
         changeScreenMode(true);
     }
 
-    if (selectedItem->text().compare("Fenêtré",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Fenêtré",Qt::CaseSensitive) == 0)
+    {
         changeScreenMode(false);
     }
-    if (selectedItem->text().compare("Fermer",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Fermer",Qt::CaseSensitive) == 0)
+    {
         this->quit();
     }
-    if (selectedItem->text().compare("Test",Qt::CaseSensitive) == 0){
+    if (selectedItem->text().compare("Test",Qt::CaseSensitive) == 0)
+    {
        //view->load(QUrl("https://www.google.fr"));
     }
 }
@@ -139,38 +142,43 @@ void MainWindow::showContextMenu(const QPoint &pos){
  * @brief MainWindow::changeScreenMode  Change l'affichage de la fenêtre
  * @param fullscreen    Vrai si mode plein écran, mode fenêtré sinon
  */
-void MainWindow::changeScreenMode(bool fullscreen){
-    if(fullscreen){
+void MainWindow::changeScreenMode(bool fullscreen)
+{
+    if(fullscreen)
+    {
         this->showFullScreen();
     }
     else{
         this->showNormal();
     }
-    config->setScreenMode(fullscreen);
+    config->SetScreenMode(fullscreen);
 }
 
 /**
  * @brief MainWindow::changeCloseButtonMode Change l'effet du bouton de fermeture
  * @param minimization  Vrai si le bouton est associé à la minimisation, association à la fermeture sinon
  */
-void MainWindow::changeCloseButtonMode(bool minimization){
-        config->setCloseButtonBehaviour(minimization);
+void MainWindow::changeCloseButtonMode(bool minimization)
+{
+        config->SetCloseButtonBehaviour(minimization);
 }
 
 /**
  * @brief MainWindow::changeToolsMode   Change l'accès aux outils développeur
  * @param toolsActivated    Vrai si les outils sont activés, désactivés sinon
  */
-void MainWindow::changeToolsMode(bool toolsActivated){
+void MainWindow::changeToolsMode(bool toolsActivated)
+{
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, toolsActivated);
-    config->setDeveloperToolsMode(toolsActivated);
+    config->SetDeveloperToolsMode(toolsActivated);
 }
 
 /**
  * @brief MainWindow::keyPressEvent Si la touche tapée est ESC, on quitte le mode plein écran, sinon on traite l'événement normalement
  * @param event Evénement de touche tapée
  */
-void MainWindow::keyPressEvent(QKeyEvent *event){
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
     if (event->key() == Qt::Key_Escape){
         if(this->isFullScreen())
             this->changeScreenMode(false);
@@ -184,8 +192,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
  * @brief MainWindow::closeEvent    Indique si la fenêtre doit être femrée ou minimisée
  * @param event Evénement de fermeture
  */
-void MainWindow::closeEvent (QCloseEvent *event){
-    if (config->getCloseButtonBehaviour() && stayOpen) {
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    if (config->GetCloseButtonBehaviour() && stayOpen) {
         event->ignore();
         this->setWindowState(Qt::WindowMinimized);
     } else {
@@ -197,19 +206,21 @@ void MainWindow::closeEvent (QCloseEvent *event){
 /**
  * @brief MainWindow::quit Quitte l'application
  */
-void MainWindow::Params (){
+void MainWindow::paramsWindow()
+{
     params->show();
 }
 
 /**
  * @brief MainWindow::quit Quitte l'application
  */
-void MainWindow::quit (){
+void MainWindow::quit ()
+{
     stayOpen = false;
     this->close();
 }
 
-void MainWindow::ChangeIcon(QIcon icon)
+void MainWindow::changeIcon(QIcon icon)
 {
     this->trayIcon->setIcon(icon);
 }

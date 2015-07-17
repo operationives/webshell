@@ -11,7 +11,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent){
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 
     wapp->baseUrl->append(QUrl("http://www.qt.io/"));
-    connect(wapp,SIGNAL(ChangeIcon(QIcon)),this,SIGNAL(ChangeIcon(QIcon)));
+    connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
 }
@@ -27,7 +27,7 @@ MyWebView::~MyWebView(){
  * @param url   Url chargée
  */
 void MyWebView::handleRedirect(QUrl url){
-    if(!wapp->ispageInApplication() && url.url()!=QString("file:///"+QApplication::applicationDirPath()+"/"+"index.html")){
+    if(!wapp->IsPageInApplication() && url.url()!=QString("file:///"+QApplication::applicationDirPath()+"/"+"index.html")){
             this->page()->triggerAction(QWebPage::Back);
             QDesktopServices::openUrl(url);
     }

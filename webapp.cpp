@@ -15,14 +15,14 @@ WebApp::~WebApp()
     delete baseUrl;
 }
 
-void WebApp::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
 
 }
 
-void WebApp::fileDownloaded(QString mime_type)
+void WebApp::FileDownloaded(QString mime_type)
 {
-    QString filename = data->getUrl();
+    QString filename = data->GetUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
     QString filedirectory = QString(QApplication::applicationDirPath()+"/");
     filedirectory.append(filename);
@@ -31,21 +31,21 @@ void WebApp::fileDownloaded(QString mime_type)
     qDebug() << filedirectory;
 
     file.open(QIODevice::WriteOnly);
-    file.write(data->downloadedData());
+    file.write(data->DownloadedData());
     file.close();
     //delete data;
 
     QIcon icon(filedirectory);
 
-    emit ChangeIcon(icon);
+    emit changeIcon(icon);
 }
 
-void WebApp::downloadFailure(QString mime_type)
+void WebApp::DownloadFailure(QString mime_type)
 {
 
 }
 
-QString WebApp::icon() const
+QString WebApp::Icon() const
 {
     return m_icon;
 }
@@ -54,13 +54,13 @@ QString WebApp::icon() const
  * @brief WebApp::setIcon   Change la propriété icon et modifie l'icône de la barre de notification
  * @param icon  Url de l'icône de l'application
  */
-void WebApp::setIcon(const QString &icon)
+void WebApp::SetIcon(const QString &icon)
 {
     m_icon = icon;
     data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
 }
 
-bool WebApp::ispageInApplication()
+bool WebApp::IsPageInApplication()
 {
     QString urls = view->url().toString();
     QList<QUrl>::iterator i;
@@ -76,7 +76,7 @@ bool WebApp::ispageInApplication()
     return res;
 }
 
-bool WebApp::ispageInApplication(QUrl url)
+bool WebApp::IsPageInApplication(QUrl url)
 {
     QString urls = url.toString();
     QList<QUrl>::iterator i;

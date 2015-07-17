@@ -7,7 +7,8 @@
 #include <QCoreApplication>
 #include <QDir>
 
-class WinAddon : public QObject{
+class WinAddon : public QObject
+{
 
     Q_OBJECT
 

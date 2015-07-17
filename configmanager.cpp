@@ -35,11 +35,11 @@ ConfigManager::~ConfigManager(){
 }
 
 /**
- * @brief Xml_Dom::changeParameter Affecte la valeur value au paramètre parameter dans les attributs et le fichier xml
+ * @brief Xml_Dom::ChangeParameter Affecte la valeur value au paramètre parameter dans les attributs et le fichier xml
  * @param parameter Type de paramètre à changer. Valuers possibles: "fullscreen","minimization","developerToolsActivated"
  * @param value     Valeur à affecter au paramètre
  */
-void ConfigManager::changeParameter(QString parameter, bool value){
+void ConfigManager::ChangeParameter(QString parameter, bool value){
 
     if(parameter == "fullscreen")
         fullscreen = value;
@@ -102,49 +102,49 @@ void ConfigManager::changeParameter(QString parameter, bool value){
 }
 
 /**
- * @brief ConfigManager::getScreenMode Indique si l'utilisateur doit être en plein écran ou non
+ * @brief ConfigManager::Getscreenmode Indique si l'utilisateur doit être en plein écran ou non
  * @return fullscreen
  */
-bool ConfigManager::getScreenMode(){
+bool ConfigManager::GetScreenMode(){
     return fullscreen;
 }
 
 /**
- * @brief ConfigManager::getCloseButtonBehaviour Indique le comportement du bouton de fermeture
+ * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
  * @return minimization
  */
-bool ConfigManager::getCloseButtonBehaviour(){
+bool ConfigManager::GetCloseButtonBehaviour(){
     return minimization;
 }
 
 /**
- * @brief ConfigManager::getDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
+ * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
  * @return developerToolsActivated
  */
-bool ConfigManager::getDeveloperToolsMode(){
+bool ConfigManager::GetDeveloperToolsMode(){
     return developerToolsActivated;
 }
 
 /**
- * @brief ConfigManager::setScreenMode Met à jour le paramètre "fullscreen"
+ * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
  * @param fullscreen    Nouvelle valeur de this.fullscreen
  */
-void ConfigManager::setScreenMode(bool fullscreen){
-    changeParameter("fullscreen",fullscreen);
+void ConfigManager::SetScreenMode(bool fullscreen){
+    ChangeParameter("fullscreen",fullscreen);
 }
 
 /**
- * @brief ConfigManager::setCloseButtonBehaviour Met à jour le paramètre "minimization"
+ * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
  * @param minimization  Nouvelle valeur de this.minimization
  */
-void ConfigManager::setCloseButtonBehaviour(bool minimization){
-    changeParameter("minimization",minimization);
+void ConfigManager::SetCloseButtonBehaviour(bool minimization){
+    ChangeParameter("minimization",minimization);
 }
 
 /**
- * @brief ConfigManager::setDeveloperToolsMode Met à jour le paramètre "developerToolsActivated"
+ * @brief ConfigManager::SetDeveloperToolsMode Met à jour le paramètre "developerToolsActivated"
  * @param developerToolsActivated Nouvelle valeur de this.developerToolsActivated
  */
-void ConfigManager::setDeveloperToolsMode(bool developerToolsActivated){
-    changeParameter("developerToolsActivated",developerToolsActivated);
+void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated){
+    ChangeParameter("developerToolsActivated",developerToolsActivated);
 }

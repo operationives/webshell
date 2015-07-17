@@ -8,14 +8,15 @@
 #include <QNetworkReply>
 #include "downloadprogresslistener.h"
  
-class FileDownloader : public QObject{
+class FileDownloader : public QObject
+{
     Q_OBJECT
 public:
     explicit FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type);
     virtual ~FileDownloader();
-    QByteArray downloadedData() const;
-    QString getMimeType();
-    QString getUrl();
+    QByteArray DownloadedData() const;
+    QString GetMimeType();
+    QString GetUrl();
  
 private slots:
     void fileDownloaded(QNetworkReply* pReply);
