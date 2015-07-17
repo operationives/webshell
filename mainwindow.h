@@ -35,6 +35,7 @@ private slots:
     void changeCloseButtonMode(bool minimization);
     void changeToolsMode(bool toolsActivated);
     void quit();
+    void Params ();
     void ChangeIcon(QIcon icon);
 };
 

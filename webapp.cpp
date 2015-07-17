@@ -7,7 +7,7 @@ WebApp::WebApp(QWebView *view)
 {
     this->view = view;
     baseUrl = new QList<QUrl>();
-    this->setIcon(QUrl("http://i.stack.imgur.com/ILTQq.png"));
+    //this->setProperty("icon","http://i.stack.imgur.com/ILTQq.png");
 }
 
 WebApp::~WebApp()
@@ -33,6 +33,7 @@ void WebApp::fileDownloaded(int id)
     file.open(QIODevice::WriteOnly);
     file.write(data->downloadedData());
     file.close();
+    //delete data;
 
     QIcon icon(filedirectory);
 
@@ -44,29 +45,30 @@ void WebApp::downloadFailure(int id)
 
 }
 
+QString WebApp::icon() const
+{
+    return m_icon;
+}
+
 /**
  * @brief WebApp::setIcon   Change la propriété icon et modifie l'icône de la barre de notification
  * @param icon  Url de l'icône de l'application
  */
-void WebApp::setIcon(QUrl icon)
+void WebApp::setIcon(const QString &icon)
 {
-    this->icon = icon;
-    data = new FileDownloader(icon,qobject_cast<DownloadProgressListener *>(this),-1);
+    m_icon = icon;
+    data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),-1);
 }
-
-QUrl WebApp::getIcon()
-{
-    return icon;
-}
-
 
 bool WebApp::ispageInApplication()
 {
     QString urls = view->url().toString();
     QList<QUrl>::iterator i;
     bool res = false;
-    for (i = baseUrl->begin(); i != baseUrl->end(); ++i){
-        if(urls.startsWith((*i).toString())){
+    for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+    {
+        if(urls.startsWith((*i).toString()))
+        {
             res = true;
             break;
         }
@@ -79,8 +81,10 @@ bool WebApp::ispageInApplication(QUrl url)
     QString urls = url.toString();
     QList<QUrl>::iterator i;
     bool res = false;
-    for (i = baseUrl->begin(); i != baseUrl->end(); ++i){
-        if(urls.startsWith((*i).toString())){
+    for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+    {
+        if(urls.startsWith((*i).toString()))
+        {
             res = true;
             break;
         }

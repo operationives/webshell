@@ -4,6 +4,7 @@
 #include <QWebView>
 #include <QtWidgets>
 #include "wnavigator.h"
+#include "wnavigatorplugins.h"
 #include "webapp.h"
 
 class MyWebView : public QWebView
@@ -20,6 +21,7 @@ signals:
 
 private:
     WNavigator *wnavigator;
+    WNavigatorPlugins *wnavigatorplugins;
     WebApp *wapp;
 
 private slots:

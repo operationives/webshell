@@ -9,10 +9,9 @@ class WebApp : public QObject, public DownloadProgressListener{
 
     Q_OBJECT
     Q_INTERFACES(DownloadProgressListener)
-    Q_PROPERTY(QUrl icon READ getIcon WRITE setIcon)
+    Q_PROPERTY(QString icon READ icon WRITE setIcon)
 
 public:
-    QUrl icon;
     QList<QUrl> *baseUrl;
     WebApp(QWebView *view);
     ~WebApp();
@@ -27,10 +26,11 @@ signals:
     void ChangeIcon(QIcon icon);
 
 private:
+    QString m_icon;
     QWebView *view;
     FileDownloader *data;
-    void setIcon(QUrl icon);
-    QUrl getIcon();
+    QString icon() const;
+    void setIcon(const QString &icon);
 };
 
 #endif // WEBAPP_H

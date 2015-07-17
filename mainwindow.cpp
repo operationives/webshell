@@ -61,8 +61,12 @@ MainWindow::MainWindow(const QUrl& url){
     WinAddon *waddon = new WinAddon();
     if(waddon->isWidgetType()){}
 
-    //On crée le controleur accessible depuis toutes les classes permettant d'accéder à la méthode evaluatejavascript
-    ctrl = new Controleur(this);
+    //Ajout du menu dans la barre de titre
+    QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
+    QAction* paramsAction = new QAction("Paramètres", this);
+    connect(paramsAction, SIGNAL(triggered()),this, SLOT(Params()));
+    fileMenu->addAction(paramsAction);
+    fileMenu->addAction(quitAction);
 }
 
 /**
@@ -189,6 +193,13 @@ void MainWindow::closeEvent (QCloseEvent *event){
         delete this;
         event->accept();
     }
+}
+
+/**
+ * @brief MainWindow::quit Quitte l'application
+ */
+void MainWindow::Params (){
+    params->show();
 }
 
 /**
