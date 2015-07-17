@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include "global.h"
+#include "mainwindow.h"
 
 //A faire: gestion de la taille maximale du fichier .log
 /**

@@ -1,5 +1,4 @@
 #include "filedownloader.h"
-#include "global.h"
 
 /**
  * @brief FileDownloader::FileDownloader Constructeur permettant d'initialiser le téléchargement

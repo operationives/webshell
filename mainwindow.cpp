@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "wnavigator.h"
-#include "global.h"
 
 /**
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
