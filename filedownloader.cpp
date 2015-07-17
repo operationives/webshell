@@ -4,9 +4,9 @@
  * @brief FileDownloader::FileDownloader Constructeur permettant d'initialiser le téléchargement
  * @param Url Lien à télécharger
  */
-FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, int id){
+FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type){
     this->url = Url.toString();
-    this->id = id;
+    this->mime_type = mime_type;
     this->listener = listener;
     connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
     this, SLOT (fileDownloaded(QNetworkReply*)));
@@ -29,13 +29,12 @@ FileDownloader::~FileDownloader() { }
 void FileDownloader::fileDownloaded(QNetworkReply* pReply){
     m_DownloadedData = pReply->readAll();
     pReply->deleteLater();
-    listener->fileDownloaded(id);
-    emit downloaded();
+    listener->fileDownloaded(mime_type);
 }
 
 void FileDownloader::downloadFailure(QNetworkReply::NetworkError error){
     if(error != QNetworkReply::NoError)
-        listener->downloadFailure(id);
+        listener->downloadFailure(mime_type);
 }
  
 /**
@@ -52,11 +51,11 @@ QByteArray FileDownloader::downloadedData() const{
  * @param bytesTotal Nombre d'octets au total
  */
 void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal){
-    listener->downloadProgress(bytesReceived,bytesTotal,id);
+    listener->downloadProgress(bytesReceived,bytesTotal,mime_type);
 }
 
-int FileDownloader::getId(){
-    return id;
+QString FileDownloader::getMimeType(){
+    return mime_type;
 }
 
 QString FileDownloader::getUrl(){

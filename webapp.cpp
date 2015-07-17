@@ -15,12 +15,12 @@ WebApp::~WebApp()
     delete baseUrl;
 }
 
-void WebApp::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id)
+void WebApp::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
 
 }
 
-void WebApp::fileDownloaded(int id)
+void WebApp::fileDownloaded(QString mime_type)
 {
     QString filename = data->getUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -40,7 +40,7 @@ void WebApp::fileDownloaded(int id)
     emit ChangeIcon(icon);
 }
 
-void WebApp::downloadFailure(int id)
+void WebApp::downloadFailure(QString mime_type)
 {
 
 }
@@ -57,7 +57,7 @@ QString WebApp::icon() const
 void WebApp::setIcon(const QString &icon)
 {
     m_icon = icon;
-    data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),-1);
+    data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 bool WebApp::ispageInApplication()

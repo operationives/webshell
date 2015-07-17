@@ -18,9 +18,9 @@ public:
     bool ispageInApplication();
     bool ispageInApplication(QUrl url);
 
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id);
-    void fileDownloaded(int id);
-    void downloadFailure(int id);
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
+    void fileDownloaded(QString mime_type);
+    void downloadFailure(QString mime_type);
 
 signals:
     void ChangeIcon(QIcon icon);

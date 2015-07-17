@@ -14,9 +14,9 @@ public:
     WNavigator(QWebView *view);
     Q_INVOKABLE void updateSoftware(QString url);
 
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id);
-    void fileDownloaded(int id);
-    void downloadFailure(int id);
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
+    void fileDownloaded(QString mime_type);
+    void downloadFailure(QString mime_type);
 
 private slots:
     void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);

@@ -7,6 +7,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent){
     wnavigatorplugins = new WNavigatorPlugins(qobject_cast<QWebView *>(this));
     //On permet l'accès aux méthodes dans WNavigator par les appels javascript
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
+    this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigatorplugins", wnavigatorplugins);
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 
     wapp->baseUrl->append(QUrl("http://www.qt.io/"));

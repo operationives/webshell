@@ -12,19 +12,19 @@ class WNavigatorPlugins : public QObject, public DownloadProgressListener{
 
 public:
     WNavigatorPlugins(QWebView *view);
-    Q_INVOKABLE void updateSoftware(QString url);
+    Q_INVOKABLE void updateSoftware(QString url, QString mime_type);
 
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id);
-    void fileDownloaded(int id);
-    void downloadFailure(int id);
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
+    void fileDownloaded(QString mime_type);
+    void downloadFailure(QString mime_type);
 
-private slots:
+public slots:
     void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
     QWebView *view;
-    FileDownloader *data;
-    static int cpt;
+    QHash<QString, FileDownloader *> hash;
+    QSemaphore *sem;
 };
 
 #endif // WNAVIGATORPLUGINS_H

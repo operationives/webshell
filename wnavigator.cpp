@@ -14,7 +14,7 @@ WNavigator::WNavigator(QWebView *view){
 void WNavigator::updateSoftware(QString url){
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
-    data = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),-1);
+    data = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
@@ -23,8 +23,8 @@ void WNavigator::updateSoftware(QString url){
  * @param bytesTotal    Nombre d'octets au total
  * @param id            Identifiant du FileDownloader
  */
-void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int id){
-    if(id!=0){}
+void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type){
+    if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
 }
 
@@ -32,8 +32,8 @@ void WNavigator::downloadProgress(qint64 bytesReceived, qint64 bytesTotal, int i
  * @brief WNavigator::fileDownloaded Stocke et exécute l'installeur téléchargé
  * @param id    Identifiant du FileDownloader
  */
-void WNavigator::fileDownloaded(int id){
-    if(id!=0){}
+void WNavigator::fileDownloaded(QString mime_type){
+    if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
 
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
@@ -84,8 +84,8 @@ void WNavigator::fileDownloaded(int id){
  * @brief WNavigator::downloadFailure Signale l'application de l'échec du téléchargement
  * @param id    Identifiant du FileDownloader
  */
-void WNavigator::downloadFailure(int id){
-    if(id!=0){}
+void WNavigator::downloadFailure(QString mime_type){
+    if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("download_fail()"));
 
 }
