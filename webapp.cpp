@@ -18,7 +18,6 @@ WebApp::WebApp(QWebView *view)
 WebApp::~WebApp()
 {
     delete baseUrl;
-    this->~QObject();
 }
 
 /**

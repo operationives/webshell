@@ -29,7 +29,6 @@ MyWebView::~MyWebView()
     delete wnavigator;
     delete wapp;
     delete wnavigatorplugins;
-    this->~QObject();
 }
 
 /**

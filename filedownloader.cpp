@@ -23,7 +23,6 @@ FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, QSt
  */
 FileDownloader::~FileDownloader()
 {
-    this->~QObject();
 }
  
 /**

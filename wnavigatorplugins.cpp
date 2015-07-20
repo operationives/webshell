@@ -18,7 +18,6 @@ WNavigatorPlugins::WNavigatorPlugins(QWebView *view)
 WNavigatorPlugins::~WNavigatorPlugins()
 {
     delete sem;
-    this->~QObject();
 }
 
 /**
@@ -52,9 +51,7 @@ void WNavigatorPlugins::FileDownloaded(QString mime_type)
 {
     view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
 
-    qDebug() << "acquire";
     sem->Acquire();
-    qDebug() << "acquis";
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
     QString filename = hash.value(mime_type)->GetUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -132,7 +129,6 @@ void WNavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitSta
         view->page()->mainFrame()->evaluateJavaScript(QString("success()"));
     }
 
-    qDebug() << "release";
     sem->Release();
 }
 

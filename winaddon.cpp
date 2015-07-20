@@ -23,5 +23,4 @@ WinAddon::~WinAddon()
 {
     delete jumplist;
     delete quitItem;
-    this->~QObject();
 }

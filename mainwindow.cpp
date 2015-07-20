@@ -78,7 +78,6 @@ MainWindow::~MainWindow()
     delete trayIcon;
     delete i;
     delete params;
-    this->~QObject();
 }
 
 /**

@@ -1,5 +1,4 @@
 #include "semaphore.h"
-#include <QDebug>
 
 /**
  * @brief Semaphore::Semaphore Création du sémaphore
@@ -23,7 +22,6 @@ Semaphore::~Semaphore()
 {
     delete mutex;
     delete stack;
-    this->~QObject();
 }
 
 /**
@@ -40,15 +38,12 @@ void Semaphore::Acquire()
     }
     else
     {
-        qDebug() << "On empile la stack";
-        qDebug() << free;
         //Sémaphore indisponible: mise en attente du thread jusqu'à ce qu'il soit libéré par un futur Release
         QEventLoop *loop = new QEventLoop();
         stack->append(loop);
         mutex->unlock();
 
         loop->exec();
-        qDebug() << "On quitte acquire";
 
         mutex->lock();
         free--;
@@ -67,14 +62,10 @@ void Semaphore::Release()
     {
         if(!stack->isEmpty())
         {
-            qDebug() << "On dépile la stack";
-            qDebug() << free;
             //Si le sémaphore est disponible et qu'un thread est en attente, on le libère puis on détruit la boucle
-            QEventLoop *loop = stack->first();
-            if(loop->isRunning())
-                qDebug() << "La boucle tourne";
+            QEventLoop *loop = stack->last();
             loop->quit();
-            stack->removeFirst();
+            stack->removeLast();
             delete loop;
         }
     }

@@ -46,16 +46,13 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
  */
 int main(int argc, char** argv)
 {
-    qDebug() << "début";
     QApplication app(argc, argv);
     app.setApplicationName(QString("fr.dev.djanah.webshell"));
     app.setApplicationVersion(QString("1.0"));
-    qDebug() << "milieu";
 
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr");
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr/VideoLiveAPI/inst_plugin.php?retour=http%253A//djanah.dev.ives.fr/client/menu.php%253Fl%253Dfr%2526PHPSESSID%253Db2ui2vusdc0nug99befbkjmjv1");
     QUrl launch = QUrl("file:///"+QApplication::applicationDirPath()+"/"+"index.html");
-    qDebug() << "fin";
     if(argc==2)
     {
         QString str;

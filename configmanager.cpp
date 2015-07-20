@@ -38,7 +38,6 @@ ConfigManager::ConfigManager()
  */
 ConfigManager::~ConfigManager()
 {
-    this->~QObject();
 }
 
 /**
