@@ -1,11 +1,12 @@
 #include "mainwindow.h"
 #include "wnavigator.h"
+#include "global.h"
 
 /**
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
  * @param url   Url avec laquelle le service est initialisé
  */
-MainWindow::MainWindow(const QUrl& url)
+MainWindow::MainWindow()
 {
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -15,11 +16,20 @@ MainWindow::MainWindow(const QUrl& url)
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 
+    //On définit les actions du menu de trayIcon
+    QAction *quitAction = new QAction("Quitter", this);
+    connect (quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    QMenu *trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction (quitAction);
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu (trayIconMenu);
+    trayIcon->show();
+
     view = new MyWebView(this);
     connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
-    view->load(url);
+    view->load(QUrl(config->GetLaunchUrl()));
     //Il faudra voir quelle taille de fenêtre minimale est autorisée
-//    view->setMinimumSize(int width,int height);
+    view->setMinimumSize(1000,800);
 
     //On enlève les barres de défilement inutiles dans le cadre de la webshell
     view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
@@ -32,22 +42,11 @@ MainWindow::MainWindow(const QUrl& url)
     view->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
 
-    //On définit les actions du menu de trayIcon
-    QAction *quitAction = new QAction("Quitter", this);
-    connect (quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-    QMenu *trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction (quitAction);
-    QIcon icon(QApplication::applicationDirPath()+"/djanah.png");
-    trayIcon = new QSystemTrayIcon(icon,this);
-    trayIcon->setContextMenu (trayIconMenu);
-    trayIcon->show();
-
     //Initialisation de l'inspecteur de la page
     i = new QWebInspector();
     i->setPage(view->page());
 
     stayOpen = true;
-    config = new ConfigManager();
     params = new Parametres(config->GetCloseButtonBehaviour(),config->GetDeveloperToolsMode());
     if(config->GetScreenMode())
         this->showFullScreen();

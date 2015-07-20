@@ -1,6 +1,12 @@
 #include <QApplication>
 #include "webapp.h"
 #include "filedownloader.h"
+#include "global.h"
+
+void WebApp::updateBaseUrl()
+{
+    config->SetBaseUrl(baseUrl);
+}
 
 /**
  * @brief WebApp::WebApp Constructeur de l'objet WebApp
@@ -9,7 +15,8 @@
 WebApp::WebApp(QWebView *view)
 {
     this->view = view;
-    baseUrl = new QList<QUrl>();
+    this->baseUrl = new QList<QString>();
+//    m_baseUrl = new QList<QString>();
 }
 
 /**
@@ -82,17 +89,36 @@ void WebApp::SetIcon(const QString &icon)
 }
 
 /**
+ * @brief WebApp::GetBaseUrl Accesseur de baseUrl
+ * @return
+ */
+//QList<QString> *WebApp::GetBaseUrl() const
+//{
+//    return m_baseUrl;
+//}
+
+/**
+ * @brief WebApp::SetBaseUrl Change baseUrl dans le fichier de config et dans l'application
+ * @param value
+ */
+//void WebApp::SetBaseUrl(QList<QString> *value)
+//{
+//    m_baseUrl = value;
+//    config->SetBaseUrl(m_baseUrl);
+//}
+
+/**
  * @brief WebApp::IsPageInApplication Indique si la page courante est dans baseUrl
  * @return Vrai si la page courante est dans baseUrl, faux sinon
  */
 bool WebApp::IsPageInApplication()
 {
     QString urls = view->url().toString();
-    QList<QUrl>::iterator i;
+    QList<QString>::iterator i;
     bool res = false;
     for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
     {
-        if(urls.startsWith((*i).toString()))
+        if(urls.startsWith(*i))
         {
             res = true;
             break;
@@ -109,11 +135,11 @@ bool WebApp::IsPageInApplication()
 bool WebApp::IsPageInApplication(QUrl url)
 {
     QString urls = url.toString();
-    QList<QUrl>::iterator i;
+    QList<QString>::iterator i;
     bool res = false;
     for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
     {
-        if(urls.startsWith((*i).toString()))
+        if(urls.startsWith(*i))
         {
             res = true;
             break;

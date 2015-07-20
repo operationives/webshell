@@ -1,5 +1,6 @@
 #include <QWebFrame>
 #include "mywebview.h"
+#include "global.h"
 
 /**
  * @brief MyWebView::MyWebView  Constructeur de notre webview et des objets à intégrer dans l'application
@@ -15,10 +16,14 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigatorplugins", wnavigatorplugins);
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 
-    wapp->baseUrl->append(QUrl("http://www.qt.io/"));
+    wapp->baseUrl = config->GetBaseUrl();
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
+
+    firstPage = true;
+
+    wapp->setProperty("icon",config->GetIcon());
 }
 
 /**
@@ -32,12 +37,24 @@ MyWebView::~MyWebView()
 }
 
 /**
- * @brief MyWebView::handleRedirect    Redirige l'url dans la webview ou dans le navigateur en fonction de sa valeur
+ * @brief MyWebView::handleRedirect Place la première page chargée dans baseUrl, puis renvoie vers le navigateur les url externes à baseUrl
  * @param url   Url chargée
  */
 void MyWebView::handleRedirect(QUrl url)
 {
-    if(!wapp->IsPageInApplication() && url.url()!=QString("file:///"+QApplication::applicationDirPath()+"/"+"index.html")){
+    if(firstPage)
+    {
+        //baseUrl peut être modifié à tout moment par le service
+        if(!wapp->IsPageInApplication())
+        {
+            qDebug() << "On insère l'url";
+            wapp->baseUrl->append(url.url());
+        }
+        config->SetBaseUrl(wapp->baseUrl);
+        firstPage = false;
+    }
+    else if(!wapp->IsPageInApplication())
+    {
             this->page()->triggerAction(QWebPage::Back);
             QDesktopServices::openUrl(url);
     }

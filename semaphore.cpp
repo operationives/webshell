@@ -2,13 +2,13 @@
 
 /**
  * @brief Semaphore::Semaphore Création du sémaphore
- * @param free  Disponibilité du sémaphore
+ * @param nbRessources  Disponibilité du sémaphore
  */
-Semaphore::Semaphore(int free)
+Semaphore::Semaphore(int nbRessources)
     : QObject()
 {
-    //Si free>0, le sémaphore est disponible
-    this->free = free;
+    //Si nbRessources>0, le sémaphore est disponible
+    this->nbRessources = nbRessources;
     //Pile d'objets servant à mettre en attente les threads
     this->stack = new QList<QEventLoop *>();
     //Mutex permettant d'assurer l'exclusion mutuelle
@@ -30,10 +30,10 @@ Semaphore::~Semaphore()
 void Semaphore::Acquire()
 {
     mutex->lock();
-    if(free>0)
+    if(nbRessources>0)
     {
         //Le sémaphore est disponible: on décrémente la disponibilité et on continue le flot d'exécution
-        free--;
+        nbRessources--;
         mutex->unlock();
     }
     else
@@ -46,7 +46,7 @@ void Semaphore::Acquire()
         loop->exec();
 
         mutex->lock();
-        free--;
+        nbRessources--;
         mutex->unlock();
     }
 }
@@ -57,8 +57,8 @@ void Semaphore::Acquire()
 void Semaphore::Release()
 {
     mutex->lock();
-    free++;
-    if(free>0)
+    nbRessources++;
+    if(nbRessources>0)
     {
         if(!stack->isEmpty())
         {

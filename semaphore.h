@@ -9,13 +9,13 @@ class Semaphore : public QObject
     Q_OBJECT
 
 public:
-    Semaphore(int free = 1);
+    Semaphore(int nbRessources = 1);
     ~Semaphore();
     void Acquire();
     void Release();
 
 private:
-    int free;
+    int nbRessources;
     QList<QEventLoop *> *stack;
     QMutex *mutex;
 };

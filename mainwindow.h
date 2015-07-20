@@ -7,7 +7,6 @@
 #include <QtNetwork>
 #include "parametres.h"
 #include "mywebview.h"
-#include "configmanager.h"
 #include "winaddon.h"
 
 class MainWindow : public QMainWindow
@@ -16,7 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(const QUrl& url);
+    MainWindow();
     ~MainWindow();
 
 private:
@@ -24,7 +23,6 @@ private:
     QSystemTrayIcon *trayIcon;
     QWebInspector *i;
     Parametres *params;
-    ConfigManager *config;
     bool stayOpen;
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);

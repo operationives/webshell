@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <QCoreApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include "mainwindow.h"
+#include "global.h"
 
 //A faire: gestion de la taille maximale du fichier .log
 /**
@@ -50,33 +54,57 @@ int main(int argc, char** argv)
     app.setApplicationName(QString("fr.dev.djanah.webshell"));
     app.setApplicationVersion(QString("1.0"));
 
+    QCommandLineParser parser;
+    QCommandLineOption configOption(QStringList() << "c" << "config", "Chemin d'accès au fichier de configuration <confFile>.", "poulpe");
+    QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "file:///"+QApplication::applicationDirPath()+"/"+"index.html");
+
+    parser.addOption(configOption);
+
+    parser.addOption(urlOption);
+
+    parser.process(app);
+
+    if(parser.isSet(configOption))
+    {
+        config = new ConfigManager(parser.value(configOption));
+    }
+    else
+    {
+        config = new ConfigManager(QApplication::applicationDirPath()+"/appli.xml");
+    }
+
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr");
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr/VideoLiveAPI/inst_plugin.php?retour=http%253A//djanah.dev.ives.fr/client/menu.php%253Fl%253Dfr%2526PHPSESSID%253Db2ui2vusdc0nug99befbkjmjv1");
-    QUrl launch = QUrl("file:///"+QApplication::applicationDirPath()+"/"+"index.html");
-    if(argc==2)
+    QString launch = config->GetLaunchUrl();
+    if(parser.isSet(urlOption))
     {
-        QString str;
-        str = argv[1];
+        QString str = parser.value(urlOption);
         //On remplace webshell:// par http:// et webshells:// par https://
         if(str.startsWith("webshell://") || str.startsWith("webshells://"))
         {
             str.replace(0,8,"http");
         }
+        //On remplace webshellf:// par file:///
+        if(str.startsWith("webshellf://"))
+        {
+            str.replace(0,12,"file:///");
+        }
         QUrl url = QUrl(str);
         //Si les conditions de validation de l'url en paramètre sont remplies, on remplace l'url de démarrage
         if(url.isValid() && !str.endsWith("//"))
         {
-            launch = url;
+            launch = url.url();
         }
     }
 
+    config->SetLaunchUrl(launch);
 
     //Permet de placer dans un fichier .log ce qui est affiché dans la console
     qInstallMessageHandler(myMessageOutput);
 
     //Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ
     //Sinon, on prend l'url spécifiée plus tôt
-    MainWindow *mw = new MainWindow(launch);
+    MainWindow *mw = new MainWindow();
 
     //Affichage de la page de démarrage
     mw->show();

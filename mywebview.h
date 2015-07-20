@@ -22,6 +22,7 @@ private:
     WNavigator *wnavigator;
     WNavigatorPlugins *wnavigatorplugins;
     WebApp *wapp;
+    bool firstPage;
 
 private slots:
     void handleRedirect(QUrl url);
