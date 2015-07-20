@@ -78,6 +78,7 @@ MainWindow::~MainWindow()
     delete trayIcon;
     delete i;
     delete params;
+    this->~QObject();
 }
 
 /**
@@ -97,7 +98,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
     {
         myMenu.addAction("Plein écran");
     }
-    else{
+    else
+    {
         myMenu.addAction("Fenêtré");
     }
     myMenu.addAction("Fermer");
@@ -148,7 +150,8 @@ void MainWindow::changeScreenMode(bool fullscreen)
     {
         this->showFullScreen();
     }
-    else{
+    else
+    {
         this->showNormal();
     }
     config->SetScreenMode(fullscreen);
@@ -179,11 +182,13 @@ void MainWindow::changeToolsMode(bool toolsActivated)
  */
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape){
+    if (event->key() == Qt::Key_Escape)
+    {
         if(this->isFullScreen())
             this->changeScreenMode(false);
     }
-    else{
+    else
+    {
         QMainWindow::keyPressEvent(event); // call the default implementation
     }
 }
@@ -194,10 +199,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
  */
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-    if (config->GetCloseButtonBehaviour() && stayOpen) {
+    if (config->GetCloseButtonBehaviour() && stayOpen)
+    {
         event->ignore();
         this->setWindowState(Qt::WindowMinimized);
-    } else {
+    }
+    else
+    {
         delete this;
         event->accept();
     }
@@ -220,6 +228,10 @@ void MainWindow::quit ()
     this->close();
 }
 
+/**
+ * @brief MainWindow::changeIcon Change l'icône dans la barre de notification
+ * @param icon  Icône à placer
+ */
 void MainWindow::changeIcon(QIcon icon)
 {
     this->trayIcon->setIcon(icon);

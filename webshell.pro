@@ -8,7 +8,8 @@ HEADERS =   mainwindow.h \
 	    downloadprogresslistener.h \
 	    winaddon.h \
 	    webapp.h \
-	    wnavigatorplugins.h
+	    wnavigatorplugins.h \
+	    semaphore.h
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
@@ -18,4 +19,5 @@ SOURCES =   main.cpp \
 	    configmanager.cpp \
 	    winaddon.cpp \
 	    webapp.cpp \
-	    wnavigatorplugins.cpp
+	    wnavigatorplugins.cpp \
+	    semaphore.cpp

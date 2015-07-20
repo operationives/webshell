@@ -13,6 +13,7 @@ public:
 
 signals:
     void optionClicked(bool value);
+
 private slots:
     void option1Clicked();
     void option2Clicked();

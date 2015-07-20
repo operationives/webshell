@@ -3,84 +3,22 @@
 #include <QApplication>
 #include "wnavigatorplugins.h"
 
-class MyThread : public QThread
-{
-public:
-    MyThread(QString mime_type, QWebView *view, QHash<QString, FileDownloader *> hash, QSemaphore *sem, WNavigatorPlugins *wnavigatorplugins)
-    {
-        this->mime_type = mime_type;
-        this->view = view;
-        this->hash = hash;
-        this->sem = sem;
-        this->wnavigatorplugins = wnavigatorplugins;
-    }
 
-    void run()
-    {
-        qDebug() << "acquire";
-        sem->acquire(1);
-        qDebug() << "acquis";
-        //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
-        QString filename = hash.value(mime_type)->GetUrl();
-        filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-        QString filedirectory = QString(QApplication::applicationDirPath()+"/");
-        filedirectory.append(filename);
-        QFile file(filedirectory);
-
-        file.open(QIODevice::WriteOnly);
-        file.write(hash.value(mime_type)->DownloadedData());
-        file.close();
-
-        //Lancement du fichier téléchargé
-        //Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
-        QString program;
-        QString tmp = QString(filedirectory);
-        if(filename.endsWith(".msi"))
-        {
-            tmp.replace("/","\\");
-            program = "msiexec.exe /i \""+tmp+"\"";
-        }
-        else if(filename.endsWith(".exe"))
-        {
-            tmp.replace("/","\\");
-            program = "\""+tmp+"\"";
-        }
-        else if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
-        {
-            //Rien à faire
-        }
-        else
-        {
-            view->page()->mainFrame()->evaluateJavaScript(QString("file_error()"));
-        }
-
-        //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
-        QProcess *myProcess = new QProcess();
-        connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),wnavigatorplugins,SLOT(finishInstall(int, QProcess::ExitStatus)));
-
-        if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
-        {
-            myProcess->start("open "+filedirectory);
-        }
-        else
-        {
-            myProcess->start(program);
-        }
-
-        view->page()->mainFrame()->evaluateJavaScript(QString("maj_webshell()"));
-    }
-private:
-    QString mime_type;
-    QWebView *view;
-    QHash<QString, FileDownloader *> hash;
-    QSemaphore *sem;
-    WNavigatorPlugins *wnavigatorplugins;
-};
-
+/**
+ * @brief WNavigatorPlugins::WNavigatorPlugins Constructeur de l'objet WNavigatorPlugins
+ * @param view  WebView sur laquelle effectuer des commandes JavaScript
+ */
 WNavigatorPlugins::WNavigatorPlugins(QWebView *view)
 {
     this->view = view;
-    sem = new QSemaphore(1);
+    sem = new Semaphore();
+}
+
+
+WNavigatorPlugins::~WNavigatorPlugins()
+{
+    delete sem;
+    this->~QObject();
 }
 
 /**
@@ -113,8 +51,58 @@ void WNavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal
 void WNavigatorPlugins::FileDownloaded(QString mime_type)
 {
     view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
-    MyThread t(mime_type,view,hash,sem,this);
-    t.run();
+
+    qDebug() << "acquire";
+    sem->Acquire();
+    qDebug() << "acquis";
+    //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
+    QString filename = hash.value(mime_type)->GetUrl();
+    filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
+    QString filedirectory = QString(QApplication::applicationDirPath()+"/");
+    filedirectory.append(filename);
+    QFile file(filedirectory);
+
+    file.open(QIODevice::WriteOnly);
+    file.write(hash.value(mime_type)->DownloadedData());
+    file.close();
+
+    //Lancement du fichier téléchargé
+    //Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
+    QString program;
+    QString tmp = QString(filedirectory);
+    if(filename.endsWith(".msi"))
+    {
+        tmp.replace("/","\\");
+        program = "msiexec.exe /i \""+tmp+"\"";
+    }
+    else if(filename.endsWith(".exe"))
+    {
+        tmp.replace("/","\\");
+        program = "\""+tmp+"\"";
+    }
+    else if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
+    {
+        //Rien à faire
+    }
+    else
+    {
+        view->page()->mainFrame()->evaluateJavaScript(QString("file_error()"));
+    }
+
+    //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
+    QProcess *myProcess = new QProcess();
+    connect(myProcess,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(finishInstall(int, QProcess::ExitStatus)));
+
+    if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
+    {
+        myProcess->start("open "+filedirectory);
+    }
+    else
+    {
+        myProcess->start(program);
+    }
+
+    view->page()->mainFrame()->evaluateJavaScript(QString("maj_webshell()"));
 }
 
 /**
@@ -139,11 +127,12 @@ void WNavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitSta
     {
         view->page()->mainFrame()->evaluateJavaScript(QString("erreur()"));
     }
-    else{
+    else
+    {
         view->page()->mainFrame()->evaluateJavaScript(QString("success()"));
     }
 
     qDebug() << "release";
-    sem->release(1);
+    sem->Release();
 }
 

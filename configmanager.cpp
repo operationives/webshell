@@ -5,19 +5,22 @@
 /**
  * @brief ConfigManager::ConfigManager  Place les paramètres spécifiés dans le fichier xml du dossier courant dans les attributs de la classe
  */
-ConfigManager::ConfigManager(){
+ConfigManager::ConfigManager()
+{
     QDomDocument dom("webshell_xml");
     QFile file(QApplication::applicationDirPath()+"/webshell.xml");
     if (!file.open(QIODevice::ReadOnly))
         return;
-    if (!dom.setContent(&file)) {
+    if (!dom.setContent(&file))
+    {
         file.close();
         return;
     }
     file.close();
     QDomElement docElem = dom.documentElement();
     QDomNode n = docElem.firstChild();
-    while(!n.isNull()){
+    while(!n.isNull())
+    {
         QDomElement e = n.toElement();
         if(e.attribute("name") == "fullscreen")
             fullscreen = (e.attribute("value") == "true" ? true : false);
@@ -30,8 +33,12 @@ ConfigManager::ConfigManager(){
     }
 }
 
-ConfigManager::~ConfigManager(){
-
+/**
+ * @brief ConfigManager::~ConfigManager Destructeur de ConfigManager
+ */
+ConfigManager::~ConfigManager()
+{
+    this->~QObject();
 }
 
 /**
@@ -39,7 +46,8 @@ ConfigManager::~ConfigManager(){
  * @param parameter Type de paramètre à changer. Valuers possibles: "fullscreen","minimization","developerToolsActivated"
  * @param value     Valeur à affecter au paramètre
  */
-void ConfigManager::ChangeParameter(QString parameter, bool value){
+void ConfigManager::ChangeParameter(QString parameter, bool value)
+{
 
     if(parameter == "fullscreen")
         fullscreen = value;
@@ -47,7 +55,8 @@ void ConfigManager::ChangeParameter(QString parameter, bool value){
         minimization = value;
     else if(parameter == "developerToolsActivated")
         developerToolsActivated = value;
-    else{
+    else
+    {
         qDebug() << "Type de paramètre incompatible.";
         return;
     }
@@ -56,28 +65,33 @@ void ConfigManager::ChangeParameter(QString parameter, bool value){
     QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
     if(!doc_xml.open(QIODevice::ReadOnly))
         return;
-    if(!dom.setContent(&doc_xml)){
+    if(!dom.setContent(&doc_xml))
+    {
         doc_xml.close();
         return;
     }
     QDomElement docElem = dom.documentElement();
     QDomNode n = docElem.firstChild();
 
-    while(!n.isNull()){
+    while(!n.isNull())
+    {
         QDomElement write_elem = dom.createElement("parameter");
         QDomElement e = n.toElement();
         n = n.nextSibling();
-        if(e.attribute("name") == "fullscreen"){
+        if(e.attribute("name") == "fullscreen")
+        {
             write_elem.setAttribute("name", "fullscreen");
             if(fullscreen) write_elem.setAttribute("value", "true");
             else write_elem.setAttribute("value", "false");
         }
-        else if(e.attribute("name") == "minimization"){
+        else if(e.attribute("name") == "minimization")
+        {
             write_elem.setAttribute("name", "minimization");
             if(minimization) write_elem.setAttribute("value", "true");
             else write_elem.setAttribute("value", "false");
         }
-        else if(e.attribute("name") == "developerToolsActivated"){
+        else if(e.attribute("name") == "developerToolsActivated")
+        {
             write_elem.setAttribute("name", "developerToolsActivated");
             if(developerToolsActivated) write_elem.setAttribute("value", "true");
             else write_elem.setAttribute("value", "false");
@@ -105,7 +119,8 @@ void ConfigManager::ChangeParameter(QString parameter, bool value){
  * @brief ConfigManager::Getscreenmode Indique si l'utilisateur doit être en plein écran ou non
  * @return fullscreen
  */
-bool ConfigManager::GetScreenMode(){
+bool ConfigManager::GetScreenMode()
+{
     return fullscreen;
 }
 
@@ -113,7 +128,8 @@ bool ConfigManager::GetScreenMode(){
  * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
  * @return minimization
  */
-bool ConfigManager::GetCloseButtonBehaviour(){
+bool ConfigManager::GetCloseButtonBehaviour()
+{
     return minimization;
 }
 
@@ -121,7 +137,8 @@ bool ConfigManager::GetCloseButtonBehaviour(){
  * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
  * @return developerToolsActivated
  */
-bool ConfigManager::GetDeveloperToolsMode(){
+bool ConfigManager::GetDeveloperToolsMode()
+{
     return developerToolsActivated;
 }
 
@@ -129,7 +146,8 @@ bool ConfigManager::GetDeveloperToolsMode(){
  * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
  * @param fullscreen    Nouvelle valeur de this.fullscreen
  */
-void ConfigManager::SetScreenMode(bool fullscreen){
+void ConfigManager::SetScreenMode(bool fullscreen)
+{
     ChangeParameter("fullscreen",fullscreen);
 }
 
@@ -137,7 +155,8 @@ void ConfigManager::SetScreenMode(bool fullscreen){
  * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
  * @param minimization  Nouvelle valeur de this.minimization
  */
-void ConfigManager::SetCloseButtonBehaviour(bool minimization){
+void ConfigManager::SetCloseButtonBehaviour(bool minimization)
+{
     ChangeParameter("minimization",minimization);
 }
 
@@ -145,6 +164,7 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization){
  * @brief ConfigManager::SetDeveloperToolsMode Met à jour le paramètre "developerToolsActivated"
  * @param developerToolsActivated Nouvelle valeur de this.developerToolsActivated
  */
-void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated){
+void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
+{
     ChangeParameter("developerToolsActivated",developerToolsActivated);
 }

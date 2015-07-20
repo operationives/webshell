@@ -3,6 +3,10 @@
 #include <QApplication>
 #include "wnavigator.h"
 
+/**
+ * @brief WNavigator::WNavigator Constructeur de l'objet WNavigator
+ * @param view  WebView sur laquelle effectuer des commandes JavaScript
+ */
 WNavigator::WNavigator(QWebView *view)
 {
     this->view = view;
@@ -69,7 +73,8 @@ void WNavigator::FileDownloaded(QString mime_type)
     {
         //Rien à faire
     }
-    else {
+    else
+    {
         view->page()->mainFrame()->evaluateJavaScript(QString("file_error()"));
     }
 
@@ -81,7 +86,8 @@ void WNavigator::FileDownloaded(QString mime_type)
     {
         myProcess->start("open "+filedirectory);
     }
-    else{
+    else
+    {
         myProcess->start(program);
     }
 
@@ -110,7 +116,8 @@ void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
     {
         view->page()->mainFrame()->evaluateJavaScript(QString("erreur()"));
     }
-    else{
+    else
+    {
         view->page()->mainFrame()->evaluateJavaScript(QString("success()"));
     }
 }

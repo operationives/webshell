@@ -1,7 +1,6 @@
 #ifndef MYWEBVIEW_H
 #define MYWEBVIEW_H
 
-#include <QWebView>
 #include <QtWidgets>
 #include "wnavigator.h"
 #include "wnavigatorplugins.h"

@@ -1,6 +1,10 @@
 #include "winaddon.h"
 
-WinAddon::WinAddon(){
+/**
+ * @brief WinAddon::WinAddon Constructeur de la JumpList de l'application
+ */
+WinAddon::WinAddon()
+{
     jumplist = new QWinJumpList();
     tasks = jumplist->tasks();
 
@@ -12,7 +16,12 @@ WinAddon::WinAddon(){
     tasks->setVisible(true);
 }
 
-WinAddon::~WinAddon(){
+/**
+ * @brief WinAddon::~WinAddon Destructeur de la JumpList de l'application
+ */
+WinAddon::~WinAddon()
+{
     delete jumplist;
     delete quitItem;
+    this->~QObject();
 }

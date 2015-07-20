@@ -21,7 +21,10 @@ FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, QSt
 /**
  * @brief FileDownloader::~FileDownloader Destructeur de FileDownloader
  */
-FileDownloader::~FileDownloader() { }
+FileDownloader::~FileDownloader()
+{
+    this->~QObject();
+}
  
 /**
  * @brief FileDownloader::fileDownloaded Méthode de fin de téléchargement
@@ -34,6 +37,10 @@ void FileDownloader::fileDownloaded(QNetworkReply* pReply)
     listener->FileDownloaded(mime_type);
 }
 
+/**
+ * @brief FileDownloader::downloadFailure Méthode signalant une erreur de téléchargement
+ * @param error Type d'erreur reçue
+ */
 void FileDownloader::downloadFailure(QNetworkReply::NetworkError error)
 {
     if(error != QNetworkReply::NoError)
@@ -59,11 +66,19 @@ void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
     listener->DownloadProgress(bytesReceived,bytesTotal,mime_type);
 }
 
+/**
+ * @brief FileDownloader::GetMimeType Accesseur de mime_type
+ * @return mime_type
+ */
 QString FileDownloader::GetMimeType()
 {
     return mime_type;
 }
 
+/**
+ * @brief FileDownloader::GetUrl Accesseur de l'url de téléchargement
+ * @return url
+ */
 QString FileDownloader::GetUrl()
 {
     return url;

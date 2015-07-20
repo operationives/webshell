@@ -4,6 +4,7 @@
 #include <QWebView>
 #include "filedownloader.h"
 #include "downloadprogresslistener.h"
+#include "semaphore.h"
 
 class WNavigatorPlugins : public QObject, public DownloadProgressListener
 {
@@ -13,6 +14,7 @@ class WNavigatorPlugins : public QObject, public DownloadProgressListener
 
 public:
     WNavigatorPlugins(QWebView *view);
+    ~WNavigatorPlugins();
     Q_INVOKABLE void UpdateSoftware(QString url, QString mime_type);
 
     void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
@@ -25,8 +27,7 @@ public slots:
 private:
     QWebView *view;
     QHash<QString, FileDownloader *> hash;
-    QSemaphore *sem;
+    Semaphore *sem;
 };
 
 #endif // WNAVIGATORPLUGINS_H
-
