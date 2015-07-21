@@ -18,7 +18,7 @@ MainWindow::MainWindow()
 
     //On définit les actions du menu de trayIcon
     QAction *quitAction = new QAction("Quitter", this);
-    connect (quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
     QMenu *trayIconMenu = new QMenu(this);
     trayIconMenu->addAction (quitAction);
     trayIcon = new QSystemTrayIcon(this);
@@ -28,8 +28,8 @@ MainWindow::MainWindow()
     view = new MyWebView(this);
     connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
     view->load(QUrl(config->GetLaunchUrl()));
-    //Il faudra voir quelle taille de fenêtre minimale est autorisée
-    view->setMinimumSize(1000,800);
+    //On met en place la taille minimale
+    this->setMinimumSize(1000,800);
 
     //On enlève les barres de défilement inutiles dans le cadre de la webshell
     view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
