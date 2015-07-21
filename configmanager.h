@@ -12,15 +12,17 @@ public:
     ConfigManager(QString confFilePath);
     ~ConfigManager();
 
-    //Setters et getters pour paramètres webshell
+    //Setters et getters pour attributs webshell
     bool GetScreenMode();
     bool GetCloseButtonBehaviour();
     bool GetDeveloperToolsMode();
+    QString GetVersion();
     void SetScreenMode(bool fullscreen);
     void SetCloseButtonBehaviour(bool minimization);
     void SetDeveloperToolsMode(bool developerToolsActivated);
+    void SetVersion(QString version);
 
-    //Setters et getters pour paramètres appli
+    //Setters et getters pour attributs appli
     QString GetLaunchUrl();
     QString GetIcon();
     QStringList *GetBaseUrl();
@@ -29,12 +31,13 @@ public:
     void SetBaseUrl(QStringList *baseUrl);
 
 private:
-    //Paramètres webshell
+    //Attributs webshell
     bool fullscreen;
     bool minimization;
     bool developerToolsActivated;
+    QString version;
 
-    //Paramètres application
+    //Attributs application
     QString launchUrl;
     QString icon;
     QStringList *baseUrl;

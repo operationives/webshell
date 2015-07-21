@@ -80,6 +80,8 @@ void ConfigManager::InitWebshellParameters()
             minimization = (e.attribute("value") == "true" ? true : false);
         else if(e.attribute("name") == "developerToolsActivated")
             developerToolsActivated = (e.attribute("value") == "true" ? true : false);
+        else if(e.attribute("name") == "version")
+            version = e.attribute("value");
 
         n = n.nextSibling();
     }
@@ -124,6 +126,11 @@ QDomDocument dom("webshell_xml");
             write_elem.setAttribute("name", "developerToolsActivated");
             if(developerToolsActivated) write_elem.setAttribute("value", "true");
             else write_elem.setAttribute("value", "false");
+        }
+        else if(e.attribute("name") == "version")
+        {
+            write_elem.setAttribute("name", "version");
+            write_elem.setAttribute("value", version);
         }
         docElem.replaceChild(write_elem,e);
 
@@ -234,6 +241,15 @@ bool ConfigManager::GetDeveloperToolsMode()
 }
 
 /**
+ * @brief ConfigManager::GetVersion Indique la version du webshell
+ * @return version
+ */
+QString ConfigManager::GetVersion()
+{
+    return version;
+}
+
+/**
  * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
  * @param fullscreen    Nouvelle valeur de this->fullscreen
  */
@@ -260,6 +276,16 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 {
     this->developerToolsActivated = developerToolsActivated;
+    LoadParametersWebshell();
+}
+
+/**
+ * @brief ConfigManager::SetVersion Met à jour la version du webshell
+ * @param version   Nouveau numéro de version du webshell
+ */
+void ConfigManager::SetVersion(QString version)
+{
+    this->version = version;
     LoadParametersWebshell();
 }
 
