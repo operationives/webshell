@@ -10,12 +10,12 @@ class WebApp : public QObject, public DownloadProgressListener
 
     Q_OBJECT
     Q_INTERFACES(DownloadProgressListener)
+    Q_PROPERTY(QStringList baseUrl READ GetBaseUrl WRITE SetBaseUrl)
     Q_PROPERTY(QString icon READ Icon WRITE SetIcon)
-//    Q_PROPERTY(QList<QString> *baseUrl READ GetBaseUrl WRITE SetBaseUrl)
 
 public:
     //A FAIRE: placer baseUrl en Q_PROPERTY, afin d'avoir un set et get adaptés à l'application
-    QList<QString> *baseUrl;
+//    QList<QString> *baseUrl;
     WebApp(QWebView *view);
     ~WebApp();
     bool IsPageInApplication();
@@ -29,18 +29,15 @@ public:
 signals:
     void changeIcon(QIcon icon);
 
-private slots:
-    void updateBaseUrl();
-
 private:
     QString m_icon;
     QWebView *view;
     FileDownloader *data;
     QString Icon() const;
     void SetIcon(const QString &icon);
-//    QList<QString> *m_baseUrl;
-//    QList<QString> *GetBaseUrl() const;
-//    void SetBaseUrl(QList<QString> *value);
+    QStringList m_baseUrl;
+    QStringList GetBaseUrl() const;
+    void SetBaseUrl(const QStringList &value);
 };
 
 #endif // WEBAPP_H

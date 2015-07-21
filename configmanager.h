@@ -23,10 +23,10 @@ public:
     //Setters et getters pour paramètres appli
     QString GetLaunchUrl();
     QString GetIcon();
-    QList<QString> *GetBaseUrl();
+    QStringList *GetBaseUrl();
     void SetLaunchUrl(QString launchUrl);
     void SetIcon(QString icon);
-    void SetBaseUrl(QList<QString> *baseUrl);
+    void SetBaseUrl(QStringList *baseUrl);
 
 private:
     //Paramètres webshell
@@ -37,7 +37,7 @@ private:
     //Paramètres application
     QString launchUrl;
     QString icon;
-    QList<QString> *baseUrl;
+    QStringList *baseUrl;
 
     QString confFilePath;
 

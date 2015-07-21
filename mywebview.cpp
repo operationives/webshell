@@ -16,7 +16,6 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigatorplugins", wnavigatorplugins);
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 
-    wapp->baseUrl = config->GetBaseUrl();
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
@@ -48,9 +47,10 @@ void MyWebView::handleRedirect(QUrl url)
         if(!wapp->IsPageInApplication())
         {
             qDebug() << "On insère l'url";
-            wapp->baseUrl->append(url.url());
+            QStringList baseUrl = wapp->property("baseUrl").toStringList();
+            baseUrl.append(url.url());
+            wapp->setProperty("baseUrl",QVariant(baseUrl));
         }
-        config->SetBaseUrl(wapp->baseUrl);
         firstPage = false;
     }
     else if(!wapp->IsPageInApplication())

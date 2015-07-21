@@ -3,10 +3,6 @@
 #include "filedownloader.h"
 #include "global.h"
 
-void WebApp::updateBaseUrl()
-{
-    config->SetBaseUrl(baseUrl);
-}
 
 /**
  * @brief WebApp::WebApp Constructeur de l'objet WebApp
@@ -15,8 +11,7 @@ void WebApp::updateBaseUrl()
 WebApp::WebApp(QWebView *view)
 {
     this->view = view;
-    this->baseUrl = new QList<QString>();
-//    m_baseUrl = new QList<QString>();
+    m_baseUrl = *config->GetBaseUrl();
 }
 
 /**
@@ -24,7 +19,6 @@ WebApp::WebApp(QWebView *view)
  */
 WebApp::~WebApp()
 {
-    delete baseUrl;
 }
 
 /**
@@ -92,20 +86,20 @@ void WebApp::SetIcon(const QString &icon)
  * @brief WebApp::GetBaseUrl Accesseur de baseUrl
  * @return
  */
-//QList<QString> *WebApp::GetBaseUrl() const
-//{
-//    return m_baseUrl;
-//}
+QStringList WebApp::GetBaseUrl() const
+{
+    return m_baseUrl;
+}
 
 /**
  * @brief WebApp::SetBaseUrl Change baseUrl dans le fichier de config et dans l'application
  * @param value
  */
-//void WebApp::SetBaseUrl(QList<QString> *value)
-//{
-//    m_baseUrl = value;
-//    config->SetBaseUrl(m_baseUrl);
-//}
+void WebApp::SetBaseUrl(const QStringList &value)
+{
+    m_baseUrl = value;
+    config->SetBaseUrl(&m_baseUrl);
+}
 
 /**
  * @brief WebApp::IsPageInApplication Indique si la page courante est dans baseUrl
@@ -114,9 +108,9 @@ void WebApp::SetIcon(const QString &icon)
 bool WebApp::IsPageInApplication()
 {
     QString urls = view->url().toString();
-    QList<QString>::iterator i;
+    QStringList::iterator i;
     bool res = false;
-    for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+    for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
     {
         if(urls.startsWith(*i))
         {
@@ -135,9 +129,9 @@ bool WebApp::IsPageInApplication()
 bool WebApp::IsPageInApplication(QUrl url)
 {
     QString urls = url.toString();
-    QList<QString>::iterator i;
+    QStringList::iterator i;
     bool res = false;
-    for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+    for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
     {
         if(urls.startsWith(*i))
         {

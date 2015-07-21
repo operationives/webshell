@@ -31,7 +31,7 @@ ConfigManager::ConfigManager(QString confFilePath)
     file.close();
     QDomElement docElem = dom.documentElement();
     QDomNode n = docElem.firstChild();
-    baseUrl = new QList<QString>();
+    baseUrl = new QStringList();
     while(!n.isNull())
     {
         QDomElement e = n.toElement();
@@ -182,7 +182,7 @@ void ConfigManager::LoadParametersAppli()
     docElem.appendChild(write_elem);
 
     //Insertion du paramètre baseUrl
-    QList<QString>::iterator i;
+    QStringList::iterator i;
     for(i = baseUrl->begin(); i != baseUrl->end();++i)
     {
         write_elem = dom.createElement("setting");
@@ -283,11 +283,11 @@ QString ConfigManager::GetIcon()
 
 /**
  * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
- * @return new QList<QString>(*baseUrl)
+ * @return new QStringList(*baseUrl)
  */
-QList<QString> *ConfigManager::GetBaseUrl()
+QStringList *ConfigManager::GetBaseUrl()
 {
-    return new QList<QString>(*baseUrl);
+    return new QStringList(*baseUrl);
 }
 
 /**
@@ -314,9 +314,9 @@ void ConfigManager::SetIcon(QString icon)
  * @brief ConfigManager::SetBaseUrl Met à jour baseUrl
  * @param baseUrl Nouvelle valeur de this->baseUrl
  */
-void ConfigManager::SetBaseUrl(QList<QString> *baseUrl)
+void ConfigManager::SetBaseUrl(QStringList *baseUrl)
 {
     delete this->baseUrl;
-    this->baseUrl = new QList<QString>(*baseUrl);
+    this->baseUrl = new QStringList(*baseUrl);
     LoadParametersAppli();
 }
