@@ -101,7 +101,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
         myMenu.addAction("Fenêtré");
     }
     myMenu.addAction("Fermer");
-    myMenu.addAction("Test");
+    myMenu.addAction("Reload");
 
     QPoint globalPos = this->mapToGlobal(pos);
 
@@ -109,32 +109,32 @@ void MainWindow::showContextMenu(const QPoint &pos)
     if(selectedItem == NULL)
         return;
 
-    if (selectedItem->text().compare("Paramètres",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Paramètres")
     {
         params->show();
     }
 
-    if (selectedItem->text().compare("Inspect",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Inspect")
     {
         i->show();
     }
 
-    if (selectedItem->text().compare("Plein écran",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Plein écran")
     {
         changeScreenMode(true);
     }
 
-    if (selectedItem->text().compare("Fenêtré",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Fenêtré")
     {
         changeScreenMode(false);
     }
-    if (selectedItem->text().compare("Fermer",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Fermer")
     {
         this->quit();
     }
-    if (selectedItem->text().compare("Test",Qt::CaseSensitive) == 0)
+    if (selectedItem->text()=="Reload")
     {
-       //view->load(QUrl("https://www.google.fr"));
+       view->reload();
     }
 }
 
