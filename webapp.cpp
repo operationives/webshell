@@ -11,6 +11,7 @@
 WebApp::WebApp(QWebView *view)
 {
     this->view = view;
+    m_infos = config->GetInfos();
     m_baseUrl = *config->GetBaseUrl();
 }
 
@@ -80,6 +81,25 @@ void WebApp::SetIcon(const QString &icon)
 {
     m_icon = icon;
     data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
+}
+
+/**
+ * @brief WebApp::Infos Accesseur des informations
+ * @return m_infos
+ */
+QString WebApp::Infos() const
+{
+    return m_infos;
+}
+
+/**
+ * @brief WebApp::SetInfos Change la propriété infos et modifie le fichier xml de l'application
+ * @param infos
+ */
+void WebApp::SetInfos(const QString &infos)
+{
+    m_infos = infos;
+    config->SetInfos(infos);
 }
 
 /**

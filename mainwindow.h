@@ -8,6 +8,7 @@
 #include "parametres.h"
 #include "mywebview.h"
 #include "winaddon.h"
+#include "informations.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,7 +24,9 @@ private:
     QSystemTrayIcon *trayIcon;
     QWebInspector *i;
     Parametres *params;
+    Informations *infos;
     bool stayOpen;
+    void DisplayInfos();
     void keyPressEvent(QKeyEvent *event);
     void closeEvent(QCloseEvent *event);
 

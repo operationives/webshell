@@ -56,6 +56,8 @@ MainWindow::MainWindow()
     connect(params,SIGNAL(closeButtonMode(bool)),this,SLOT(changeCloseButtonMode(bool)));
     connect(params,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 
+    infos = new Informations();
+
     //On ajoute les suppléments windows
     WinAddon *waddon = new WinAddon();
     if(waddon->isWidgetType()){}
@@ -77,6 +79,7 @@ MainWindow::~MainWindow()
     delete trayIcon;
     delete i;
     delete params;
+    delete infos;
 }
 
 /**
@@ -102,6 +105,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
     }
     myMenu.addAction("Fermer");
     myMenu.addAction("Reload");
+    myMenu.addAction("Informations");
 
     QPoint globalPos = this->mapToGlobal(pos);
 
@@ -135,6 +139,10 @@ void MainWindow::showContextMenu(const QPoint &pos)
     if (selectedItem->text()=="Reload")
     {
        view->reload();
+    }
+    if (selectedItem->text()=="Informations")
+    {
+        this->DisplayInfos();
     }
 }
 
@@ -233,4 +241,13 @@ void MainWindow::quit ()
 void MainWindow::changeIcon(QIcon icon)
 {
     this->trayIcon->setIcon(icon);
+}
+
+/**
+ * @brief MainWindow::DisplayInfos Met à jour les données de la page d'information et l'affiche
+ */
+void MainWindow::DisplayInfos()
+{
+    infos->UpdateValues();
+    infos->show();
 }

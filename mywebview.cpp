@@ -46,7 +46,6 @@ void MyWebView::handleRedirect(QUrl url)
         //baseUrl peut être modifié à tout moment par le service
         if(!wapp->IsPageInApplication())
         {
-            qDebug() << "On insère l'url";
             QStringList baseUrl = wapp->property("baseUrl").toStringList();
             baseUrl.append(url.url());
             wapp->setProperty("baseUrl",QVariant(baseUrl));

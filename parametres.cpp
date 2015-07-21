@@ -7,7 +7,8 @@
  * @param toolsactivated    Vrai si les outils développeur sont activés
  * @param parent            Widget parent
  */
-Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent) : QDialog(parent)
+Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent)
+    : QDialog(parent)
 {
 
     //On enlève le bouton "?" inutile

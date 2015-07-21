@@ -25,9 +25,11 @@ public:
     //Setters et getters pour attributs appli
     QString GetLaunchUrl();
     QString GetIcon();
+    QString GetInfos();
     QStringList *GetBaseUrl();
     void SetLaunchUrl(QString launchUrl);
     void SetIcon(QString icon);
+    void SetInfos(QString infosAppli);
     void SetBaseUrl(QStringList *baseUrl);
 
 private:
@@ -40,6 +42,7 @@ private:
     //Attributs application
     QString launchUrl;
     QString icon;
+    QString infosAppli;
     QStringList *baseUrl;
 
     QString confFilePath;

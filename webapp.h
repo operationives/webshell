@@ -12,6 +12,7 @@ class WebApp : public QObject, public DownloadProgressListener
     Q_INTERFACES(DownloadProgressListener)
     Q_PROPERTY(QStringList baseUrl READ GetBaseUrl WRITE SetBaseUrl)
     Q_PROPERTY(QString icon READ Icon WRITE SetIcon)
+    Q_PROPERTY(QString infos READ Infos WRITE SetInfos)
 
 public:
     //A FAIRE: placer baseUrl en Q_PROPERTY, afin d'avoir un set et get adaptés à l'application
@@ -31,10 +32,13 @@ signals:
 
 private:
     QString m_icon;
+    QString m_infos;
     QWebView *view;
     FileDownloader *data;
     QString Icon() const;
     void SetIcon(const QString &icon);
+    QString Infos() const;
+    void SetInfos(const QString &infos);
     QStringList m_baseUrl;
     QStringList GetBaseUrl() const;
     void SetBaseUrl(const QStringList &value);

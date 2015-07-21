@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     app.setApplicationVersion(QString("1.0"));
 
     QCommandLineParser parser;
-    QCommandLineOption configOption(QStringList() << "c" << "config", "Chemin d'accès au fichier de configuration <confFile>.", "poulpe");
+    QCommandLineOption configOption(QStringList() << "c" << "config", "Chemin d'accès au fichier de configuration <confFile>.", "confFile");
     QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "file:///"+QApplication::applicationDirPath()+"/"+"index.html");
 
     parser.addOption(configOption);

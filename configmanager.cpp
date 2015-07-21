@@ -39,6 +39,8 @@ ConfigManager::ConfigManager(QString confFilePath)
             launchUrl = e.attribute("value");
         else if(e.attribute("name") == "icon")
             icon = e.attribute("value");
+        else if(e.attribute("name") == "infos")
+            infosAppli = e.attribute("value");
         else if(e.attribute("name") == "baseUrl")
             baseUrl->append(e.attribute("value"));
 
@@ -156,6 +158,7 @@ QDomDocument dom("webshell_xml");
  */
 void ConfigManager::LoadParametersAppli()
 {
+    qDebug() << "On modifie l'xml";
     QDomDocument dom("appli_xml");
     QFile doc_xml(confFilePath);
     if(!doc_xml.open(QIODevice::ReadOnly))
@@ -188,6 +191,12 @@ void ConfigManager::LoadParametersAppli()
     write_elem.setAttribute("value", icon);
     docElem.appendChild(write_elem);
 
+    //Insertion du paramètre infosAppli
+    write_elem = dom.createElement("setting");
+    write_elem.setAttribute("name", "infos");
+    write_elem.setAttribute("value", infosAppli);
+    docElem.appendChild(write_elem);
+
     //Insertion du paramètre baseUrl
     QStringList::iterator i;
     for(i = baseUrl->begin(); i != baseUrl->end();++i)
@@ -210,6 +219,7 @@ void ConfigManager::LoadParametersAppli()
         return;
     }
     QTextStream stream(&fichier);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
     stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
 }
 
@@ -308,6 +318,15 @@ QString ConfigManager::GetIcon()
 }
 
 /**
+ * @brief ConfigManager::GetIcon Indique les infos du service
+ * @return infosAppli
+ */
+QString ConfigManager::GetInfos()
+{
+    return infosAppli;
+}
+
+/**
  * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
  * @return new QStringList(*baseUrl)
  */
@@ -333,6 +352,16 @@ void ConfigManager::SetLaunchUrl(QString launchUrl)
 void ConfigManager::SetIcon(QString icon)
 {
     this->icon = icon;
+    LoadParametersAppli();
+}
+
+/**
+ * @brief ConfigManager::SetInfos Met à jour les infos service
+ * @param infosAppli Nouvelle valeur des infos service
+ */
+void ConfigManager::SetInfos(QString infosAppli)
+{
+    this->infosAppli = infosAppli;
     LoadParametersAppli();
 }
 

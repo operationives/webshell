@@ -10,7 +10,8 @@ HEADERS =   mainwindow.h \
 	    webapp.h \
 	    navigatorplugins.h \
 	    semaphore.h \
-	    global.h
+	    global.h \
+    informations.h
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
@@ -22,4 +23,5 @@ SOURCES =   main.cpp \
 	    webapp.cpp \
 	    navigatorplugins.cpp \
 	    semaphore.cpp \
-	    global.cpp
+	    global.cpp \
+    informations.cpp
