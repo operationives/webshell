@@ -24,6 +24,15 @@ void WNavigator::UpdateSoftware(QString url)
 }
 
 /**
+ * @brief Initialization Initialisation des objets JavaScript de l'application
+ */
+void WNavigator::InitWebshellAPI()
+{
+    view->page()->mainFrame()->evaluateJavaScript(\
+    "navigator.UpdateSoftware = wnavigator.UpdateSoftware");
+}
+
+/**
  * @brief WNavigator::DownloadProgress Indique à l'application l'avancement du téléchargement
  * @param bytesReceived Nombre d'octets reçus
  * @param bytesTotal    Nombre d'octets au total

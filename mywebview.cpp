@@ -10,10 +10,10 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
     wnavigator = new WNavigator(qobject_cast<QWebView *>(this));
     wapp = new WebApp(qobject_cast<QWebView *>(this));
-    wnavigatorplugins = new WNavigatorPlugins(qobject_cast<QWebView *>(this));
+    navigatorplugins = new NavigatorPlugins(qobject_cast<QWebView *>(this));
     //On permet l'accès aux méthodes dans WNavigator par les appels javascript
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
-    this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigatorplugins", wnavigatorplugins);
+    this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
@@ -32,7 +32,7 @@ MyWebView::~MyWebView()
 {
     delete wnavigator;
     delete wapp;
-    delete wnavigatorplugins;
+    delete navigatorplugins;
 }
 
 /**

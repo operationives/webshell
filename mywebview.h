@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 #include "wnavigator.h"
-#include "wnavigatorplugins.h"
+#include "navigatorplugins.h"
 #include "webapp.h"
 
 class MyWebView : public QWebView
@@ -20,7 +20,7 @@ signals:
 
 private:
     WNavigator *wnavigator;
-    WNavigatorPlugins *wnavigatorplugins;
+    NavigatorPlugins *navigatorplugins;
     WebApp *wapp;
     bool firstPage;
 

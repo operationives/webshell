@@ -1,30 +1,30 @@
 #include <QWebFrame>
 #include <QProcess>
 #include <QApplication>
-#include "wnavigatorplugins.h"
+#include "navigatorplugins.h"
 
 
 /**
- * @brief WNavigatorPlugins::WNavigatorPlugins Constructeur de l'objet WNavigatorPlugins
+ * @brief NavigatorPlugins::NavigatorPlugins Constructeur de l'objet NavigatorPlugins
  * @param view  WebView sur laquelle effectuer des commandes JavaScript
  */
-WNavigatorPlugins::WNavigatorPlugins(QWebView *view)
+NavigatorPlugins::NavigatorPlugins(QWebView *view)
 {
     this->view = view;
     sem = new Semaphore();
 }
 
 
-WNavigatorPlugins::~WNavigatorPlugins()
+NavigatorPlugins::~NavigatorPlugins()
 {
     delete sem;
 }
 
 /**
- * @brief WNavigatorPlugins::UpdateSoftware Met à jour le webshell
+ * @brief NavigatorPlugins::UpdateSoftware Met à jour le webshell
  * @param url   Lien de téléchargement
  */
-void WNavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
+void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
 {
     //La partie suivante permet de télécharger depuis la webshell
     QUrl updateUrl(url);
@@ -32,22 +32,22 @@ void WNavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
 }
 
 /**
- * @brief WNavigatorPlugins::DownloadProgress Indique à l'application l'avancement du téléchargement
+ * @brief NavigatorPlugins::DownloadProgress Indique à l'application l'avancement du téléchargement
  * @param bytesReceived Nombre d'octets reçus
  * @param bytesTotal    Nombre d'octets au total
  * @param id            Identifiant du FileDownloader
  */
-void WNavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
     if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
 }
 
 /**
- * @brief WNavigatorPlugins::fileDownloaded Stocke et exécute l'installeur téléchargé
+ * @brief NavigatorPlugins::fileDownloaded Stocke et exécute l'installeur téléchargé
  * @param id    Identifiant du FileDownloader
  */
-void WNavigatorPlugins::FileDownloaded(QString mime_type)
+void NavigatorPlugins::FileDownloaded(QString mime_type)
 {
     view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
 
@@ -103,10 +103,10 @@ void WNavigatorPlugins::FileDownloaded(QString mime_type)
 }
 
 /**
- * @brief WNavigatorPlugins::DownloadFailure Signale l'application de l'échec du téléchargement
+ * @brief NavigatorPlugins::DownloadFailure Signale l'application de l'échec du téléchargement
  * @param id    Identifiant du FileDownloader
  */
-void WNavigatorPlugins::DownloadFailure(QString mime_type)
+void NavigatorPlugins::DownloadFailure(QString mime_type)
 {
     if(!mime_type.isNull()){}
     view->page()->mainFrame()->evaluateJavaScript(QString("download_fail()"));
@@ -114,11 +114,11 @@ void WNavigatorPlugins::DownloadFailure(QString mime_type)
 }
 
 /**
- * @brief WNavigatorPlugins::finishInstall Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
+ * @brief NavigatorPlugins::finishInstall Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
  * @param exitCode      Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus    Indique si le processus a crashé ou non
  */
-void WNavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
+void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(exitCode!=0 || exitStatus == QProcess::CrashExit)
     {

@@ -1,20 +1,20 @@
-#ifndef WNAVIGATORPLUGINS_H
-#define WNAVIGATORPLUGINS_H
+#ifndef NavigatorPlugins_H
+#define NavigatorPlugins_H
 
 #include <QWebView>
 #include "filedownloader.h"
 #include "downloadprogresslistener.h"
 #include "semaphore.h"
 
-class WNavigatorPlugins : public QObject, public DownloadProgressListener
+class NavigatorPlugins : public QObject, public DownloadProgressListener
 {
 
     Q_OBJECT
     Q_INTERFACES(DownloadProgressListener)
 
 public:
-    WNavigatorPlugins(QWebView *view);
-    ~WNavigatorPlugins();
+    NavigatorPlugins(QWebView *view);
+    ~NavigatorPlugins();
     Q_INVOKABLE void UpdateSoftware(QString url, QString mime_type);
 
     void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
@@ -30,4 +30,4 @@ private:
     Semaphore *sem;
 };
 
-#endif // WNAVIGATORPLUGINS_H
+#endif // NavigatorPlugins_H

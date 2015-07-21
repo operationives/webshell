@@ -14,6 +14,7 @@ class WNavigator : public QObject, public DownloadProgressListener
 public:
     WNavigator(QWebView *view);
     Q_INVOKABLE void UpdateSoftware(QString url);
+    Q_INVOKABLE void InitWebshellAPI();
 
     void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
     void FileDownloaded(QString mime_type);
