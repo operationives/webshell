@@ -22,7 +22,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
 
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
-    connect(wnavigator,SIGNAL(close()),this,SIGNAL,(close()));
+    connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
 
     firstPage = true;
