@@ -1,5 +1,9 @@
 #include <QWebFrame>
+#include <stdarg.h>
 #include "mywebview.h"
+#include "wnavigator.h"
+#include "navigatorplugins.h"
+#include "webapp.h"
 #include "global.h"
 
 /**
@@ -8,9 +12,9 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
-    wnavigator = new WNavigator(qobject_cast<QWebView *>(this));
-    wapp = new WebApp(qobject_cast<QWebView *>(this));
-    navigatorplugins = new NavigatorPlugins(qobject_cast<QWebView *>(this));
+    wnavigator = new WNavigator(this);
+    wapp = new WebApp(this);
+    navigatorplugins = new NavigatorPlugins(this);
     //On permet l'accès aux méthodes dans WNavigator par les appels javascript
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
     this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
@@ -56,5 +60,49 @@ void MyWebView::handleRedirect(QUrl url)
     {
             this->page()->triggerAction(QWebPage::Back);
             QDesktopServices::openUrl(url);
+    }
+}
+
+/**
+ * @brief MyWebView::DispatchJsEvent Lance un événement depuis une cible particulière avec des clefs et valeurs spécifiques
+ * @param evtType   Nom de l'événement
+ * @param evtTarget Target de l'événement
+ * @param keyValues Doublons clés/valeurs, si la liste ne contient pas un nombre pair d'éléments on a une erreur
+ * @return
+ */
+bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues)
+{
+    QString code =QString("var webshellEvent = new Event('%1');").arg(evtType);
+    QString key;
+    QString value;
+
+    QStringList::const_iterator i;
+    for(i = keyValues.begin(); i!= keyValues.end();++i)
+    {
+        key = *i;
+        if(i!= keyValues.end())
+        {
+            ++i;
+        }
+        else
+        {
+            qDebug() << "Nombre d'arguments invalide";
+            return false;
+        }
+        value = *i;
+        code.append(QString("webshellEvent.%1='%2';").arg(key,value));
+    }
+
+    code.append(evtTarget+".dispatchEvent(webshellEvent);");
+    this->page()->mainFrame()->evaluateJavaScript(code);
+    return true;
+}
+
+void MyWebView::func(const QStringList &test)
+{
+    QStringList::const_iterator i;
+    for(i = test.begin(); i!= test.end();++i)
+    {
+        qDebug() << *i;
     }
 }

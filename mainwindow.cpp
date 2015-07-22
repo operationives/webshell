@@ -231,6 +231,7 @@ void MainWindow::paramsWindow()
 void MainWindow::quit ()
 {
     stayOpen = false;
+    view->DispatchJsEvent("Exit","window");
     this->close();
 }
 

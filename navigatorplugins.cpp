@@ -8,9 +8,10 @@
  * @brief NavigatorPlugins::NavigatorPlugins Constructeur de l'objet NavigatorPlugins
  * @param view  WebView sur laquelle effectuer des commandes JavaScript
  */
-NavigatorPlugins::NavigatorPlugins(QWebView *view)
+NavigatorPlugins::NavigatorPlugins(MyWebView *view)
 {
-    this->view = view;
+    this->m_webView = view;
+    this->m_target = "window";
     sem = new Semaphore();
 }
 
@@ -39,8 +40,7 @@ void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
  */
 void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
-    if(!mime_type.isNull()){}
-    view->page()->mainFrame()->evaluateJavaScript(QString("update(%1,%2)").arg(QString::number(bytesReceived),QString::number(bytesTotal)));
+    if(m_webView->DispatchJsEvent("DownloadProgress",m_target,QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
 
 /**
@@ -49,9 +49,10 @@ void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal,
  */
 void NavigatorPlugins::FileDownloaded(QString mime_type)
 {
-    view->page()->mainFrame()->evaluateJavaScript(QString("download_done()"));
+    if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << mime_type)){}
 
     sem->Acquire();
+    currentTypeMime = mime_type;
     //Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
     QString filename = hash.value(mime_type)->GetUrl();
     filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -83,7 +84,7 @@ void NavigatorPlugins::FileDownloaded(QString mime_type)
     }
     else
     {
-        view->page()->mainFrame()->evaluateJavaScript(QString("file_error()"));
+        if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << mime_type)){}
     }
 
     //Lancement du programme. Lorsqu'il finit, finishInstall est appelé
@@ -98,8 +99,6 @@ void NavigatorPlugins::FileDownloaded(QString mime_type)
     {
         myProcess->start(program);
     }
-
-    view->page()->mainFrame()->evaluateJavaScript(QString("maj_webshell()"));
 }
 
 /**
@@ -108,9 +107,7 @@ void NavigatorPlugins::FileDownloaded(QString mime_type)
  */
 void NavigatorPlugins::DownloadFailure(QString mime_type)
 {
-    if(!mime_type.isNull()){}
-    view->page()->mainFrame()->evaluateJavaScript(QString("download_fail()"));
-
+    if(m_webView->DispatchJsEvent("DownloadFailure",m_target,QStringList() << "typemime" << mime_type)){}
 }
 
 /**
@@ -122,13 +119,30 @@ void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStat
 {
     if(exitCode!=0 || exitStatus == QProcess::CrashExit)
     {
-        view->page()->mainFrame()->evaluateJavaScript(QString("erreur()"));
+        if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << currentTypeMime)){}
     }
     else
     {
-        view->page()->mainFrame()->evaluateJavaScript(QString("success()"));
+        if(m_webView->DispatchJsEvent("InstallSuccess",m_target,QStringList() << "typemime" << currentTypeMime)){}
     }
 
     sem->Release();
 }
 
+/**
+ * @brief NavigatorPlugins::Target Retourne la cible des événements
+ * @return m_target
+ */
+QString NavigatorPlugins::Target() const
+{
+    return m_target;
+}
+
+/**
+ * @brief NavigatorPlugins::SetTarget met à jour la cible des événements
+ * @param target    Nouvelle cible des événements
+ */
+void NavigatorPlugins::SetTarget(const QString &target)
+{
+    m_target = target;
+}

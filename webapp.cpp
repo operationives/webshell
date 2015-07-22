@@ -8,9 +8,10 @@
  * @brief WebApp::WebApp Constructeur de l'objet WebApp
  * @param view  Page sur laquelle effectuer des commandes JavaScript
  */
-WebApp::WebApp(QWebView *view)
+WebApp::WebApp(MyWebView *view)
 {
-    this->view = view;
+    this->m_webView = view;
+    this->m_target = "window";
     m_infos = config->GetInfos();
     m_baseUrl = *config->GetBaseUrl();
 }
@@ -127,7 +128,7 @@ void WebApp::SetBaseUrl(const QStringList &value)
  */
 bool WebApp::IsPageInApplication()
 {
-    QString urls = view->url().toString();
+    QString urls = m_webView->url().toString();
     QStringList::iterator i;
     bool res = false;
     for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
@@ -162,3 +163,22 @@ bool WebApp::IsPageInApplication(QUrl url)
     return res;
 
 }
+
+/**
+ * @brief WebApp::Target Retourne la cible des événements
+ * @return m_target
+ */
+QString WebApp::Target() const
+{
+    return m_target;
+}
+
+/**
+ * @brief WebApp::SetTarget met à jour la cible des événements
+ * @param target    Nouvelle cible des événements
+ */
+void WebApp::SetTarget(const QString &target)
+{
+    m_target = target;
+}
+

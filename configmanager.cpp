@@ -150,6 +150,7 @@ QDomDocument dom("webshell_xml");
         return;
     }
     QTextStream stream(&fichier);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
     stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
 }
 

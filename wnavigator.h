@@ -1,18 +1,19 @@
 #ifndef WNAVIGATOR_H
 #define WNAVIGATOR_H
 
-#include <QWebView>
 #include "filedownloader.h"
 #include "downloadprogresslistener.h"
+#include "mywebview.h"
 
 class WNavigator : public QObject, public DownloadProgressListener
 {
 
     Q_OBJECT
     Q_INTERFACES(DownloadProgressListener)
+    Q_PROPERTY(QString target READ Target WRITE SetTarget)
 
 public:
-    WNavigator(QWebView *view);
+    WNavigator(MyWebView *view);
     Q_INVOKABLE void UpdateSoftware(QString url);
     Q_INVOKABLE void InitWebshellAPI();
 
@@ -24,8 +25,12 @@ private slots:
     void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    QWebView *view;
+    MyWebView *m_webView;
+    QString m_target;
+    QString currentTypeMime;
     FileDownloader *data;
+    QString Target() const;
+    void SetTarget(const QString &target);
 };
 
 #endif // WNAVIGATOR_H

@@ -1,9 +1,9 @@
 #ifndef WEBAPP_H
 #define WEBAPP_H
 
-#include <QWebView>
 #include "filedownloader.h"
 #include "downloadprogresslistener.h"
+#include "mywebview.h"
 
 class WebApp : public QObject, public DownloadProgressListener
 {
@@ -13,11 +13,10 @@ class WebApp : public QObject, public DownloadProgressListener
     Q_PROPERTY(QStringList baseUrl READ GetBaseUrl WRITE SetBaseUrl)
     Q_PROPERTY(QString icon READ Icon WRITE SetIcon)
     Q_PROPERTY(QString infos READ Infos WRITE SetInfos)
+    Q_PROPERTY(QString target READ Target WRITE SetTarget)
 
 public:
-    //A FAIRE: placer baseUrl en Q_PROPERTY, afin d'avoir un set et get adaptés à l'application
-//    QList<QString> *baseUrl;
-    WebApp(QWebView *view);
+    WebApp(MyWebView *view);
     ~WebApp();
     bool IsPageInApplication();
     bool IsPageInApplication(QUrl url);
@@ -33,7 +32,8 @@ signals:
 private:
     QString m_icon;
     QString m_infos;
-    QWebView *view;
+    MyWebView *m_webView;
+    QString m_target;
     FileDownloader *data;
     QString Icon() const;
     void SetIcon(const QString &icon);
@@ -42,6 +42,8 @@ private:
     QStringList m_baseUrl;
     QStringList GetBaseUrl() const;
     void SetBaseUrl(const QStringList &value);
+    QString Target() const;
+    void SetTarget(const QString &target);
 };
 
 #endif // WEBAPP_H
