@@ -40,6 +40,28 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
         file.write(QString("Other: ").toLatin1()+msg.toLatin1()+QString(" LogContext: ").toLatin1()+QString(logcontext.function).toLatin1()+QString("\r\n").toLatin1());
         break;
     }
+    //Taille maximale: 10 Mo
+    if(file.size()>10000000)
+    {
+        file.close();
+        if(file.open(QIODevice::ReadWrite | QIODevice::Text))
+        {
+            QString s;
+            QTextStream t(&file);
+            QString line = t.readLine();
+            while(!t.atEnd())
+            {
+                line = t.readLine();
+                if(!line.contains("DELETE"))
+                    s.append(line + "\n");
+            }
+            file.resize(0);
+            t << s;
+            file.close();
+        }
+    }
+    else
+        file.close();
 }
 
 /**
