@@ -1,5 +1,4 @@
 #include <QWebFrame>
-#include <stdarg.h>
 #include "mywebview.h"
 #include "wnavigator.h"
 #include "navigatorplugins.h"
@@ -96,13 +95,4 @@ bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarg
     code.append(evtTarget+".dispatchEvent(webshellEvent);");
     this->page()->mainFrame()->evaluateJavaScript(code);
     return true;
-}
-
-void MyWebView::func(const QStringList &test)
-{
-    QStringList::const_iterator i;
-    for(i = test.begin(); i!= test.end();++i)
-    {
-        qDebug() << *i;
-    }
 }

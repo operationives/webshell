@@ -16,9 +16,7 @@ class MyWebView : public QWebView
 public:
     MyWebView(QWidget *parent = 0);
     ~MyWebView();
-
      bool DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues = QStringList());
-     void func(const QStringList &test);
 
 signals:
     void changeIcon(QIcon icon);
