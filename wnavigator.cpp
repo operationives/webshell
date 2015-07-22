@@ -26,13 +26,22 @@ void WNavigator::UpdateSoftware(QString url)
 }
 
 /**
- * @brief Initialization Initialisation des objets JavaScript de l'application
+ * @brief WNavigator::InitWebshellAPI Initialisation des objets JavaScript de l'application
  */
 void WNavigator::InitWebshellAPI()
 {
     m_webView->page()->mainFrame()->evaluateJavaScript(\
     "navigator.UpdateSoftware = wnavigator.UpdateSoftware;\
-    navigator.webshellParameters = webshellParameters;");
+    navigator.webshellParameters = webshellParameters;\
+    navigator.Close = wnavigator.Close;");
+}
+
+/**
+ * @brief WNavigator::Close Ferme le webshell
+ */
+void WNavigator::Close()
+{
+    emit close();
 }
 
 /**

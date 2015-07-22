@@ -16,11 +16,14 @@ public:
     WNavigator(MyWebView *view);
     Q_INVOKABLE void UpdateSoftware(QString url);
     Q_INVOKABLE void InitWebshellAPI();
+    Q_INVOKABLE void Close();
 
     void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
     void FileDownloaded(QString mime_type);
     void DownloadFailure(QString mime_type);
 
+signals:
+    void close();
 
 private slots:
     void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);

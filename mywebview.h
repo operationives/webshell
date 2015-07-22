@@ -20,6 +20,7 @@ public:
 
 signals:
     void changeIcon(QIcon icon);
+    void close();
 
 private:
     WNavigator *wnavigator;
