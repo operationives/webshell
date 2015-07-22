@@ -17,14 +17,11 @@ Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent)
     this->setWindowIcon(QIcon(QApplication::applicationDirPath()+"/djanah.png"));
 
     tabWidget = new QTabWidget;
-//    Tab *screen = new Tab("Dimensions de l'écran","Plein écran","Fenêtré",fullscreen);
     Tab *closeOption = new Tab("Action du bouton de fermeture","Minimisation","Fermeture",minimization);
     Tab *tools = new Tab("Outils de développement","Activés","Désactivés",toolsactivated);
-//    tabWidget->addTab(screen, tr("Ecran"));
     tabWidget->addTab(closeOption, tr("Fermeture"));
     tabWidget->addTab(tools, tr("Outils"));
 
-//    connect(screen,SIGNAL(OptionClicked(bool)),this,SIGNAL(screenMode(bool)));
     connect(closeOption,SIGNAL(optionClicked(bool)),this,SIGNAL(closeButtonMode(bool)));
     connect(tools,SIGNAL(optionClicked(bool)),this,SIGNAL(toolsMode(bool)));
 

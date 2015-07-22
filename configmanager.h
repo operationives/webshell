@@ -12,25 +12,33 @@ public:
     ConfigManager(QString confFilePath);
     ~ConfigManager();
 
-    //Setters et getters pour attributs webshell
+    //Getters pour attributs webshell
     bool GetScreenMode();
-    bool GetCloseButtonBehaviour();
     bool GetDeveloperToolsMode();
     QString GetVersion();
-    void SetScreenMode(bool fullscreen);
-    void SetCloseButtonBehaviour(bool minimization);
-    void SetDeveloperToolsMode(bool developerToolsActivated);
-    void SetVersion(QString version);
 
-    //Setters et getters pour attributs appli
+    //Getters pour attributs appli
+    bool GetCloseButtonBehaviour();
     QString GetLaunchUrl();
     QString GetIcon();
     QString GetInfos();
     QStringList *GetBaseUrl();
+
+public slots:
+    //Setters pour attributs webshell
+    void SetScreenMode(bool fullscreen);
+    void SetDeveloperToolsMode(bool developerToolsActivated);
+    void SetVersion(QString version);
+
+    //Setters pour attributs appli
+    void SetCloseButtonBehaviour(bool minimization);
     void SetLaunchUrl(QString launchUrl);
     void SetIcon(QString icon);
     void SetInfos(QString infosAppli);
     void SetBaseUrl(QStringList *baseUrl);
+
+signals:
+    void toolsMode(bool toolsActivated);
 
 private:
     //Attributs webshell

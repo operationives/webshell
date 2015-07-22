@@ -2,6 +2,7 @@
 #include <QProcess>
 #include <QApplication>
 #include "wnavigator.h"
+#include "global.h"
 
 /**
  * @brief WNavigator::WNavigator Constructeur de l'objet WNavigator
@@ -30,7 +31,8 @@ void WNavigator::UpdateSoftware(QString url)
 void WNavigator::InitWebshellAPI()
 {
     m_webView->page()->mainFrame()->evaluateJavaScript(\
-    "navigator.UpdateSoftware = wnavigator.UpdateSoftware");
+    "navigator.UpdateSoftware = wnavigator.UpdateSoftware;\
+    navigator.webshellParameters = webshellParameters;");
 }
 
 /**
@@ -139,7 +141,7 @@ QString WNavigator::Target() const
 }
 
 /**
- * @brief WNavigator::SetTarget met à jour la cible des événements
+ * @brief WNavigator::SetTarget Met à jour la cible des événements
  * @param target    Nouvelle cible des événements
  */
 void WNavigator::SetTarget(const QString &target)

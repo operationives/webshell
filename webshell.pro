@@ -11,7 +11,8 @@ HEADERS =   mainwindow.h \
 	    navigatorplugins.h \
 	    semaphore.h \
 	    global.h \
-    informations.h
+	    informations.h \
+	    webshellparameters.h
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
@@ -24,4 +25,5 @@ SOURCES =   main.cpp \
 	    navigatorplugins.cpp \
 	    semaphore.cpp \
 	    global.cpp \
-    informations.cpp
+	    informations.cpp \
+	    webshellparameters.cpp

@@ -21,6 +21,7 @@ public:
     void FileDownloaded(QString mime_type);
     void DownloadFailure(QString mime_type);
 
+
 private slots:
     void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);
 

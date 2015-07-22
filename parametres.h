@@ -31,7 +31,6 @@ private:
     QDialogButtonBox *buttonBox;
 
 signals:
-//    void screenMode(bool fullscreen);
     void closeButtonMode(bool minimization);
     void toolsMode(bool toolsActivated);
 };

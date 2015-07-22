@@ -3,6 +3,7 @@
 #include "wnavigator.h"
 #include "navigatorplugins.h"
 #include "webapp.h"
+#include "webshellparameters.h"
 #include "global.h"
 
 /**
@@ -18,6 +19,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
     this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
     this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
+    this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
 
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 

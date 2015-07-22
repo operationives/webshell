@@ -35,7 +35,9 @@ ConfigManager::ConfigManager(QString confFilePath)
     while(!n.isNull())
     {
         QDomElement e = n.toElement();
-        if(e.attribute("name") == "launchUrl")
+        if(e.attribute("name") == "minimization")
+            minimization = (e.attribute("value") == "true" ? true : false);
+        else if(e.attribute("name") == "launchUrl")
             launchUrl = e.attribute("value");
         else if(e.attribute("name") == "icon")
             icon = e.attribute("value");
@@ -78,8 +80,6 @@ void ConfigManager::InitWebshellParameters()
         QDomElement e = n.toElement();
         if(e.attribute("name") == "fullscreen")
             fullscreen = (e.attribute("value") == "true" ? true : false);
-        else if(e.attribute("name") == "minimization")
-            minimization = (e.attribute("value") == "true" ? true : false);
         else if(e.attribute("name") == "developerToolsActivated")
             developerToolsActivated = (e.attribute("value") == "true" ? true : false);
         else if(e.attribute("name") == "version")
@@ -94,7 +94,7 @@ void ConfigManager::InitWebshellParameters()
  */
 void ConfigManager::LoadParametersWebshell()
 {
-QDomDocument dom("webshell_xml");
+    QDomDocument dom("webshell_xml");
     QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
     if(!doc_xml.open(QIODevice::ReadOnly))
         return;
@@ -115,12 +115,6 @@ QDomDocument dom("webshell_xml");
         {
             write_elem.setAttribute("name", "fullscreen");
             if(fullscreen) write_elem.setAttribute("value", "true");
-            else write_elem.setAttribute("value", "false");
-        }
-        else if(e.attribute("name") == "minimization")
-        {
-            write_elem.setAttribute("name", "minimization");
-            if(minimization) write_elem.setAttribute("value", "true");
             else write_elem.setAttribute("value", "false");
         }
         else if(e.attribute("name") == "developerToolsActivated")
@@ -159,7 +153,6 @@ QDomDocument dom("webshell_xml");
  */
 void ConfigManager::LoadParametersAppli()
 {
-    qDebug() << "On modifie l'xml";
     QDomDocument dom("appli_xml");
     QFile doc_xml(confFilePath);
     if(!doc_xml.open(QIODevice::ReadOnly))
@@ -179,6 +172,13 @@ void ConfigManager::LoadParametersAppli()
     }
 
     QDomElement write_elem;
+
+    //Insertion du paramètre minimization
+    write_elem = dom.createElement("setting");
+    write_elem.setAttribute("name", "minimization");
+    if(minimization) write_elem.setAttribute("value", "true");
+    else write_elem.setAttribute("value", "false");
+    docElem.appendChild(write_elem);
 
     //Insertion du paramètre launchUrl
     write_elem = dom.createElement("setting");
@@ -234,15 +234,6 @@ bool ConfigManager::GetScreenMode()
 }
 
 /**
- * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
- * @return minimization
- */
-bool ConfigManager::GetCloseButtonBehaviour()
-{
-    return minimization;
-}
-
-/**
  * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
  * @return developerToolsActivated
  */
@@ -271,22 +262,13 @@ void ConfigManager::SetScreenMode(bool fullscreen)
 }
 
 /**
- * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
- * @param minimization  Nouvelle valeur de this->minimization
- */
-void ConfigManager::SetCloseButtonBehaviour(bool minimization)
-{
-    this->minimization = minimization;
-    LoadParametersWebshell();
-}
-
-/**
  * @brief ConfigManager::SetDeveloperToolsMode Met à jour le paramètre "developerToolsActivated"
  * @param developerToolsActivated Nouvelle valeur de this->developerToolsActivated
  */
 void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 {
     this->developerToolsActivated = developerToolsActivated;
+    emit toolsMode(developerToolsActivated);
     LoadParametersWebshell();
 }
 
@@ -298,6 +280,15 @@ void ConfigManager::SetVersion(QString version)
 {
     this->version = version;
     LoadParametersWebshell();
+}
+
+/**
+ * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
+ * @return minimization
+ */
+bool ConfigManager::GetCloseButtonBehaviour()
+{
+    return minimization;
 }
 
 /**
@@ -334,6 +325,16 @@ QString ConfigManager::GetInfos()
 QStringList *ConfigManager::GetBaseUrl()
 {
     return new QStringList(*baseUrl);
+}
+
+/**
+ * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
+ * @param minimization  Nouvelle valeur de this->minimization
+ */
+void ConfigManager::SetCloseButtonBehaviour(bool minimization)
+{
+    this->minimization = minimization;
+    LoadParametersAppli();
 }
 
 /**

@@ -23,7 +23,6 @@ private:
     MyWebView *view;
     QSystemTrayIcon *trayIcon;
     QWebInspector *i;
-    Parametres *params;
     Informations *infos;
     bool stayOpen;
     void DisplayInfos();
@@ -33,10 +32,8 @@ private:
 private slots:
     void showContextMenu(const QPoint& pos);
     void changeScreenMode(bool fullscreen);
-    void changeCloseButtonMode(bool minimization);
     void changeToolsMode(bool toolsActivated);
     void quit();
-    void paramsWindow();
     void changeIcon(QIcon icon);
 };
 

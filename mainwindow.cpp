@@ -47,14 +47,11 @@ MainWindow::MainWindow()
     i->setPage(view->page());
 
     stayOpen = true;
-    params = new Parametres(config->GetCloseButtonBehaviour(),config->GetDeveloperToolsMode());
     if(config->GetScreenMode())
         this->showFullScreen();
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
-//    connect(params,SIGNAL(screenMode(bool)),this,SLOT(changeScreenMode(bool)));
-    connect(params,SIGNAL(closeButtonMode(bool)),this,SLOT(changeCloseButtonMode(bool)));
-    connect(params,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+    connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 
     infos = new Informations();
 
@@ -64,9 +61,6 @@ MainWindow::MainWindow()
 
     //Ajout du menu dans la barre de titre
     QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
-    QAction* paramsAction = new QAction("Paramètres", this);
-    connect(paramsAction, SIGNAL(triggered()),this, SLOT(paramsWindow()));
-    fileMenu->addAction(paramsAction);
     fileMenu->addAction(quitAction);
 }
 
@@ -78,7 +72,6 @@ MainWindow::~MainWindow()
     delete view;
     delete trayIcon;
     delete i;
-    delete params;
     delete infos;
 }
 
@@ -90,7 +83,6 @@ void MainWindow::showContextMenu(const QPoint &pos)
 {
 
     QMenu myMenu;
-    myMenu.addAction("Paramètres");
     if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
     {
         myMenu.addAction("Inspect");
@@ -112,11 +104,6 @@ void MainWindow::showContextMenu(const QPoint &pos)
     QAction* selectedItem = myMenu.exec(globalPos);
     if(selectedItem == NULL)
         return;
-
-    if (selectedItem->text()=="Paramètres")
-    {
-        params->show();
-    }
 
     if (selectedItem->text()=="Inspect")
     {
@@ -164,22 +151,12 @@ void MainWindow::changeScreenMode(bool fullscreen)
 }
 
 /**
- * @brief MainWindow::changeCloseButtonMode Change l'effet du bouton de fermeture
- * @param minimization  Vrai si le bouton est associé à la minimisation, association à la fermeture sinon
- */
-void MainWindow::changeCloseButtonMode(bool minimization)
-{
-        config->SetCloseButtonBehaviour(minimization);
-}
-
-/**
- * @brief MainWindow::changeToolsMode   Change l'accès aux outils développeur
+ * @brief MainWindow::changeToolsMode   Change l'accès aux outils développeur sur la page et dans le fichier xml
  * @param toolsActivated    Vrai si les outils sont activés, désactivés sinon
  */
 void MainWindow::changeToolsMode(bool toolsActivated)
 {
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, toolsActivated);
-    config->SetDeveloperToolsMode(toolsActivated);
 }
 
 /**
@@ -215,14 +192,6 @@ void MainWindow::closeEvent (QCloseEvent *event)
         delete this;
         event->accept();
     }
-}
-
-/**
- * @brief MainWindow::quit Quitte l'application
- */
-void MainWindow::paramsWindow()
-{
-    params->show();
 }
 
 /**
