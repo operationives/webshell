@@ -4,7 +4,6 @@
 #include "navigatorplugins.h"
 #include "webapp.h"
 #include "webshellparameters.h"
-#include "cookiejar.h"
 #include "global.h"
 
 /**
@@ -32,7 +31,8 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     wapp->setProperty("icon",config->GetIcon());
 
     m_WebCtrl = new QNetworkAccessManager();
-    m_WebCtrl->setCookieJar(new CookieJar());
+    m_cookieJar = new CookieJar();
+    m_WebCtrl->setCookieJar(m_cookieJar);
     this->page()->setNetworkAccessManager(m_WebCtrl);
 }
 

@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include <QWebView>
+#include "cookiejar.h"
 
 class WNavigator;
 class NavigatorPlugins;
@@ -17,6 +18,7 @@ public:
     MyWebView(QWidget *parent = 0);
     ~MyWebView();
      bool DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues = QStringList());
+     CookieJar *m_cookieJar;
 
 signals:
     void changeIcon(QIcon icon);

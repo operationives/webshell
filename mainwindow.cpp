@@ -25,10 +25,17 @@ MainWindow::MainWindow()
     trayIcon->setContextMenu (trayIconMenu);
     trayIcon->show();
 
+    //Ajout du menu dans la barre de titre
+    QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
+    fileMenu->addAction(quitAction);
+    QAction *clearCookies = new QAction("&Effacer les cookies", this);
+    fileMenu->addAction(clearCookies);
+
     view = new MyWebView(this);
     connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
     connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
     connect(view,SIGNAL(close()),this,SLOT(quit()));
+    connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
     view->load(QUrl(config->GetLaunchUrl()));
     //On met en place la taille minimale
     this->setMinimumSize(1000,800);
@@ -60,10 +67,6 @@ MainWindow::MainWindow()
     //On ajoute les suppléments windows
     WinAddon *waddon = new WinAddon();
     if(waddon->isWidgetType()){}
-
-    //Ajout du menu dans la barre de titre
-    QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
-    fileMenu->addAction(quitAction);
 }
 
 /**
