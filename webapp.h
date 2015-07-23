@@ -14,6 +14,7 @@ class WebApp : public QObject, public DownloadProgressListener
     Q_PROPERTY(QString icon READ Icon WRITE SetIcon)
     Q_PROPERTY(QString infos READ Infos WRITE SetInfos)
     Q_PROPERTY(QString target READ Target WRITE SetTarget)
+    Q_PROPERTY(QString appName READ AppName WRITE SetAppName)
 
 public:
     WebApp(MyWebView *view);
@@ -28,12 +29,14 @@ public:
 
 signals:
     void changeIcon(QIcon icon);
+    void changeTitle(QString appName);
 
 private:
     QString m_icon;
     QString m_infos;
-    MyWebView *m_webView;
     QString m_target;
+    QString m_appName;
+    MyWebView *m_webView;
     FileDownloader *data;
     QString Icon() const;
     void SetIcon(const QString &icon);
@@ -44,6 +47,8 @@ private:
     void SetBaseUrl(const QStringList &value);
     QString Target() const;
     void SetTarget(const QString &target);
+    QString AppName() const;
+    void SetAppName(const QString &appname);
 };
 
 #endif // WEBAPP_H

@@ -20,9 +20,11 @@ public:
 
 signals:
     void changeIcon(QIcon icon);
+    void changeTitle(QString appName);
     void close();
 
 private:
+    QNetworkAccessManager *m_WebCtrl;
     WNavigator *wnavigator;
     NavigatorPlugins *navigatorplugins;
     WebApp *wapp;

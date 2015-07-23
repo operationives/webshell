@@ -1,4 +1,5 @@
 QT += webkitwidgets core network xml winextras
+
 HEADERS =   mainwindow.h \
 	    filedownloader.h \
 	    wnavigator.h \
@@ -12,7 +13,10 @@ HEADERS =   mainwindow.h \
 	    semaphore.h \
 	    global.h \
 	    informations.h \
-	    webshellparameters.h
+	    webshellparameters.h \
+	    cookiejar.h \
+	    autosaver.h
+
 SOURCES =   main.cpp \
 	    mainwindow.cpp \
 	    filedownloader.cpp \
@@ -26,4 +30,6 @@ SOURCES =   main.cpp \
 	    semaphore.cpp \
 	    global.cpp \
 	    informations.cpp \
-	    webshellparameters.cpp
+	    webshellparameters.cpp \
+	    cookiejar.cpp \
+	    autosaver.cpp

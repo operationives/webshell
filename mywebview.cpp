@@ -4,6 +4,7 @@
 #include "navigatorplugins.h"
 #include "webapp.h"
 #include "webshellparameters.h"
+#include "cookiejar.h"
 #include "global.h"
 
 /**
@@ -22,12 +23,17 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
 
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
+    connect(wapp,SIGNAL(changeTitle(QString)),this,SIGNAL(changeTitle(QString)));
     connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
 
     firstPage = true;
 
     wapp->setProperty("icon",config->GetIcon());
+
+    m_WebCtrl = new QNetworkAccessManager();
+    m_WebCtrl->setCookieJar(new CookieJar());
+    this->page()->setNetworkAccessManager(m_WebCtrl);
 }
 
 /**

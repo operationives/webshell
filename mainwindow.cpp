@@ -27,6 +27,7 @@ MainWindow::MainWindow()
 
     view = new MyWebView(this);
     connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
+    connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
     connect(view,SIGNAL(close()),this,SLOT(quit()));
     view->load(QUrl(config->GetLaunchUrl()));
     //On met en place la taille minimale

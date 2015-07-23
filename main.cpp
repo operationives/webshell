@@ -51,8 +51,9 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    app.setApplicationName(QString("fr.dev.djanah.webshell"));
-    app.setApplicationVersion(QString("1.0"));
+
+    //Permet de placer dans un fichier .log ce qui est affiché dans la console
+    qInstallMessageHandler(myMessageOutput);
 
     QCommandLineParser parser;
     QCommandLineOption configOption(QStringList() << "c" << "config", "Chemin d'accès au fichier de configuration <confFile>.", "confFile");
@@ -72,6 +73,7 @@ int main(int argc, char** argv)
     {
         config = new ConfigManager(QApplication::applicationDirPath()+"/appli.xml");
     }
+
 
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr");
 //    QUrl launch = QUrl("http://djanah.dev.ives.fr/VideoLiveAPI/inst_plugin.php?retour=http%253A//djanah.dev.ives.fr/client/menu.php%253Fl%253Dfr%2526PHPSESSID%253Db2ui2vusdc0nug99befbkjmjv1");
@@ -99,8 +101,11 @@ int main(int argc, char** argv)
 
     config->SetLaunchUrl(launch);
 
-    //Permet de placer dans un fichier .log ce qui est affiché dans la console
-    qInstallMessageHandler(myMessageOutput);
+    if(!config->GetAppName().isEmpty())
+        app.setApplicationName(config->GetAppName());
+    else
+        app.setApplicationName(launch);
+    app.setApplicationVersion(config->GetVersion());
 
     //Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ
     //Sinon, on prend l'url spécifiée plus tôt
