@@ -24,6 +24,13 @@ Informations::Informations(QWidget *parent)
     setWindowTitle(tr("Informations"));
 }
 
+Informations::~Informations()
+{
+    delete label;
+    delete buttonBox;
+    delete manager;
+}
+
 void Informations::UpdateValues()
 {
     version = config->GetVersion();

@@ -11,6 +11,7 @@ class Informations : public QDialog
 
 public:
     Informations(QWidget *parent = 0);
+    ~Informations();
     void UpdateValues();
 
 private:

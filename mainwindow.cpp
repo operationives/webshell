@@ -102,6 +102,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
     myMenu.addAction("Informations");
 
     QPoint globalPos = this->mapToGlobal(pos);
+    //Correction de position
+    globalPos.setY(globalPos.ry()+20);
 
     QAction* selectedItem = myMenu.exec(globalPos);
     if(selectedItem == NULL)

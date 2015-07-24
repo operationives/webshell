@@ -234,24 +234,6 @@ bool ConfigManager::GetScreenMode()
 }
 
 /**
- * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
- * @return developerToolsActivated
- */
-bool ConfigManager::GetDeveloperToolsMode()
-{
-    return developerToolsActivated;
-}
-
-/**
- * @brief ConfigManager::GetVersion Indique la version du webshell
- * @return version
- */
-QString ConfigManager::GetVersion()
-{
-    return version;
-}
-
-/**
  * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
  * @param fullscreen    Nouvelle valeur de this->fullscreen
  */
@@ -259,6 +241,15 @@ void ConfigManager::SetScreenMode(bool fullscreen)
 {
     this->fullscreen = fullscreen;
     LoadParametersWebshell();
+}
+
+/**
+ * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
+ * @return developerToolsActivated
+ */
+bool ConfigManager::GetDeveloperToolsMode()
+{
+    return developerToolsActivated;
 }
 
 /**
@@ -270,6 +261,15 @@ void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
     this->developerToolsActivated = developerToolsActivated;
     emit toolsMode(developerToolsActivated);
     LoadParametersWebshell();
+}
+
+/**
+ * @brief ConfigManager::GetVersion Indique la version du webshell
+ * @return version
+ */
+QString ConfigManager::GetVersion()
+{
+    return version;
 }
 
 /**
@@ -292,42 +292,6 @@ bool ConfigManager::GetCloseButtonBehaviour()
 }
 
 /**
- * @brief ConfigManager::GetLaunchUrl Indique l'adresse de démarrage de l'application
- * @return  launchUrl
- */
-QString ConfigManager::GetLaunchUrl()
-{
-    return launchUrl;
-}
-
-/**
- * @brief ConfigManager::GetIcon Indique l'url de l'icône par défaut de l'application
- * @return icon
- */
-QString ConfigManager::GetIcon()
-{
-    return icon;
-}
-
-/**
- * @brief ConfigManager::GetIcon Indique les infos du service
- * @return infosAppli
- */
-QString ConfigManager::GetInfos()
-{
-    return infosAppli;
-}
-
-/**
- * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
- * @return new QStringList(*baseUrl)
- */
-QStringList *ConfigManager::GetBaseUrl()
-{
-    return new QStringList(*baseUrl);
-}
-
-/**
  * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
  * @param minimization  Nouvelle valeur de this->minimization
  */
@@ -335,6 +299,15 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 {
     this->minimization = minimization;
     LoadParametersAppli();
+}
+
+/**
+ * @brief ConfigManager::GetLaunchUrl Indique l'adresse de démarrage de l'application
+ * @return  launchUrl
+ */
+QString ConfigManager::GetLaunchUrl()
+{
+    return launchUrl;
 }
 
 /**
@@ -348,6 +321,15 @@ void ConfigManager::SetLaunchUrl(QString launchUrl)
 }
 
 /**
+ * @brief ConfigManager::GetIcon Indique l'url de l'icône par défaut de l'application
+ * @return icon
+ */
+QString ConfigManager::GetIcon()
+{
+    return icon;
+}
+
+/**
  * @brief ConfigManager::SetIcon Met à jour icon
  * @param icon Nouvelle valeur de this->icon
  */
@@ -358,6 +340,15 @@ void ConfigManager::SetIcon(QString icon)
 }
 
 /**
+ * @brief ConfigManager::GetIcon Indique les infos du service
+ * @return infosAppli
+ */
+QString ConfigManager::GetInfos()
+{
+    return infosAppli;
+}
+
+/**
  * @brief ConfigManager::SetInfos Met à jour les infos service
  * @param infosAppli Nouvelle valeur des infos service
  */
@@ -365,6 +356,15 @@ void ConfigManager::SetInfos(QString infosAppli)
 {
     this->infosAppli = infosAppli;
     LoadParametersAppli();
+}
+
+/**
+ * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
+ * @return new QStringList(*baseUrl)
+ */
+QStringList *ConfigManager::GetBaseUrl()
+{
+    return new QStringList(*baseUrl);
 }
 
 /**
