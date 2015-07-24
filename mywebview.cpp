@@ -84,7 +84,7 @@ void MyWebView::updateTitle()
  */
 bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues)
 {
-    QString code =QString("var webshellEvent = new Event('%1');").arg(evtType);
+    QString code =QString("var webshellEvent = new CustomEvent('%1');").arg(evtType);
     QString key;
     QString value;
 

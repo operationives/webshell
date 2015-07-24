@@ -22,7 +22,7 @@ public:
 private:
     MyWebView *view;
     QSystemTrayIcon *trayIcon;
-    QWebInspector *i;
+    QWebInspector *inspector;
     Informations *infos;
     bool stayOpen;
     void DisplayInfos();

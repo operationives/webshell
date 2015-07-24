@@ -53,8 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
 
     //Initialisation de l'inspecteur de la page
-    i = new QWebInspector();
-    i->setPage(view->page());
+    inspector = new QWebInspector();
+    inspector->setPage(view->page());
 
     stayOpen = true;
     if(config->GetScreenMode())
@@ -73,7 +73,7 @@ MainWindow::~MainWindow()
 {
     delete view;
     delete trayIcon;
-    delete i;
+    delete inspector;
     delete infos;
 }
 
@@ -109,7 +109,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 
     if (selectedItem->text()=="Inspect")
     {
-        i->show();
+        inspector->show();
     }
 
     if (selectedItem->text()=="Plein écran")
@@ -214,6 +214,7 @@ void MainWindow::changeIcon(QIcon icon)
 {
     this->setWindowIcon(icon);
     infos->setWindowIcon(icon);
+    inspector->setWindowIcon(icon);
     this->trayIcon->setIcon(icon);
 }
 
