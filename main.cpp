@@ -72,7 +72,10 @@ int main(int argc, char** argv)
     else
     {
         config = new ConfigManager(QApplication::applicationDirPath()+"/appli.xml");
-        //Il faudra voir comment initialiser appli.xml pour qu'il ne soit pas pollué par les informations de la précédente application
+        config->SetBaseUrl(new QStringList());
+        config->SetIcon("");
+        config->SetInfos("");
+        config->SetCloseButtonBehaviour(false);
     }
 
     QString launch = config->GetLaunchUrl();

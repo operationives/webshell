@@ -31,7 +31,6 @@ signals:
     void changeTitle(QString appName);
 
 private:
-    QString m_icon;
     QString m_infos;
     QString m_target;
     MyWebView *m_webView;

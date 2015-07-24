@@ -67,11 +67,11 @@ void WebApp::DownloadFailure(QString mime_type)
 
 /**
  * @brief WebApp::Icon Accesseur de l'icône
- * @return m_icon
+ * @return config->GetIcon()
  */
 QString WebApp::Icon() const
 {
-    return m_icon;
+    return config->GetIcon();
 }
 
 /**
@@ -80,7 +80,7 @@ QString WebApp::Icon() const
  */
 void WebApp::SetIcon(const QString &icon)
 {
-    m_icon = icon;
+    config->SetIcon(icon);
     data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
 }
 
