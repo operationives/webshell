@@ -215,6 +215,7 @@ void MainWindow::quit ()
  */
 void MainWindow::changeIcon(QIcon icon)
 {
+    this->setWindowIcon(icon);
     this->trayIcon->setIcon(icon);
 }
 

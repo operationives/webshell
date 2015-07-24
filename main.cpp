@@ -100,13 +100,25 @@ int main(int argc, char** argv)
     if(launch!=config->GetLaunchUrl())
         config->SetLaunchUrl(launch);
 
+    QString appName;
     if(!config->GetBaseUrl()->isEmpty())
-        app.setApplicationName(config->GetBaseUrl()->first());
+        appName = config->GetBaseUrl()->first();
     else
     {
         config->SetBaseUrl(&(QStringList() << launch));
-        app.setApplicationName(launch);
+        appName = launch;
     }
+
+    //On récupère dans appName la partie placée entre ://(/) et le premier / suivant
+    int index = appName.indexOf("//");
+    if(appName.at(index+2) == '/')
+        index = index+3;
+    else
+        index = index+2;
+    appName.remove(0,index);
+    index = appName.indexOf("/");
+    appName.truncate(index);
+    app.setApplicationName(appName);
 
     app.setApplicationVersion(config->GetVersion());
 
