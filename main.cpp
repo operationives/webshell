@@ -72,11 +72,9 @@ int main(int argc, char** argv)
     else
     {
         config = new ConfigManager(QApplication::applicationDirPath()+"/appli.xml");
+        //Il faudra voir comment initialiser appli.xml pour qu'il ne soit pas pollué par les informations de la précédente application
     }
 
-
-//    QUrl launch = QUrl("http://djanah.dev.ives.fr");
-//    QUrl launch = QUrl("http://djanah.dev.ives.fr/VideoLiveAPI/inst_plugin.php?retour=http%253A//djanah.dev.ives.fr/client/menu.php%253Fl%253Dfr%2526PHPSESSID%253Db2ui2vusdc0nug99befbkjmjv1");
     QString launch = config->GetLaunchUrl();
     if(parser.isSet(urlOption))
     {
@@ -99,12 +97,17 @@ int main(int argc, char** argv)
         }
     }
 
-    config->SetLaunchUrl(launch);
+    if(launch!=config->GetLaunchUrl())
+        config->SetLaunchUrl(launch);
 
-    if(!config->GetAppName().isEmpty())
-        app.setApplicationName(config->GetAppName());
+    if(!config->GetBaseUrl()->isEmpty())
+        app.setApplicationName(config->GetBaseUrl()->first());
     else
+    {
+        config->SetBaseUrl(&(QStringList() << launch));
         app.setApplicationName(launch);
+    }
+
     app.setApplicationVersion(config->GetVersion());
 
     //Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ

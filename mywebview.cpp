@@ -22,9 +22,9 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
 
     connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
-    connect(wapp,SIGNAL(changeTitle(QString)),this,SIGNAL(changeTitle(QString)));
     connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
     connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
+    connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
 
     firstPage = true;
 
@@ -68,6 +68,11 @@ void MyWebView::handleRedirect(QUrl url)
             this->page()->triggerAction(QWebPage::Back);
             QDesktopServices::openUrl(url);
     }
+}
+
+void MyWebView::updateTitle()
+{
+    emit changeTitle(this->title());
 }
 
 /**

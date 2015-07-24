@@ -35,9 +35,7 @@ ConfigManager::ConfigManager(QString confFilePath)
     while(!n.isNull())
     {
         QDomElement e = n.toElement();
-        if(e.attribute("name") == "appName")
-            appName = e.attribute("value");
-        else if(e.attribute("name") == "minimization")
+        if(e.attribute("name") == "minimization")
             minimization = (e.attribute("value") == "true" ? true : false);
         else if(e.attribute("name") == "launchUrl")
             launchUrl = e.attribute("value");
@@ -175,12 +173,6 @@ void ConfigManager::LoadParametersAppli()
 
     QDomElement write_elem;
 
-    //Insertion du paramètre appName
-    write_elem = dom.createElement("setting");
-    write_elem.setAttribute("name", "appName");
-    write_elem.setAttribute("value", appName);
-    docElem.appendChild(write_elem);
-
     //Insertion du paramètre minimization
     write_elem = dom.createElement("setting");
     write_elem.setAttribute("name", "minimization");
@@ -291,15 +283,6 @@ void ConfigManager::SetVersion(QString version)
 }
 
 /**
- * @brief ConfigManager::GetAppName Indique le nom de l'application
- * @return  appName
- */
-QString ConfigManager::GetAppName()
-{
-    return appName;
-}
-
-/**
  * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
  * @return minimization
  */
@@ -342,16 +325,6 @@ QString ConfigManager::GetInfos()
 QStringList *ConfigManager::GetBaseUrl()
 {
     return new QStringList(*baseUrl);
-}
-
-/**
- * @brief ConfigManager::SetAppName Met à jour appName
- * @param appName Nouvelle valeur de this->appName
- */
-void ConfigManager::SetAppName(QString appName)
-{
-    this->appName = appName;
-    LoadParametersAppli();
 }
 
 /**

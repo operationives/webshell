@@ -181,24 +181,3 @@ void WebApp::SetTarget(const QString &target)
 {
     m_target = target;
 }
-
-/**
- * @brief WebApp::AppName Retourne le nom de l'application
- * @return m_appName
- */
-QString WebApp::AppName() const
-{
-    return m_appName;
-}
-
-/**
- * @brief WebApp::SetAppName Met à jour le nom de l'application
- * @param appName    Nouveau nom de l'application
- */
-void WebApp::SetAppName(const QString &appName)
-{
-    m_appName = appName;
-    config->SetAppName(appName);
-    qApp->setApplicationName(appName);
-    emit changeTitle(appName);
-}

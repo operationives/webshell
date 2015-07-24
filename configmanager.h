@@ -18,7 +18,6 @@ public:
     QString GetVersion();
 
     //Getters pour attributs appli
-    QString GetAppName();
     bool GetCloseButtonBehaviour();
     QString GetLaunchUrl();
     QString GetIcon();
@@ -32,7 +31,6 @@ public slots:
     void SetVersion(QString version);
 
     //Setters pour attributs appli
-    void SetAppName(QString appName);
     void SetCloseButtonBehaviour(bool minimization);
     void SetLaunchUrl(QString launchUrl);
     void SetIcon(QString icon);
@@ -50,7 +48,6 @@ private:
     QString version;
 
     //Attributs application
-    QString appName;
     QString launchUrl;
     QString icon;
     QString infosAppli;

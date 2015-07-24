@@ -35,6 +35,7 @@ private:
 
 private slots:
     void handleRedirect(QUrl url);
+    void updateTitle();
 };
 
 #endif
