@@ -1,5 +1,10 @@
 QT += webkitwidgets core network xml winextras
 
+TARGET = MonAppli
+VERSION = 1.0
+RC_ICONS = app.ico
+QMAKE_TARGET_DESCRIPTION = Application
+
 HEADERS =   mainwindow.h \
 	    filedownloader.h \
 	    wnavigator.h \

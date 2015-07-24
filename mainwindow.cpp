@@ -6,7 +6,8 @@
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
  * @param url   Url avec laquelle le service est initialisé
  */
-MainWindow::MainWindow()
+MainWindow::MainWindow(QWidget *parent)
+    :QMainWindow(parent)
 {
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -64,9 +65,11 @@ MainWindow::MainWindow()
 
     infos = new Informations();
 
+#ifdef Q_OS_WIN
     //On ajoute les suppléments windows
     WinAddon *waddon = new WinAddon();
     if(waddon->isWidgetType()){}
+#endif //Q_OS_WIN
 }
 
 /**
@@ -215,7 +218,7 @@ void MainWindow::quit ()
  */
 void MainWindow::changeIcon(QIcon icon)
 {
-    this->setWindowIcon(icon);
+    this->setWindowIconText("salut");
     this->trayIcon->setIcon(icon);
 }
 
