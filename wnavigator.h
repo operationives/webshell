@@ -4,16 +4,16 @@
 #include "filedownloader.h"
 #include "downloadprogresslistener.h"
 #include "mywebview.h"
+#include "webshellparameters.h"
 
 class WNavigator : public QObject, public DownloadProgressListener
 {
 
 	Q_OBJECT
 	Q_INTERFACES(DownloadProgressListener)
-	Q_PROPERTY(QString target READ Target WRITE SetTarget)
 
 public:
-	WNavigator(MyWebView *view);
+	WNavigator(MyWebView *view, WebshellParameters *webshellParameters);
 	Q_INVOKABLE void UpdateSoftware(QString url);
 	Q_INVOKABLE void InitWebshellAPI();
 	Q_INVOKABLE void Close();
@@ -30,11 +30,9 @@ private slots:
 
 private:
 	MyWebView *m_webView;
-	QString m_target;
+	WebshellParameters *m_parameters;
 	QString currentTypeMime;
 	FileDownloader *data;
-	QString Target() const;
-	void SetTarget(const QString &target);
 };
 
 #endif // WNAVIGATOR_H

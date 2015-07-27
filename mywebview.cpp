@@ -12,14 +12,15 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
-	wnavigator = new WNavigator(this);
-	wapp = new WebApp(this);
 	navigatorplugins = new NavigatorPlugins(this);
+	wapp = new WebApp(this);
+	WebshellParameters *webshellParameters = new WebshellParameters();
+	wnavigator = new WNavigator(this,webshellParameters);
 	//On permet l'accès aux méthodes dans WNavigator par les appels javascript
 	this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
 	this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
 	this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
-	this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
+	this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", webshellParameters);
 
 	connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 	connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));

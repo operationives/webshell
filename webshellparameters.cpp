@@ -49,3 +49,21 @@ void WebshellParameters::SetMinimization(bool minimization)
 	m_minimization = minimization;
 	config->SetCloseButtonBehaviour(minimization);
 }
+
+/**
+ * @brief WebshellParameters::Target Retourne la cible des événements
+ * @return m_target
+ */
+QString WebshellParameters::Target() const
+{
+	return m_target;
+}
+
+/**
+ * @brief WebshellParameters::SetTarget Met à jour la cible des événements
+ * @param target	Nouvelle cible des événements
+ */
+void WebshellParameters::SetTarget(const QString &target)
+{
+	m_target = target;
+}

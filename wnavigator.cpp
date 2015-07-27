@@ -8,10 +8,11 @@
  * @brief WNavigator::WNavigator Constructeur de l'objet WNavigator
  * @param view  WebView sur laquelle effectuer des commandes JavaScript
  */
-WNavigator::WNavigator(MyWebView *view)
+WNavigator::WNavigator(MyWebView *view, WebshellParameters *webshellParameters)
 {
 	this->m_webView = view;
-	this->m_target = "window";
+	this->m_parameters = webshellParameters;
+	m_parameters->setProperty("target","window");
 }
 
 /**
@@ -52,7 +53,7 @@ void WNavigator::Close()
  */
 void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
-	if(m_webView->DispatchJsEvent("DownloadProgress",m_target,QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
+	if(m_webView->DispatchJsEvent("DownloadProgress",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
 
 /**
@@ -61,7 +62,7 @@ void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QStri
  */
 void WNavigator::FileDownloaded(QString mime_type)
 {
-	if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadComplete",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 
 	currentTypeMime = mime_type;
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
@@ -96,7 +97,7 @@ void WNavigator::FileDownloaded(QString mime_type)
 	}
 	else
 	{
-		if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << mime_type)){}
+		if(m_webView->DispatchJsEvent("InstallError",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 	}
 
 	//Lancement du programme. Lorsqu'il finit, finishInstall est appelé
@@ -112,7 +113,7 @@ void WNavigator::FileDownloaded(QString mime_type)
 		myProcess->start(program);
 	}
 
-	if(m_webView->DispatchJsEvent("NeedRestart",m_target,QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("NeedRestart",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 }
 
 /**
@@ -121,7 +122,7 @@ void WNavigator::FileDownloaded(QString mime_type)
  */
 void WNavigator::DownloadFailure(QString mime_type)
 {
-	if(m_webView->DispatchJsEvent("DownloadFailure",m_target,QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadFailure",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 }
 
 /**
@@ -133,28 +134,10 @@ void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	if(exitCode!=0 || exitStatus == QProcess::CrashExit)
 	{
-		if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << currentTypeMime)){}
+		if(m_webView->DispatchJsEvent("InstallError",m_parameters->property("target").toString(),QStringList() << "typemime" << currentTypeMime)){}
 	}
 	else
 	{
-		if(m_webView->DispatchJsEvent("InstallSuccess",m_target,QStringList() << "typemime" << currentTypeMime)){}
+		if(m_webView->DispatchJsEvent("InstallSuccess",m_parameters->property("target").toString(),QStringList() << "typemime" << currentTypeMime)){}
 	}
-}
-
-/**
- * @brief WNavigator::Target Retourne la cible des événements
- * @return m_target
- */
-QString WNavigator::Target() const
-{
-	return m_target;
-}
-
-/**
- * @brief WNavigator::SetTarget Met à jour la cible des événements
- * @param target	Nouvelle cible des événements
- */
-void WNavigator::SetTarget(const QString &target)
-{
-	m_target = target;
 }
