@@ -7,7 +7,7 @@
  */
 ConfigManager::ConfigManager()
 {
-    this->InitWebshellParameters();
+	this->InitWebshellParameters();
 }
 
 /**
@@ -16,38 +16,38 @@ ConfigManager::ConfigManager()
  */
 ConfigManager::ConfigManager(QString confFilePath)
 {
-    this->InitWebshellParameters();
-    this->confFilePath = confFilePath;
+	this->InitWebshellParameters();
+	this->confFilePath = confFilePath;
 
-    QDomDocument dom("appli_xml");
-    QFile file(confFilePath);
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-    if (!dom.setContent(&file))
-    {
-        file.close();
-        return;
-    }
-    file.close();
-    QDomElement docElem = dom.documentElement();
-    QDomNode n = docElem.firstChild();
-    baseUrl = new QStringList();
-    while(!n.isNull())
-    {
-        QDomElement e = n.toElement();
-        if(e.attribute("name") == "minimization")
-            minimization = (e.attribute("value") == "true" ? true : false);
-        else if(e.attribute("name") == "launchUrl")
-            launchUrl = e.attribute("value");
-        else if(e.attribute("name") == "icon")
-            icon = e.attribute("value");
-        else if(e.attribute("name") == "infos")
-            infosAppli = e.attribute("value");
-        else if(e.attribute("name") == "baseUrl")
-            baseUrl->append(e.attribute("value"));
+	QDomDocument dom("appli_xml");
+	QFile file(confFilePath);
+	if (!file.open(QIODevice::ReadOnly))
+		return;
+	if (!dom.setContent(&file))
+	{
+		file.close();
+		return;
+	}
+	file.close();
+	QDomElement docElem = dom.documentElement();
+	QDomNode n = docElem.firstChild();
+	baseUrl = new QStringList();
+	while(!n.isNull())
+	{
+		QDomElement e = n.toElement();
+		if(e.attribute("name") == "minimization")
+			minimization = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "launchUrl")
+			launchUrl = e.attribute("value");
+		else if(e.attribute("name") == "icon")
+			icon = e.attribute("value");
+		else if(e.attribute("name") == "infos")
+			infosAppli = e.attribute("value");
+		else if(e.attribute("name") == "baseUrl")
+			baseUrl->append(e.attribute("value"));
 
-        n = n.nextSibling();
-    }
+		n = n.nextSibling();
+	}
 }
 
 /**
@@ -55,7 +55,7 @@ ConfigManager::ConfigManager(QString confFilePath)
  */
 ConfigManager::~ConfigManager()
 {
-    delete baseUrl;
+	delete baseUrl;
 }
 
 /**
@@ -63,30 +63,30 @@ ConfigManager::~ConfigManager()
  */
 void ConfigManager::InitWebshellParameters()
 {
-    QDomDocument dom("webshell_xml");
-    QFile file(QApplication::applicationDirPath()+"/webshell.xml");
-    if (!file.open(QIODevice::ReadOnly))
-        return;
-    if (!dom.setContent(&file))
-    {
-        file.close();
-        return;
-    }
-    file.close();
-    QDomElement docElem = dom.documentElement();
-    QDomNode n = docElem.firstChild();
-    while(!n.isNull())
-    {
-        QDomElement e = n.toElement();
-        if(e.attribute("name") == "fullscreen")
-            fullscreen = (e.attribute("value") == "true" ? true : false);
-        else if(e.attribute("name") == "developerToolsActivated")
-            developerToolsActivated = (e.attribute("value") == "true" ? true : false);
-        else if(e.attribute("name") == "version")
-            version = e.attribute("value");
+	QDomDocument dom("webshell_xml");
+	QFile file(QApplication::applicationDirPath()+"/webshell.xml");
+	if (!file.open(QIODevice::ReadOnly))
+		return;
+	if (!dom.setContent(&file))
+	{
+		file.close();
+		return;
+	}
+	file.close();
+	QDomElement docElem = dom.documentElement();
+	QDomNode n = docElem.firstChild();
+	while(!n.isNull())
+	{
+		QDomElement e = n.toElement();
+		if(e.attribute("name") == "fullscreen")
+			fullscreen = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "developerToolsActivated")
+			developerToolsActivated = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "version")
+			version = e.attribute("value");
 
-        n = n.nextSibling();
-    }
+		n = n.nextSibling();
+	}
 }
 
 /**
@@ -94,58 +94,58 @@ void ConfigManager::InitWebshellParameters()
  */
 void ConfigManager::LoadParametersWebshell()
 {
-    QDomDocument dom("webshell_xml");
-    QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
-    if(!doc_xml.open(QIODevice::ReadOnly))
-        return;
-    if(!dom.setContent(&doc_xml))
-    {
-        doc_xml.close();
-        return;
-    }
-    QDomElement docElem = dom.documentElement();
-    QDomNode n = docElem.firstChild();
+	QDomDocument dom("webshell_xml");
+	QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
+	if(!doc_xml.open(QIODevice::ReadOnly))
+		return;
+	if(!dom.setContent(&doc_xml))
+	{
+		doc_xml.close();
+		return;
+	}
+	QDomElement docElem = dom.documentElement();
+	QDomNode n = docElem.firstChild();
 
-    while(!n.isNull())
-    {
-        QDomElement write_elem = dom.createElement("parameter");
-        QDomElement e = n.toElement();
-        n = n.nextSibling();
-        if(e.attribute("name") == "fullscreen")
-        {
-            write_elem.setAttribute("name", "fullscreen");
-            if(fullscreen) write_elem.setAttribute("value", "true");
-            else write_elem.setAttribute("value", "false");
-        }
-        else if(e.attribute("name") == "developerToolsActivated")
-        {
-            write_elem.setAttribute("name", "developerToolsActivated");
-            if(developerToolsActivated) write_elem.setAttribute("value", "true");
-            else write_elem.setAttribute("value", "false");
-        }
-        else if(e.attribute("name") == "version")
-        {
-            write_elem.setAttribute("name", "version");
-            write_elem.setAttribute("value", version);
-        }
-        docElem.replaceChild(write_elem,e);
+	while(!n.isNull())
+	{
+		QDomElement write_elem = dom.createElement("parameter");
+		QDomElement e = n.toElement();
+		n = n.nextSibling();
+		if(e.attribute("name") == "fullscreen")
+		{
+			write_elem.setAttribute("name", "fullscreen");
+			if(fullscreen) write_elem.setAttribute("value", "true");
+			else write_elem.setAttribute("value", "false");
+		}
+		else if(e.attribute("name") == "developerToolsActivated")
+		{
+			write_elem.setAttribute("name", "developerToolsActivated");
+			if(developerToolsActivated) write_elem.setAttribute("value", "true");
+			else write_elem.setAttribute("value", "false");
+		}
+		else if(e.attribute("name") == "version")
+		{
+			write_elem.setAttribute("name", "version");
+			write_elem.setAttribute("value", version);
+		}
+		docElem.replaceChild(write_elem,e);
 
-    }
+	}
 
-    doc_xml.close();
+	doc_xml.close();
 
-    QString write_doc = dom.toString();
+	QString write_doc = dom.toString();
 
-    QFile fichier(QApplication::applicationDirPath()+"/webshell.xml");
-    if(!fichier.open(QIODevice::WriteOnly))
-    {
-        fichier.close();
-        qDebug() << "Impossible d'écrire dans le document XML";
-        return;
-    }
-    QTextStream stream(&fichier);
-    stream.setCodec(QTextCodec::codecForName("UTF-8"));
-    stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
+	QFile fichier(QApplication::applicationDirPath()+"/webshell.xml");
+	if(!fichier.open(QIODevice::WriteOnly))
+	{
+		fichier.close();
+		qDebug() << "Impossible d'écrire dans le document XML";
+		return;
+	}
+	QTextStream stream(&fichier);
+	stream.setCodec(QTextCodec::codecForName("UTF-8"));
+	stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
 }
 
 /**
@@ -153,75 +153,75 @@ void ConfigManager::LoadParametersWebshell()
  */
 void ConfigManager::LoadParametersAppli()
 {
-    QDomDocument dom("appli_xml");
-    QFile doc_xml(confFilePath);
-    if(!doc_xml.open(QIODevice::ReadOnly))
-        return;
-    if(!dom.setContent(&doc_xml))
-    {
-        doc_xml.close();
-        return;
-    }
-    QDomElement docElem = dom.documentElement();
-    QDomNode n = docElem.firstChild();
-    while(!n.isNull())
-    {
-        QDomNode remove = n;
-        n = n.nextSibling();
-        docElem.removeChild(remove);
-    }
+	QDomDocument dom("appli_xml");
+	QFile doc_xml(confFilePath);
+	if(!doc_xml.open(QIODevice::ReadOnly))
+		return;
+	if(!dom.setContent(&doc_xml))
+	{
+		doc_xml.close();
+		return;
+	}
+	QDomElement docElem = dom.documentElement();
+	QDomNode n = docElem.firstChild();
+	while(!n.isNull())
+	{
+		QDomNode remove = n;
+		n = n.nextSibling();
+		docElem.removeChild(remove);
+	}
 
-    QDomElement write_elem;
+	QDomElement write_elem;
 
-    //Insertion du paramètre minimization
-    write_elem = dom.createElement("setting");
-    write_elem.setAttribute("name", "minimization");
-    if(minimization) write_elem.setAttribute("value", "true");
-    else write_elem.setAttribute("value", "false");
-    docElem.appendChild(write_elem);
+	//Insertion du paramètre minimization
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "minimization");
+	if(minimization) write_elem.setAttribute("value", "true");
+	else write_elem.setAttribute("value", "false");
+	docElem.appendChild(write_elem);
 
-    //Insertion du paramètre launchUrl
-    write_elem = dom.createElement("setting");
-    write_elem.setAttribute("name", "launchUrl");
-    write_elem.setAttribute("value", launchUrl);
-    docElem.appendChild(write_elem);
+	//Insertion du paramètre launchUrl
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "launchUrl");
+	write_elem.setAttribute("value", launchUrl);
+	docElem.appendChild(write_elem);
 
-    //Insertion du paramètre icon
-    write_elem = dom.createElement("setting");
-    write_elem.setAttribute("name", "icon");
-    write_elem.setAttribute("value", icon);
-    docElem.appendChild(write_elem);
+	//Insertion du paramètre icon
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "icon");
+	write_elem.setAttribute("value", icon);
+	docElem.appendChild(write_elem);
 
-    //Insertion du paramètre infosAppli
-    write_elem = dom.createElement("setting");
-    write_elem.setAttribute("name", "infos");
-    write_elem.setAttribute("value", infosAppli);
-    docElem.appendChild(write_elem);
+	//Insertion du paramètre infosAppli
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "infos");
+	write_elem.setAttribute("value", infosAppli);
+	docElem.appendChild(write_elem);
 
-    //Insertion du paramètre baseUrl
-    QStringList::iterator i;
-    for(i = baseUrl->begin(); i != baseUrl->end();++i)
-    {
-        write_elem = dom.createElement("setting");
-        write_elem.setAttribute("name", "baseUrl");
-        write_elem.setAttribute("value", *i);
-        docElem.appendChild(write_elem);
-    }
+	//Insertion du paramètre baseUrl
+	QStringList::iterator i;
+	for(i = baseUrl->begin(); i != baseUrl->end();++i)
+	{
+		write_elem = dom.createElement("setting");
+		write_elem.setAttribute("name", "baseUrl");
+		write_elem.setAttribute("value", *i);
+		docElem.appendChild(write_elem);
+	}
 
-    doc_xml.close();
+	doc_xml.close();
 
-    QString write_doc = dom.toString();
+	QString write_doc = dom.toString();
 
-    QFile fichier(confFilePath);
-    if(!fichier.open(QIODevice::WriteOnly))
-    {
-        fichier.close();
-        qDebug() << "Impossible d'écrire dans le document XML";
-        return;
-    }
-    QTextStream stream(&fichier);
-    stream.setCodec(QTextCodec::codecForName("UTF-8"));
-    stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
+	QFile fichier(confFilePath);
+	if(!fichier.open(QIODevice::WriteOnly))
+	{
+		fichier.close();
+		qDebug() << "Impossible d'écrire dans le document XML";
+		return;
+	}
+	QTextStream stream(&fichier);
+	stream.setCodec(QTextCodec::codecForName("UTF-8"));
+	stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
 }
 
 /**
@@ -230,17 +230,17 @@ void ConfigManager::LoadParametersAppli()
  */
 bool ConfigManager::GetScreenMode()
 {
-    return fullscreen;
+	return fullscreen;
 }
 
 /**
  * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
- * @param fullscreen    Nouvelle valeur de this->fullscreen
+ * @param fullscreen	Nouvelle valeur de this->fullscreen
  */
 void ConfigManager::SetScreenMode(bool fullscreen)
 {
-    this->fullscreen = fullscreen;
-    LoadParametersWebshell();
+	this->fullscreen = fullscreen;
+	LoadParametersWebshell();
 }
 
 /**
@@ -249,7 +249,7 @@ void ConfigManager::SetScreenMode(bool fullscreen)
  */
 bool ConfigManager::GetDeveloperToolsMode()
 {
-    return developerToolsActivated;
+	return developerToolsActivated;
 }
 
 /**
@@ -258,9 +258,9 @@ bool ConfigManager::GetDeveloperToolsMode()
  */
 void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 {
-    this->developerToolsActivated = developerToolsActivated;
-    emit toolsMode(developerToolsActivated);
-    LoadParametersWebshell();
+	this->developerToolsActivated = developerToolsActivated;
+	emit toolsMode(developerToolsActivated);
+	LoadParametersWebshell();
 }
 
 /**
@@ -269,7 +269,7 @@ void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
  */
 QString ConfigManager::GetVersion()
 {
-    return version;
+	return version;
 }
 
 /**
@@ -278,8 +278,8 @@ QString ConfigManager::GetVersion()
  */
 void ConfigManager::SetVersion(QString version)
 {
-    this->version = version;
-    LoadParametersWebshell();
+	this->version = version;
+	LoadParametersWebshell();
 }
 
 /**
@@ -288,7 +288,7 @@ void ConfigManager::SetVersion(QString version)
  */
 bool ConfigManager::GetCloseButtonBehaviour()
 {
-    return minimization;
+	return minimization;
 }
 
 /**
@@ -297,8 +297,8 @@ bool ConfigManager::GetCloseButtonBehaviour()
  */
 void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 {
-    this->minimization = minimization;
-    LoadParametersAppli();
+	this->minimization = minimization;
+	LoadParametersAppli();
 }
 
 /**
@@ -307,7 +307,7 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization)
  */
 QString ConfigManager::GetLaunchUrl()
 {
-    return launchUrl;
+	return launchUrl;
 }
 
 /**
@@ -316,8 +316,8 @@ QString ConfigManager::GetLaunchUrl()
  */
 void ConfigManager::SetLaunchUrl(QString launchUrl)
 {
-    this->launchUrl = launchUrl;
-    LoadParametersAppli();
+	this->launchUrl = launchUrl;
+	LoadParametersAppli();
 }
 
 /**
@@ -326,7 +326,7 @@ void ConfigManager::SetLaunchUrl(QString launchUrl)
  */
 QString ConfigManager::GetIcon()
 {
-    return icon;
+	return icon;
 }
 
 /**
@@ -335,8 +335,8 @@ QString ConfigManager::GetIcon()
  */
 void ConfigManager::SetIcon(QString icon)
 {
-    this->icon = icon;
-    LoadParametersAppli();
+	this->icon = icon;
+	LoadParametersAppli();
 }
 
 /**
@@ -345,7 +345,7 @@ void ConfigManager::SetIcon(QString icon)
  */
 QString ConfigManager::GetInfos()
 {
-    return infosAppli;
+	return infosAppli;
 }
 
 /**
@@ -354,8 +354,8 @@ QString ConfigManager::GetInfos()
  */
 void ConfigManager::SetInfos(QString infosAppli)
 {
-    this->infosAppli = infosAppli;
-    LoadParametersAppli();
+	this->infosAppli = infosAppli;
+	LoadParametersAppli();
 }
 
 /**
@@ -364,7 +364,7 @@ void ConfigManager::SetInfos(QString infosAppli)
  */
 QStringList *ConfigManager::GetBaseUrl()
 {
-    return new QStringList(*baseUrl);
+	return new QStringList(*baseUrl);
 }
 
 /**
@@ -373,7 +373,7 @@ QStringList *ConfigManager::GetBaseUrl()
  */
 void ConfigManager::SetBaseUrl(QStringList *baseUrl)
 {
-    delete this->baseUrl;
-    this->baseUrl = new QStringList(*baseUrl);
-    LoadParametersAppli();
+	delete this->baseUrl;
+	this->baseUrl = new QStringList(*baseUrl);
+	LoadParametersAppli();
 }

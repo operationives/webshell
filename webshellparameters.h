@@ -5,20 +5,20 @@
 
 class WebshellParameters : public QObject
 {
-    Q_OBJECT
-    Q_PROPERTY(bool developerToolsActivated READ DeveloperToolsActivated WRITE SetDeveloperToolsActivated)
-    Q_PROPERTY(bool minimization READ Minimization WRITE SetMinimization)
+	Q_OBJECT
+	Q_PROPERTY(bool developerToolsActivated READ DeveloperToolsActivated WRITE SetDeveloperToolsActivated)
+	Q_PROPERTY(bool minimization READ Minimization WRITE SetMinimization)
 public:
-    WebshellParameters();
+	WebshellParameters();
 
 
 private:
-    bool m_developerToolsActivated;
-    bool m_minimization;
-    bool DeveloperToolsActivated() const;
-    void SetDeveloperToolsActivated(bool developerToolsActivated);
-    bool Minimization() const;
-    void SetMinimization(bool minimization);
+	bool m_developerToolsActivated;
+	bool m_minimization;
+	bool DeveloperToolsActivated() const;
+	void SetDeveloperToolsActivated(bool developerToolsActivated);
+	bool Minimization() const;
+	void SetMinimization(bool minimization);
 
 };
 

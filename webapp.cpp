@@ -10,10 +10,10 @@
  */
 WebApp::WebApp(MyWebView *view)
 {
-    this->m_webView = view;
-    this->m_target = "window";
-    m_infos = config->GetInfos();
-    m_baseUrl = *config->GetBaseUrl();
+	this->m_webView = view;
+	this->m_target = "window";
+	m_infos = config->GetInfos();
+	m_baseUrl = *config->GetBaseUrl();
 }
 
 /**
@@ -26,8 +26,8 @@ WebApp::~WebApp()
 /**
  * @brief WebApp::DownloadProgress Méthode de progression de téléchargement, actuellement rien à faire pour un téléchargement si petit
  * @param bytesReceived Nombre d'octets reçus
- * @param bytesTotal    Nombre d'octets total
- * @param mime_type     String non significatif
+ * @param bytesTotal	Nombre d'octets total
+ * @param mime_type	 String non significatif
  */
 void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
 {
@@ -40,20 +40,21 @@ void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString m
  */
 void WebApp::FileDownloaded(QString mime_type)
 {
-    QString filename = data->GetUrl();
-    filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-    QString filedirectory = QString(QApplication::applicationDirPath()+"/");
-    filedirectory.append(filename);
-    QFile file(filedirectory);
+	QString filename = data->GetUrl();
+	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
+	QString filedirectory = QString(QApplication::applicationDirPath()+"/");
+	filedirectory.append(filename);
+	QFile file(filedirectory);
 
-    file.open(QIODevice::WriteOnly);
-    file.write(data->DownloadedData());
-    file.close();
-    //delete data;
+	if(!file.open(QIODevice::WriteOnly))
+		qWarning() << "Fichier d'installation webapp impossible à ouvrir. Type mime: " << mime_type;
+	file.write(data->DownloadedData());
+	file.close();
+	//QFile::remove(filedirectory);
 
-    QIcon icon(filedirectory);
+	QIcon icon(filedirectory);
 
-    emit changeIcon(icon);
+	emit changeIcon(icon);
 }
 
 /**
@@ -62,7 +63,7 @@ void WebApp::FileDownloaded(QString mime_type)
  */
 void WebApp::DownloadFailure(QString mime_type)
 {
-
+	qWarning() << "Erreur téléchargement icône " << mime_type;
 }
 
 /**
@@ -71,7 +72,7 @@ void WebApp::DownloadFailure(QString mime_type)
  */
 QString WebApp::Icon() const
 {
-    return config->GetIcon();
+	return config->GetIcon();
 }
 
 /**
@@ -80,8 +81,9 @@ QString WebApp::Icon() const
  */
 void WebApp::SetIcon(const QString &icon)
 {
-    config->SetIcon(icon);
-    data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
+	config->SetIcon(icon);
+	if(QUrl(icon).isValid())
+		data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
@@ -90,7 +92,7 @@ void WebApp::SetIcon(const QString &icon)
  */
 QString WebApp::Infos() const
 {
-    return m_infos;
+	return m_infos;
 }
 
 /**
@@ -99,8 +101,8 @@ QString WebApp::Infos() const
  */
 void WebApp::SetInfos(const QString &infos)
 {
-    m_infos = infos;
-    config->SetInfos(infos);
+	m_infos = infos;
+	config->SetInfos(infos);
 }
 
 /**
@@ -109,7 +111,7 @@ void WebApp::SetInfos(const QString &infos)
  */
 QStringList WebApp::GetBaseUrl() const
 {
-    return m_baseUrl;
+	return m_baseUrl;
 }
 
 /**
@@ -118,8 +120,8 @@ QStringList WebApp::GetBaseUrl() const
  */
 void WebApp::SetBaseUrl(const QStringList &value)
 {
-    m_baseUrl = value;
-    config->SetBaseUrl(&m_baseUrl);
+	m_baseUrl = value;
+	config->SetBaseUrl(&m_baseUrl);
 }
 
 /**
@@ -128,39 +130,39 @@ void WebApp::SetBaseUrl(const QStringList &value)
  */
 bool WebApp::IsPageInApplication()
 {
-    QString urls = m_webView->url().toString();
-    QStringList::iterator i;
-    bool res = false;
-    for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
-    {
-        if(urls.startsWith(*i))
-        {
-            res = true;
-            break;
-        }
-    }
-    return res;
+	QString urls = m_webView->url().toString();
+	QStringList::iterator i;
+	bool res = false;
+	for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
+	{
+		if(urls.startsWith(*i))
+		{
+			res = true;
+			break;
+		}
+	}
+	return res;
 }
 
 /**
  * @brief WebApp::IsPageInApplication Indique si url est dans baseUrl
  * @param url   url dont on veut tester l'appartenance à baseUrl
- * @return      Vrai si url est dans baseUrl, faux sinon
+ * @return	  Vrai si url est dans baseUrl, faux sinon
  */
 bool WebApp::IsPageInApplication(QUrl url)
 {
-    QString urls = url.toString();
-    QStringList::iterator i;
-    bool res = false;
-    for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
-    {
-        if(urls.startsWith(*i))
-        {
-            res = true;
-            break;
-        }
-    }
-    return res;
+	QString urls = url.toString();
+	QStringList::iterator i;
+	bool res = false;
+	for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
+	{
+		if(urls.startsWith(*i))
+		{
+			res = true;
+			break;
+		}
+	}
+	return res;
 
 }
 
@@ -170,14 +172,14 @@ bool WebApp::IsPageInApplication(QUrl url)
  */
 QString WebApp::Target() const
 {
-    return m_target;
+	return m_target;
 }
 
 /**
  * @brief WebApp::SetTarget Met à jour la cible des événements
- * @param target    Nouvelle cible des événements
+ * @param target	Nouvelle cible des événements
  */
 void WebApp::SetTarget(const QString &target)
 {
-    m_target = target;
+	m_target = target;
 }

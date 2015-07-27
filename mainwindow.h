@@ -13,28 +13,28 @@
 class MainWindow : public QMainWindow
 {
 
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	MainWindow(QWidget *parent = 0);
+	~MainWindow();
 
 private:
-    MyWebView *view;
-    QSystemTrayIcon *trayIcon;
-    QWebInspector *inspector;
-    Informations *infos;
-    bool stayOpen;
-    void DisplayInfos();
-    void keyPressEvent(QKeyEvent *event);
-    void closeEvent(QCloseEvent *event);
+	MyWebView *view;
+	QSystemTrayIcon *trayIcon;
+	QWebInspector *inspector;
+	Informations *infos;
+	bool stayOpen;
+	void DisplayInfos();
+	void keyPressEvent(QKeyEvent *event);
+	void closeEvent(QCloseEvent *event);
 
 private slots:
-    void showContextMenu(const QPoint& pos);
-    void changeScreenMode(bool fullscreen);
-    void changeToolsMode(bool toolsActivated);
-    void quit();
-    void changeIcon(QIcon icon);
+	void showContextMenu(const QPoint& pos);
+	void changeScreenMode(bool fullscreen);
+	void changeToolsMode(bool toolsActivated);
+	void quit();
+	void changeIcon(QIcon icon);
 };
 
 #endif

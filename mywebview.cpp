@@ -12,28 +12,29 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
-    wnavigator = new WNavigator(this);
-    wapp = new WebApp(this);
-    navigatorplugins = new NavigatorPlugins(this);
-    //On permet l'accès aux méthodes dans WNavigator par les appels javascript
-    this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
-    this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
-    this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
-    this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
+	wnavigator = new WNavigator(this);
+	wapp = new WebApp(this);
+	navigatorplugins = new NavigatorPlugins(this);
+	//On permet l'accès aux méthodes dans WNavigator par les appels javascript
+	this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", new WebshellParameters());
 
-    connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
-    connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
-    connect(this,SIGNAL(urlChanged(QUrl)),this,SLOT(handleRedirect(QUrl)));
-    connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
+	connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
+	connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
+	connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
 
-    firstPage = true;
+	this->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	connect(this,SIGNAL(linkClicked(QUrl)),this,SLOT(handleRedirect(QUrl)));
 
-    wapp->setProperty("icon",config->GetIcon());
+	//On affecte l'icône présent dans le fichier xml à la page principale
+	wapp->setProperty("icon",config->GetIcon());
 
-    m_WebCtrl = new QNetworkAccessManager();
-    m_cookieJar = new CookieJar();
-    m_WebCtrl->setCookieJar(m_cookieJar);
-    this->page()->setNetworkAccessManager(m_WebCtrl);
+	m_WebCtrl = new QNetworkAccessManager();
+	m_cookieJar = new CookieJar();
+	m_WebCtrl->setCookieJar(m_cookieJar);
+	this->page()->setNetworkAccessManager(m_WebCtrl);
 }
 
 /**
@@ -41,9 +42,9 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
  */
 MyWebView::~MyWebView()
 {
-    delete wnavigator;
-    delete wapp;
-    delete navigatorplugins;
+	delete wnavigator;
+	delete wapp;
+	delete navigatorplugins;
 }
 
 /**
@@ -52,27 +53,15 @@ MyWebView::~MyWebView()
  */
 void MyWebView::handleRedirect(QUrl url)
 {
-    if(firstPage)
-    {
-        //baseUrl peut être modifié à tout moment par le service
-        if(!wapp->IsPageInApplication())
-        {
-            QStringList baseUrl = wapp->property("baseUrl").toStringList();
-            baseUrl.append(url.url());
-            wapp->setProperty("baseUrl",QVariant(baseUrl));
-        }
-        firstPage = false;
-    }
-    else if(!wapp->IsPageInApplication())
-    {
-            this->page()->triggerAction(QWebPage::Back);
-            QDesktopServices::openUrl(url);
-    }
+	if(!wapp->IsPageInApplication(url.url()))
+			QDesktopServices::openUrl(url);
+	else
+		this->load(url);
 }
 
 void MyWebView::updateTitle()
 {
-    emit changeTitle(this->title());
+	emit changeTitle(this->title());
 }
 
 /**
@@ -84,28 +73,28 @@ void MyWebView::updateTitle()
  */
 bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues)
 {
-    QString code =QString("var webshellEvent = new CustomEvent('%1');").arg(evtType);
-    QString key;
-    QString value;
+	QString code =QString("var webshellEvent = new CustomEvent('%1');").arg(evtType);
+	QString key;
+	QString value;
 
-    QStringList::const_iterator i;
-    for(i = keyValues.begin(); i!= keyValues.end();++i)
-    {
-        key = *i;
-        if(i!= keyValues.end())
-        {
-            ++i;
-        }
-        else
-        {
-            qDebug() << "Nombre d'arguments invalide";
-            return false;
-        }
-        value = *i;
-        code.append(QString("webshellEvent.%1='%2';").arg(key,value));
-    }
+	QStringList::const_iterator i;
+	for(i = keyValues.begin(); i!= keyValues.end();++i)
+	{
+		key = *i;
+		if(i!= keyValues.end())
+		{
+			++i;
+		}
+		else
+		{
+			qDebug() << "Nombre d'arguments invalide";
+			return false;
+		}
+		value = *i;
+		code.append(QString("webshellEvent.%1='%2';").arg(key,value));
+	}
 
-    code.append(evtTarget+".dispatchEvent(webshellEvent);");
-    this->page()->mainFrame()->evaluateJavaScript(code);
-    return true;
+	code.append(evtTarget+".dispatchEvent(webshellEvent);");
+	this->page()->mainFrame()->evaluateJavaScript(code);
+	return true;
 }

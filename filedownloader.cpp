@@ -6,16 +6,16 @@
  */
 FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type)
 {
-    this->url = Url.toString();
-    this->mime_type = mime_type;
-    this->listener = listener;
-    connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
-    this, SLOT (fileDownloaded(QNetworkReply*)));
+	this->url = Url.toString();
+	this->mime_type = mime_type;
+	this->listener = listener;
+	connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
+	this, SLOT (fileDownloaded(QNetworkReply*)));
 
-    QNetworkRequest request(Url);
-    QNetworkReply *download = m_WebCtrl.get(request);
-    connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
-    connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
+	QNetworkRequest request(Url);
+	QNetworkReply *download = m_WebCtrl.get(request);
+	connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
+	connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
 }
  
 /**
@@ -31,9 +31,9 @@ FileDownloader::~FileDownloader()
  */
 void FileDownloader::fileDownloaded(QNetworkReply* pReply)
 {
-    m_DownloadedData = pReply->readAll();
-    pReply->deleteLater();
-    listener->FileDownloaded(mime_type);
+	m_DownloadedData = pReply->readAll();
+	pReply->deleteLater();
+	listener->FileDownloaded(mime_type);
 }
 
 /**
@@ -42,8 +42,8 @@ void FileDownloader::fileDownloaded(QNetworkReply* pReply)
  */
 void FileDownloader::downloadFailure(QNetworkReply::NetworkError error)
 {
-    if(error != QNetworkReply::NoError)
-        listener->DownloadFailure(mime_type);
+	if(error != QNetworkReply::NoError)
+		listener->DownloadFailure(mime_type);
 }
  
 /**
@@ -52,7 +52,7 @@ void FileDownloader::downloadFailure(QNetworkReply::NetworkError error)
  */
 QByteArray FileDownloader::DownloadedData() const
 {
-    return m_DownloadedData;
+	return m_DownloadedData;
 }
 
 /**
@@ -62,7 +62,7 @@ QByteArray FileDownloader::DownloadedData() const
  */
 void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    listener->DownloadProgress(bytesReceived,bytesTotal,mime_type);
+	listener->DownloadProgress(bytesReceived,bytesTotal,mime_type);
 }
 
 /**
@@ -71,7 +71,7 @@ void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
  */
 QString FileDownloader::GetMimeType()
 {
-    return mime_type;
+	return mime_type;
 }
 
 /**
@@ -80,5 +80,5 @@ QString FileDownloader::GetMimeType()
  */
 QString FileDownloader::GetUrl()
 {
-    return url;
+	return url;
 }

@@ -7,19 +7,19 @@
 
 class Informations : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    Informations(QWidget *parent = 0);
-    ~Informations();
-    void UpdateValues();
+	Informations(QWidget *parent = 0);
+	~Informations();
+	void UpdateValues();
 
 private:
-    QString version;
-    QString infosAppli;
-    QLabel *label;
-    QDialogButtonBox *buttonBox;
-    QNetworkAccessManager *manager;
+	QString version;
+	QString infosAppli;
+	QLabel *label;
+	QDialogButtonBox *buttonBox;
+	QNetworkAccessManager *manager;
 };
 
 #endif // INFORMATIONS_H

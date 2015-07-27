@@ -5,10 +5,10 @@
  * @brief WebshellParameters::DeveloperToolsActivated Initialise les attributs avec ceux de configmanager
  */
 WebshellParameters::WebshellParameters()
-    :QObject()
+	:QObject()
 {
-    m_developerToolsActivated = config->GetDeveloperToolsMode();
-    m_minimization = config->GetCloseButtonBehaviour();
+	m_developerToolsActivated = config->GetDeveloperToolsMode();
+	m_minimization = config->GetCloseButtonBehaviour();
 }
 
 
@@ -18,7 +18,7 @@ WebshellParameters::WebshellParameters()
  */
 bool WebshellParameters::DeveloperToolsActivated() const
 {
-    return m_developerToolsActivated;
+	return m_developerToolsActivated;
 }
 
 /**
@@ -27,8 +27,8 @@ bool WebshellParameters::DeveloperToolsActivated() const
  */
 void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated)
 {
-    m_developerToolsActivated = developerToolsActivated;
-    config->SetDeveloperToolsMode(developerToolsActivated);
+	m_developerToolsActivated = developerToolsActivated;
+	config->SetDeveloperToolsMode(developerToolsActivated);
 }
 
 /**
@@ -37,7 +37,7 @@ void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated
  */
 bool WebshellParameters::Minimization() const
 {
-    return m_minimization;
+	return m_minimization;
 }
 
 /**
@@ -46,6 +46,6 @@ bool WebshellParameters::Minimization() const
  */
 void WebshellParameters::SetMinimization(bool minimization)
 {
-    m_minimization = minimization;
-    config->SetCloseButtonBehaviour(minimization);
+	m_minimization = minimization;
+	config->SetCloseButtonBehaviour(minimization);
 }

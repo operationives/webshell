@@ -7,63 +7,63 @@
  * @param url   Url avec laquelle le service est initialisé
  */
 MainWindow::MainWindow(QWidget *parent)
-    :QMainWindow(parent)
+	:QMainWindow(parent)
 {
-    QNetworkProxyFactory::setUseSystemConfiguration(true);
+	QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-    //Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 
-    //On définit les actions du menu de trayIcon
-    QAction *quitAction = new QAction("Quitter", this);
-    connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
-    QMenu *trayIconMenu = new QMenu(this);
-    trayIconMenu->addAction (quitAction);
-    trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setContextMenu (trayIconMenu);
-    trayIcon->show();
+	//On définit les actions du menu de trayIcon
+	QAction *quitAction = new QAction("Quitter", this);
+	connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
+	QMenu *trayIconMenu = new QMenu(this);
+	trayIconMenu->addAction (quitAction);
+	trayIcon = new QSystemTrayIcon(this);
+	trayIcon->setContextMenu (trayIconMenu);
+	trayIcon->show();
 
-    //Ajout du menu dans la barre de titre
-    QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
-    fileMenu->addAction(quitAction);
-    QAction *clearCookies = new QAction("&Effacer les cookies", this);
-    fileMenu->addAction(clearCookies);
+	//Ajout du menu dans la barre de titre
+	QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
+	fileMenu->addAction(quitAction);
+	QAction *clearCookies = new QAction("&Effacer les cookies", this);
+	fileMenu->addAction(clearCookies);
 
-    view = new MyWebView(this);
-    connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
-    connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
-    connect(view,SIGNAL(close()),this,SLOT(quit()));
-    connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
-    view->load(QUrl(config->GetLaunchUrl()));
-    //On met en place la taille minimale
-    this->setMinimumSize(1000,800);
+	view = new MyWebView(this);
+	connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
+	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
+	connect(view,SIGNAL(close()),this,SLOT(quit()));
+	connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
+	view->load(QUrl(config->GetLaunchUrl()));
+	//On met en place la taille minimale
+	this->setMinimumSize(1000,800);
 
-    //On enlève les barres de défilement inutiles dans le cadre de la webshell
-    view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
-    view->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+	//On enlève les barres de défilement inutiles dans le cadre de la webshell
+	view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+	view->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
 
-    setCentralWidget(view);
-    setUnifiedTitleAndToolBarOnMac(true);
+	setCentralWidget(view);
+	setUnifiedTitleAndToolBarOnMac(true);
 
-    //On indique qu'on utilise un menu personnalisé
-    view->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
+	//On indique qu'on utilise un menu personnalisé
+	view->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
 
-    //Initialisation de l'inspecteur de la page
-    inspector = new QWebInspector();
-    inspector->setPage(view->page());
+	//Initialisation de l'inspecteur de la page
+	inspector = new QWebInspector();
+	inspector->setPage(view->page());
 
-    stayOpen = true;
-    if(config->GetScreenMode())
-        this->showFullScreen();
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
+	stayOpen = true;
+	if(config->GetScreenMode())
+		this->showFullScreen();
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
-    connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 
-    infos = new Informations();
+	infos = new Informations();
 }
 
 /**
@@ -71,10 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
-    delete view;
-    delete trayIcon;
-    delete inspector;
-    delete infos;
+	delete view;
+	delete trayIcon;
+	delete inspector;
+	delete infos;
 }
 
 /**
@@ -84,83 +84,83 @@ MainWindow::~MainWindow()
 void MainWindow::showContextMenu(const QPoint &pos)
 {
 
-    QMenu myMenu;
-    if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
-    {
-        myMenu.addAction("Inspect");
-    }
-    if(!this->isFullScreen())
-    {
-        myMenu.addAction("Plein écran");
-    }
-    else
-    {
-        myMenu.addAction("Fenêtré");
-    }
-    myMenu.addAction("Fermer");
-    myMenu.addAction("Reload");
-    myMenu.addAction("Informations");
+	QMenu myMenu;
+	if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
+	{
+		myMenu.addAction("Inspect");
+	}
+	if(!this->isFullScreen())
+	{
+		myMenu.addAction("Plein écran");
+	}
+	else
+	{
+		myMenu.addAction("Fenêtré");
+	}
+	myMenu.addAction("Fermer");
+	myMenu.addAction("Reload");
+	myMenu.addAction("Informations");
 
-    QPoint globalPos = this->mapToGlobal(pos);
-    //Correction de position
-    globalPos.setY(globalPos.ry()+20);
+	QPoint globalPos = this->mapToGlobal(pos);
+	//Correction de position
+	globalPos.setY(globalPos.ry()+20);
 
-    QAction* selectedItem = myMenu.exec(globalPos);
-    if(selectedItem == NULL)
-        return;
+	QAction* selectedItem = myMenu.exec(globalPos);
+	if(selectedItem == NULL)
+		return;
 
-    if (selectedItem->text()=="Inspect")
-    {
-        inspector->show();
-    }
+	if (selectedItem->text()=="Inspect")
+	{
+		inspector->show();
+	}
 
-    if (selectedItem->text()=="Plein écran")
-    {
-        changeScreenMode(true);
-    }
+	if (selectedItem->text()=="Plein écran")
+	{
+		changeScreenMode(true);
+	}
 
-    if (selectedItem->text()=="Fenêtré")
-    {
-        changeScreenMode(false);
-    }
-    if (selectedItem->text()=="Fermer")
-    {
-        this->quit();
-    }
-    if (selectedItem->text()=="Reload")
-    {
-       view->reload();
-    }
-    if (selectedItem->text()=="Informations")
-    {
-        this->DisplayInfos();
-    }
+	if (selectedItem->text()=="Fenêtré")
+	{
+		changeScreenMode(false);
+	}
+	if (selectedItem->text()=="Fermer")
+	{
+		this->quit();
+	}
+	if (selectedItem->text()=="Reload")
+	{
+	   view->reload();
+	}
+	if (selectedItem->text()=="Informations")
+	{
+		this->DisplayInfos();
+	}
 }
 
 /**
  * @brief MainWindow::changeScreenMode  Change l'affichage de la fenêtre
- * @param fullscreen    Vrai si mode plein écran, mode fenêtré sinon
+ * @param fullscreen	Vrai si mode plein écran, mode fenêtré sinon
  */
 void MainWindow::changeScreenMode(bool fullscreen)
 {
-    if(fullscreen)
-    {
-        this->showFullScreen();
-    }
-    else
-    {
-        this->showNormal();
-    }
-    config->SetScreenMode(fullscreen);
+	if(fullscreen)
+	{
+		this->showFullScreen();
+	}
+	else
+	{
+		this->showNormal();
+	}
+	config->SetScreenMode(fullscreen);
 }
 
 /**
  * @brief MainWindow::changeToolsMode   Change l'accès aux outils développeur sur la page et dans le fichier xml
- * @param toolsActivated    Vrai si les outils sont activés, désactivés sinon
+ * @param toolsActivated	Vrai si les outils sont activés, désactivés sinon
  */
 void MainWindow::changeToolsMode(bool toolsActivated)
 {
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, toolsActivated);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, toolsActivated);
 }
 
 /**
@@ -169,33 +169,33 @@ void MainWindow::changeToolsMode(bool toolsActivated)
  */
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape)
-    {
-        if(this->isFullScreen())
-            this->changeScreenMode(false);
-    }
-    else
-    {
-        QMainWindow::keyPressEvent(event); // call the default implementation
-    }
+	if (event->key() == Qt::Key_Escape)
+	{
+		if(this->isFullScreen())
+			this->changeScreenMode(false);
+	}
+	else
+	{
+		QMainWindow::keyPressEvent(event); // call the default implementation
+	}
 }
 
 /**
- * @brief MainWindow::closeEvent    Indique si la fenêtre doit être femrée ou minimisée
+ * @brief MainWindow::closeEvent	Indique si la fenêtre doit être femrée ou minimisée
  * @param event Evénement de fermeture
  */
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-    if (config->GetCloseButtonBehaviour() && stayOpen)
-    {
-        event->ignore();
-        this->setWindowState(Qt::WindowMinimized);
-    }
-    else
-    {
-        delete this;
-        event->accept();
-    }
+	if (config->GetCloseButtonBehaviour() && stayOpen)
+	{
+		event->ignore();
+		this->setWindowState(Qt::WindowMinimized);
+	}
+	else
+	{
+		delete this;
+		event->accept();
+	}
 }
 
 /**
@@ -203,9 +203,9 @@ void MainWindow::closeEvent (QCloseEvent *event)
  */
 void MainWindow::quit ()
 {
-    stayOpen = false;
-    view->DispatchJsEvent("Exit","window");
-    this->close();
+	stayOpen = false;
+	view->DispatchJsEvent("Exit","window");
+	this->close();
 }
 
 /**
@@ -214,10 +214,10 @@ void MainWindow::quit ()
  */
 void MainWindow::changeIcon(QIcon icon)
 {
-    this->setWindowIcon(icon);
-    infos->setWindowIcon(icon);
-    inspector->setWindowIcon(icon);
-    this->trayIcon->setIcon(icon);
+	this->setWindowIcon(icon);
+	infos->setWindowIcon(icon);
+	inspector->setWindowIcon(icon);
+	this->trayIcon->setIcon(icon);
 }
 
 /**
@@ -225,6 +225,6 @@ void MainWindow::changeIcon(QIcon icon)
  */
 void MainWindow::DisplayInfos()
 {
-    infos->UpdateValues();
-    infos->show();
+	infos->UpdateValues();
+	infos->show();
 }

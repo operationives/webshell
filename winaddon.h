@@ -10,16 +10,16 @@
 class WinAddon : public QObject
 {
 
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    WinAddon();
-    ~WinAddon();
+	WinAddon();
+	~WinAddon();
 
 private:
-    QWinJumpList *jumplist;
-    QWinJumpListCategory *tasks;
-    QWinJumpListItem *quitItem;
+	QWinJumpList *jumplist;
+	QWinJumpListCategory *tasks;
+	QWinJumpListItem *quitItem;
 };
 
 #endif // WINADDON_H

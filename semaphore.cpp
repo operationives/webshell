@@ -5,14 +5,14 @@
  * @param nbRessources  Disponibilité du sémaphore
  */
 Semaphore::Semaphore(int nbRessources)
-    : QObject()
+	: QObject()
 {
-    //Si nbRessources>0, le sémaphore est disponible
-    this->nbRessources = nbRessources;
-    //Pile d'objets servant à mettre en attente les threads
-    this->stack = new QList<QEventLoop *>();
-    //Mutex permettant d'assurer l'exclusion mutuelle
-    this->mutex = new QMutex();
+	//Si nbRessources>0, le sémaphore est disponible
+	this->nbRessources = nbRessources;
+	//Pile d'objets servant à mettre en attente les threads
+	this->stack = new QList<QEventLoop *>();
+	//Mutex permettant d'assurer l'exclusion mutuelle
+	this->mutex = new QMutex();
 }
 
 /**
@@ -20,8 +20,8 @@ Semaphore::Semaphore(int nbRessources)
  */
 Semaphore::~Semaphore()
 {
-    delete mutex;
-    delete stack;
+	delete mutex;
+	delete stack;
 }
 
 /**
@@ -29,26 +29,26 @@ Semaphore::~Semaphore()
  */
 void Semaphore::Acquire()
 {
-    mutex->lock();
-    if(nbRessources>0)
-    {
-        //Le sémaphore est disponible: on décrémente la disponibilité et on continue le flot d'exécution
-        nbRessources--;
-        mutex->unlock();
-    }
-    else
-    {
-        //Sémaphore indisponible: mise en attente du thread jusqu'à ce qu'il soit libéré par un futur Release
-        QEventLoop *loop = new QEventLoop();
-        stack->append(loop);
-        mutex->unlock();
+	mutex->lock();
+	if(nbRessources>0)
+	{
+		//Le sémaphore est disponible: on décrémente la disponibilité et on continue le flot d'exécution
+		nbRessources--;
+		mutex->unlock();
+	}
+	else
+	{
+		//Sémaphore indisponible: mise en attente du thread jusqu'à ce qu'il soit libéré par un futur Release
+		QEventLoop *loop = new QEventLoop();
+		stack->append(loop);
+		mutex->unlock();
 
-        loop->exec();
+		loop->exec();
 
-        mutex->lock();
-        nbRessources--;
-        mutex->unlock();
-    }
+		mutex->lock();
+		nbRessources--;
+		mutex->unlock();
+	}
 }
 
 /**
@@ -56,18 +56,18 @@ void Semaphore::Acquire()
  */
 void Semaphore::Release()
 {
-    mutex->lock();
-    nbRessources++;
-    if(nbRessources>0)
-    {
-        if(!stack->isEmpty())
-        {
-            //Si le sémaphore est disponible et qu'un thread est en attente, on le libère puis on détruit la boucle
-            QEventLoop *loop = stack->last();
-            loop->quit();
-            stack->removeLast();
-            delete loop;
-        }
-    }
-    mutex->unlock();
+	mutex->lock();
+	nbRessources++;
+	if(nbRessources>0)
+	{
+		if(!stack->isEmpty())
+		{
+			//Si le sémaphore est disponible et qu'un thread est en attente, on le libère puis on détruit la boucle
+			QEventLoop *loop = stack->last();
+			loop->quit();
+			stack->removeLast();
+			delete loop;
+		}
+	}
+	mutex->unlock();
 }

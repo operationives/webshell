@@ -10,25 +10,25 @@
  
 class FileDownloader : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type);
-    virtual ~FileDownloader();
-    QByteArray DownloadedData() const;
-    QString GetMimeType();
-    QString GetUrl();
+	explicit FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type);
+	virtual ~FileDownloader();
+	QByteArray DownloadedData() const;
+	QString GetMimeType();
+	QString GetUrl();
  
 private slots:
-    void fileDownloaded(QNetworkReply* pReply);
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
-    void downloadFailure(QNetworkReply::NetworkError error);
+	void fileDownloaded(QNetworkReply* pReply);
+	void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void downloadFailure(QNetworkReply::NetworkError error);
  
 private:
-    QString mime_type;
-    QString url;
-    QNetworkAccessManager m_WebCtrl;
-    QByteArray m_DownloadedData;
-    DownloadProgressListener *listener;
+	QString mime_type;
+	QString url;
+	QNetworkAccessManager m_WebCtrl;
+	QByteArray m_DownloadedData;
+	DownloadProgressListener *listener;
 
 };
  

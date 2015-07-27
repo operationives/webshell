@@ -8,33 +8,33 @@
 class WNavigator : public QObject, public DownloadProgressListener
 {
 
-    Q_OBJECT
-    Q_INTERFACES(DownloadProgressListener)
-    Q_PROPERTY(QString target READ Target WRITE SetTarget)
+	Q_OBJECT
+	Q_INTERFACES(DownloadProgressListener)
+	Q_PROPERTY(QString target READ Target WRITE SetTarget)
 
 public:
-    WNavigator(MyWebView *view);
-    Q_INVOKABLE void UpdateSoftware(QString url);
-    Q_INVOKABLE void InitWebshellAPI();
-    Q_INVOKABLE void Close();
+	WNavigator(MyWebView *view);
+	Q_INVOKABLE void UpdateSoftware(QString url);
+	Q_INVOKABLE void InitWebshellAPI();
+	Q_INVOKABLE void Close();
 
-    void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
-    void FileDownloaded(QString mime_type);
-    void DownloadFailure(QString mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
+	void FileDownloaded(QString mime_type);
+	void DownloadFailure(QString mime_type);
 
 signals:
-    void close();
+	void close();
 
 private slots:
-    void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);
+	void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    MyWebView *m_webView;
-    QString m_target;
-    QString currentTypeMime;
-    FileDownloader *data;
-    QString Target() const;
-    void SetTarget(const QString &target);
+	MyWebView *m_webView;
+	QString m_target;
+	QString currentTypeMime;
+	FileDownloader *data;
+	QString Target() const;
+	void SetTarget(const QString &target);
 };
 
 #endif // WNAVIGATOR_H
