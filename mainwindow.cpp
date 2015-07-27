@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "wnavigator.h"
 #include "global.h"
+#include "mailsender.h"
 
 /**
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
@@ -100,6 +101,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	myMenu.addAction("Fermer");
 	myMenu.addAction("Reload");
 	myMenu.addAction("Informations");
+	myMenu.addAction("Envoi de logs");
 
 	QPoint globalPos = this->mapToGlobal(pos);
 	//Correction de position
@@ -134,6 +136,13 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	if (selectedItem->text()=="Informations")
 	{
 		this->DisplayInfos();
+	}
+	if (selectedItem->text()=="Envoi de logs")
+	{
+		MailSender mail;
+		//qDebug() << QApplication::applicationDirPath()+"/"+qAppName()+".log";
+		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
+		mail.Send("Envoi de lgos");
 	}
 }
 

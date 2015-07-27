@@ -17,8 +17,8 @@ HEADERS =	mainwindow.h \
 		informations.h \
 		webshellparameters.h \
 		cookiejar.h \
-		autosaver.h
-
+		autosaver.h \
+		mailsender.h
 SOURCES =	main.cpp \
 		mainwindow.cpp \
 		filedownloader.cpp \
@@ -34,4 +34,5 @@ SOURCES =	main.cpp \
 		informations.cpp \
 		webshellparameters.cpp \
 		cookiejar.cpp \
-		autosaver.cpp
+		autosaver.cpp \
+		mailsender.cpp

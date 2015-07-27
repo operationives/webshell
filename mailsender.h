@@ -1,5 +1,5 @@
-#ifndef MAILSENDER
-#define MAILSENDER
+#ifndef MAILSENDER_H
+#define MAILSENDER_H
 
 #include <Windows.h>
 #include <mapi.h>
@@ -11,17 +11,17 @@
 class MailSender
 {
 public:
-    MailSender();
-    ~MailSender();
+	MailSender();
+	~MailSender();
 
-    void AddFile(LPCTSTR path, LPCTSTR name = NULL);
-    bool Send(HWND hWndParent, LPCTSTR szSubject = NULL);
+	void AddFile(QString path, QString name = NULL);
+	bool Send(QString szSubject = NULL);
 
 private:
-    struct attachment { QString path, name; };
-    QVector<attachment> m_Files;
-    HMODULE m_hLib;
+	struct attachment { QString path, name; };
+	QVector<attachment> m_Files;
+	HMODULE m_hLib;
 };
 
-#endif // MAILSENDER
+#endif // MAILSENDER_H
 
