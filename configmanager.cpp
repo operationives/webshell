@@ -40,7 +40,11 @@ ConfigManager::ConfigManager(QString confFilePath)
 	while(!n.isNull())
 	{
 		QDomElement e = n.toElement();
-		if(e.attribute("name") == "minimization")
+		if(e.attribute("name") == "fullscreen")
+			fullscreen = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "developerToolsActivated")
+			developerToolsActivated = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "minimization")
 			minimization = (e.attribute("value") == "true" ? true : false);
 		else if(e.attribute("name") == "launchUrl")
 			launchUrl = e.attribute("value");
@@ -87,11 +91,7 @@ void ConfigManager::InitWebshellParameters()
 	while(!n.isNull())
 	{
 		QDomElement e = n.toElement();
-		if(e.attribute("name") == "fullscreen")
-			fullscreen = (e.attribute("value") == "true" ? true : false);
-		else if(e.attribute("name") == "developerToolsActivated")
-			developerToolsActivated = (e.attribute("value") == "true" ? true : false);
-		else if(e.attribute("name") == "version")
+		if(e.attribute("name") == "version")
 			version = e.attribute("value");
 
 		n = n.nextSibling();
@@ -118,32 +118,20 @@ void ConfigManager::LoadParametersWebshell()
 	}
 	QDomElement docElem = dom.documentElement();
 	QDomNode n = docElem.firstChild();
-
 	while(!n.isNull())
 	{
-		QDomElement write_elem = dom.createElement("parameter");
-		QDomElement e = n.toElement();
+		QDomNode remove = n;
 		n = n.nextSibling();
-		if(e.attribute("name") == "fullscreen")
-		{
-			write_elem.setAttribute("name", "fullscreen");
-			if(fullscreen) write_elem.setAttribute("value", "true");
-			else write_elem.setAttribute("value", "false");
-		}
-		else if(e.attribute("name") == "developerToolsActivated")
-		{
-			write_elem.setAttribute("name", "developerToolsActivated");
-			if(developerToolsActivated) write_elem.setAttribute("value", "true");
-			else write_elem.setAttribute("value", "false");
-		}
-		else if(e.attribute("name") == "version")
-		{
-			write_elem.setAttribute("name", "version");
-			write_elem.setAttribute("value", version);
-		}
-		docElem.replaceChild(write_elem,e);
-
+		docElem.removeChild(remove);
 	}
+
+	QDomElement write_elem;
+
+	//Insertion du paramètre version
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "version");
+	write_elem.setAttribute("value", version);
+	docElem.appendChild(write_elem);
 
 	doc_xml.close();
 
@@ -189,6 +177,20 @@ void ConfigManager::LoadParametersAppli()
 	}
 
 	QDomElement write_elem;
+
+	//Insertion du paramètre fullscreen
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "fullscreen");
+	if(fullscreen) write_elem.setAttribute("value", "true");
+	else write_elem.setAttribute("value", "false");
+	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre developerToolsActivated
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "developerToolsActivated");
+	if(developerToolsActivated) write_elem.setAttribute("value", "true");
+	else write_elem.setAttribute("value", "false");
+	docElem.appendChild(write_elem);
 
 	//Insertion du paramètre minimization
 	write_elem = dom.createElement("setting");
@@ -242,6 +244,25 @@ void ConfigManager::LoadParametersAppli()
 }
 
 /**
+ * @brief ConfigManager::GetVersion Indique la version du webshell
+ * @return version
+ */
+QString ConfigManager::GetVersion()
+{
+	return version;
+}
+
+/**
+ * @brief ConfigManager::SetVersion Met à jour la version du webshell
+ * @param version   Nouveau numéro de version du webshell
+ */
+void ConfigManager::SetVersion(QString version)
+{
+	this->version = version;
+	LoadParametersWebshell();
+}
+
+/**
  * @brief ConfigManager::Getscreenmode Indique si l'utilisateur doit être en plein écran ou non
  * @return fullscreen
  */
@@ -257,7 +278,7 @@ bool ConfigManager::GetScreenMode()
 void ConfigManager::SetScreenMode(bool fullscreen)
 {
 	this->fullscreen = fullscreen;
-	LoadParametersWebshell();
+	LoadParametersAppli();
 }
 
 /**
@@ -277,26 +298,7 @@ void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 {
 	this->developerToolsActivated = developerToolsActivated;
 	emit toolsMode(developerToolsActivated);
-	LoadParametersWebshell();
-}
-
-/**
- * @brief ConfigManager::GetVersion Indique la version du webshell
- * @return version
- */
-QString ConfigManager::GetVersion()
-{
-	return version;
-}
-
-/**
- * @brief ConfigManager::SetVersion Met à jour la version du webshell
- * @param version   Nouveau numéro de version du webshell
- */
-void ConfigManager::SetVersion(QString version)
-{
-	this->version = version;
-	LoadParametersWebshell();
+	LoadParametersAppli();
 }
 
 /**

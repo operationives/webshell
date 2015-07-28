@@ -13,11 +13,11 @@ public:
 	~ConfigManager();
 
 	//Getters pour attributs webshell
-	bool GetScreenMode();
-	bool GetDeveloperToolsMode();
 	QString GetVersion();
 
 	//Getters pour attributs appli
+	bool GetScreenMode();
+	bool GetDeveloperToolsMode();
 	bool GetCloseButtonBehaviour();
 	QString GetLaunchUrl();
 	QString GetIcon();
@@ -26,11 +26,11 @@ public:
 
 public slots:
 	//Setters pour attributs webshell
-	void SetScreenMode(bool fullscreen);
-	void SetDeveloperToolsMode(bool developerToolsActivated);
 	void SetVersion(QString version);
 
 	//Setters pour attributs appli
+	void SetScreenMode(bool fullscreen);
+	void SetDeveloperToolsMode(bool developerToolsActivated);
 	void SetCloseButtonBehaviour(bool minimization);
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
