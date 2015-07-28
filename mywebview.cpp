@@ -40,7 +40,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
 	{
 		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << *config->GetBaseUrl();
-		config->SetBaseUrl(&baseUrl);
+		wapp->setProperty("baseUrl",baseUrl);
 	}
 }
 
