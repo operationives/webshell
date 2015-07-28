@@ -39,7 +39,6 @@ private:
 	void SetIcon(const QString &icon);
 	QString Infos() const;
 	void SetInfos(const QString &infos);
-	QStringList m_baseUrl;
 	QStringList GetBaseUrl() const;
 	void SetBaseUrl(const QStringList &value);
 	QString Target() const;

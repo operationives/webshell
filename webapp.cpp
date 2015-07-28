@@ -13,7 +13,6 @@ WebApp::WebApp(MyWebView *view)
 	this->m_webView = view;
 	this->m_target = "window";
 	m_infos = config->GetInfos();
-	m_baseUrl = *config->GetBaseUrl();
 }
 
 /**
@@ -111,7 +110,7 @@ void WebApp::SetInfos(const QString &infos)
  */
 QStringList WebApp::GetBaseUrl() const
 {
-	return m_baseUrl;
+	return *config->GetBaseUrl();
 }
 
 /**
@@ -120,8 +119,8 @@ QStringList WebApp::GetBaseUrl() const
  */
 void WebApp::SetBaseUrl(const QStringList &value)
 {
-	m_baseUrl = value;
-	config->SetBaseUrl(&m_baseUrl);
+	QStringList newBaseUrl = value;
+	config->SetBaseUrl(&newBaseUrl);
 }
 
 /**
@@ -132,8 +131,9 @@ bool WebApp::IsPageInApplication()
 {
 	QString urls = m_webView->url().toString();
 	QStringList::iterator i;
+	QStringList *baseUrl = config->GetBaseUrl();
 	bool res = false;
-	for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
+	for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
 	{
 		if(urls.startsWith(*i))
 		{
@@ -153,8 +153,9 @@ bool WebApp::IsPageInApplication(QUrl url)
 {
 	QString urls = url.toString();
 	QStringList::iterator i;
+	QStringList *baseUrl = config->GetBaseUrl();
 	bool res = false;
-	for (i = m_baseUrl.begin(); i != m_baseUrl.end(); ++i)
+	for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
 	{
 		if(urls.startsWith(*i))
 		{
