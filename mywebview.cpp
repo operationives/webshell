@@ -36,6 +36,12 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	m_cookieJar = new CookieJar();
 	m_WebCtrl->setCookieJar(m_cookieJar);
 	this->page()->setNetworkAccessManager(m_WebCtrl);
+
+	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
+	{
+		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << *config->GetBaseUrl();
+		config->SetBaseUrl(&baseUrl);
+	}
 }
 
 /**
