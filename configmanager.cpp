@@ -22,12 +22,17 @@ ConfigManager::ConfigManager(QString confFilePath)
 	QDomDocument dom("appli_xml");
 	QFile file(confFilePath);
 	if (!file.open(QIODevice::ReadOnly))
+	{
+		qWarning() << "Open appli conf File: constructor error";
 		return;
+	}
 	if (!dom.setContent(&file))
 	{
+		qWarning() << "setContent appli conf File: constructor error";
 		file.close();
 		return;
 	}
+
 	file.close();
 	QDomElement docElem = dom.documentElement();
 	QDomNode n = docElem.firstChild();
@@ -66,9 +71,13 @@ void ConfigManager::InitWebshellParameters()
 	QDomDocument dom("webshell_xml");
 	QFile file(QApplication::applicationDirPath()+"/webshell.xml");
 	if (!file.open(QIODevice::ReadOnly))
+	{
+		qWarning() << "Open webshell conf File: constructor error";
 		return;
+	}
 	if (!dom.setContent(&file))
 	{
+		qWarning() << "setContent webshell conf File: constructor error";
 		file.close();
 		return;
 	}
@@ -97,9 +106,13 @@ void ConfigManager::LoadParametersWebshell()
 	QDomDocument dom("webshell_xml");
 	QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
 	if(!doc_xml.open(QIODevice::ReadOnly))
+	{
+		qWarning() << "Open webshell conf File: load error";
 		return;
+	}
 	if(!dom.setContent(&doc_xml))
 	{
+		qWarning() << "setContent webshell conf File: load error";
 		doc_xml.close();
 		return;
 	}
@@ -156,9 +169,13 @@ void ConfigManager::LoadParametersAppli()
 	QDomDocument dom("appli_xml");
 	QFile doc_xml(confFilePath);
 	if(!doc_xml.open(QIODevice::ReadOnly))
+	{
+		qWarning() << "Open appli conf File: load error";
 		return;
+	}
 	if(!dom.setContent(&doc_xml))
 	{
+		qWarning() << "setContent appli conf File: load error";
 		doc_xml.close();
 		return;
 	}

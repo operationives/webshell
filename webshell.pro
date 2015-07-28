@@ -9,7 +9,6 @@ HEADERS =	mainwindow.h \
 		mywebview.h \
 		configmanager.h \
 		downloadprogresslistener.h \
-		winaddon.h \
 		webapp.h \
 		navigatorplugins.h \
 		semaphore.h \
@@ -17,8 +16,12 @@ HEADERS =	mainwindow.h \
 		informations.h \
 		webshellparameters.h \
 		cookiejar.h \
-		autosaver.h \
-		mailsender.h
+		autosaver.h
+win32 {
+    HEADERS +=	mailsender.h \
+		winaddon.h
+}
+
 SOURCES =	main.cpp \
 		mainwindow.cpp \
 		filedownloader.cpp \
@@ -26,7 +29,6 @@ SOURCES =	main.cpp \
 		parametres.cpp \
 		mywebview.cpp \
 		configmanager.cpp \
-		winaddon.cpp \
 		webapp.cpp \
 		navigatorplugins.cpp \
 		semaphore.cpp \
@@ -34,5 +36,8 @@ SOURCES =	main.cpp \
 		informations.cpp \
 		webshellparameters.cpp \
 		cookiejar.cpp \
-		autosaver.cpp \
-		mailsender.cpp
+		autosaver.cpp
+win32 {
+    SOURCES +=	mailsender.cpp \
+		winaddon.cpp
+}

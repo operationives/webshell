@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "wnavigator.h"
 #include "global.h"
+#ifdef Q_OS_WIN
 #include "mailsender.h"
+#endif
 
 /**
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
@@ -101,7 +103,9 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	myMenu.addAction("Fermer");
 	myMenu.addAction("Reload");
 	myMenu.addAction("Informations");
+#ifdef Q_OS_WIN
 	myMenu.addAction("Envoi de logs");
+#endif
 
 	QPoint globalPos = this->mapToGlobal(pos);
 	//Correction de position
@@ -137,6 +141,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	{
 		this->DisplayInfos();
 	}
+#ifdef Q_OS_WIN
 	if (selectedItem->text()=="Envoi de logs")
 	{
 		MailSender mail;
@@ -144,6 +149,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
 		mail.Send("Envoi de lgos");
 	}
+#endif
 }
 
 /**

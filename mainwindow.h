@@ -7,7 +7,6 @@
 #include <QtNetwork>
 #include "parametres.h"
 #include "mywebview.h"
-#include "winaddon.h"
 #include "informations.h"
 
 class MainWindow : public QMainWindow
