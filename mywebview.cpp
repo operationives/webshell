@@ -3,7 +3,6 @@
 #include "wnavigator.h"
 #include "navigatorplugins.h"
 #include "webapp.h"
-#include "webshellparameters.h"
 #include "global.h"
 
 /**
@@ -14,7 +13,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
 	navigatorplugins = new NavigatorPlugins(this);
 	wapp = new WebApp(this);
-	WebshellParameters *webshellParameters = new WebshellParameters();
+	webshellParameters = new WebshellParameters();
 	wnavigator = new WNavigator(this,webshellParameters);
 	//On permet l'accès aux méthodes dans WNavigator par les appels javascript
 	this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
@@ -25,6 +24,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 	connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
 	connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
+	connect(this->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(updateJavaScriptObjects()));
 
 	this->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 	connect(this,SIGNAL(linkClicked(QUrl)),this,SLOT(handleRedirect(QUrl)));
@@ -69,6 +69,17 @@ void MyWebView::handleRedirect(QUrl url)
 void MyWebView::updateTitle()
 {
 	emit changeTitle(this->title());
+}
+
+/**
+ * @brief MyWebView::updateJavaScriptObjetcs Remet les objets JavaScript sur la page lorsqu'ils sont supprimés
+ */
+void MyWebView::updateJavaScriptObjects()
+{
+	this->page()->mainFrame()->addToJavaScriptWindowObject("wnavigator", wnavigator);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("navigatorplugins", navigatorplugins);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
+	this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", webshellParameters);
 }
 
 /**

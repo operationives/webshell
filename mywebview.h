@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <QWebView>
 #include "cookiejar.h"
+#include "webshellparameters.h"
 
 class WNavigator;
 class NavigatorPlugins;
@@ -30,10 +31,12 @@ private:
 	WNavigator *wnavigator;
 	NavigatorPlugins *navigatorplugins;
 	WebApp *wapp;
+	WebshellParameters *webshellParameters;
 
 
 private slots:
 	void handleRedirect(QUrl url);
+	void updateJavaScriptObjects();
 	void updateTitle();
 };
 
