@@ -19,7 +19,13 @@ public:
 	WebApp(MyWebView *view);
 	~WebApp();
 	bool IsPageInApplication();
-	bool IsPageInApplication(QUrl url);
+	Q_INVOKABLE bool IsPageInApplication(QUrl url);
+	Q_INVOKABLE int GetMinWidth();
+	Q_INVOKABLE int GetMinHeight();
+	Q_INVOKABLE int GetDefaultWidth();
+	Q_INVOKABLE int GetDefaultHeight();
+	Q_INVOKABLE void SetMinSize(int minWidth, int minHeight);
+	Q_INVOKABLE void SetDefaultSize(int defaultWidth, int defaultHeight);
 
 	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
 	void FileDownloaded(QString mime_type);

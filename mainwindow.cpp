@@ -42,7 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
 	connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
 	view->load(QUrl(config->GetLaunchUrl()));
 	//On met en place la taille minimale
-	this->setMinimumSize(1000,800);
+	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
+	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
 
 	//On enlève les barres de défilement inutiles dans le cadre de la webshell
 	view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
@@ -65,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
 	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
+	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
 
 	infos = new Informations();
 }
@@ -179,6 +182,26 @@ void MainWindow::changeToolsMode(bool toolsActivated)
 }
 
 /**
+ * @brief MainWindow::changeMinSize Change la taille minimale de la fenêtre
+ * @param minWidth	Nouvelle largeur minimale
+ * @param minHeight	Nouvelle hauteur minimale
+ */
+void MainWindow::changeMinSize(int minWidth, int minHeight)
+{
+	this->setMinimumSize(minWidth,minHeight);
+}
+
+/**
+ * @brief MainWindow::changeDefaultSize Change la taille par défaut de la fenêtre
+ * @param defaultWidth	Nouvelle largeur par défaut
+ * @param defaultHeight	Nouvelle hauteur par défaut
+ */
+void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
+{
+	this->resize(defaultWidth,defaultHeight);
+}
+
+/**
  * @brief MainWindow::keyPressEvent Si la touche tapée est ESC, on quitte le mode plein écran, sinon on traite l'événement normalement
  * @param event Evénement de touche tapée
  */
@@ -229,9 +252,6 @@ void MainWindow::quit ()
  */
 void MainWindow::changeIcon(QIcon icon)
 {
-	this->setWindowIcon(icon);
-	infos->setWindowIcon(icon);
-	inspector->setWindowIcon(icon);
 	this->trayIcon->setIcon(icon);
 }
 

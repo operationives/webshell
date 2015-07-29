@@ -32,6 +32,8 @@ private slots:
 	void showContextMenu(const QPoint& pos);
 	void changeScreenMode(bool fullscreen);
 	void changeToolsMode(bool toolsActivated);
+	void changeMinSize(int minWidth, int minHeight);
+	void changeDefaultSize(int defaultWidth, int defaultHeight);
 	void quit();
 	void changeIcon(QIcon icon);
 };

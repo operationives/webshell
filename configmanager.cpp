@@ -46,6 +46,14 @@ ConfigManager::ConfigManager(QString confFilePath)
 			developerToolsActivated = (e.attribute("value") == "true" ? true : false);
 		else if(e.attribute("name") == "minimization")
 			minimization = (e.attribute("value") == "true" ? true : false);
+		else if(e.attribute("name") == "minWidth")
+			minWidth = e.attribute("value").toInt();
+		else if(e.attribute("name") == "minHeight")
+			minHeight = e.attribute("value").toInt();
+		else if(e.attribute("name") == "defaultWidth")
+			defaultWidth = e.attribute("value").toInt();
+		else if(e.attribute("name") == "defaultHeight")
+			defaultHeight = e.attribute("value").toInt();
 		else if(e.attribute("name") == "launchUrl")
 			launchUrl = e.attribute("value");
 		else if(e.attribute("name") == "icon")
@@ -199,6 +207,30 @@ void ConfigManager::LoadParametersAppli()
 	else write_elem.setAttribute("value", "false");
 	docElem.appendChild(write_elem);
 
+	//Insertion du paramètre minWidth
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "minWidth");
+	write_elem.setAttribute("value", QString::number(minWidth));
+	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre minHeight
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "minHeight");
+	write_elem.setAttribute("value", QString::number(minHeight));
+	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre defaultWidth
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "defaultWidth");
+	write_elem.setAttribute("value", QString::number(defaultWidth));
+	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre defaultHeight
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "defaultHeight");
+	write_elem.setAttribute("value", QString::number(defaultHeight));
+	docElem.appendChild(write_elem);
+
 	//Insertion du paramètre launchUrl
 	write_elem = dom.createElement("setting");
 	write_elem.setAttribute("name", "launchUrl");
@@ -319,6 +351,69 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 	this->minimization = minimization;
 	LoadParametersAppli();
 }
+
+/**
+ * @brief ConfigManager::GetMinWidth Renvoie la largeur minimale de l'application
+ * @return minWidth
+ */
+int ConfigManager::GetMinWidth() const
+{
+	return minWidth;
+}
+
+/**
+ * @brief ConfigManager::GetMinHeight Renvoie la hauteur minimale de l'application
+ * @return minHeight
+ */
+int ConfigManager::GetMinHeight() const
+{
+	return minHeight;
+}
+
+/**
+ * @brief ConfigManager::SetMinSize Met à jour la taille minimale de l'application
+ * @param minWidth	Nouvelle largeur minimale
+ * @param minHeight	Nouvelle hauteur minimale
+ */
+void ConfigManager::SetMinSize(int minWidth, int minHeight)
+{
+	this->minWidth = minWidth;
+	this->minHeight = minHeight;
+	LoadParametersAppli();
+	emit minSize(minWidth,minHeight);
+}
+
+/**
+ * @brief ConfigManager::GetDefaultWidth Renvoie la largeur par défaut de l'application
+ * @return defaultWidth
+ */
+int ConfigManager::GetDefaultWidth() const
+{
+	return defaultWidth;
+}
+
+/**
+ * @brief ConfigManager::GetDefaultHeight Renvoie la hauteur par défaut de l'application
+ * @return defaultHeight
+ */
+int ConfigManager::GetDefaultHeight() const
+{
+	return defaultHeight;
+}
+
+/**
+ * @brief ConfigManager::SetDefaultSize Met à jour la taille par défaut de l'application
+ * @param defaultWidth	Nouvelle largeur par défaut
+ * @param defaultHeight	Nouvelle hauteur par défaut
+ */
+void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
+{
+	this->defaultWidth = defaultWidth;
+	this->defaultHeight = defaultHeight;
+	LoadParametersAppli();
+	emit defaultSize(defaultWidth,defaultHeight);
+}
+
 
 /**
  * @brief ConfigManager::GetLaunchUrl Indique l'adresse de démarrage de l'application

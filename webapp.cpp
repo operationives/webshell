@@ -184,3 +184,61 @@ void WebApp::SetTarget(const QString &target)
 {
 	m_target = target;
 }
+
+/**
+ * @brief WebApp::GetMinWidth Renvoie la largeur minimale de la fenêtre
+ * @return config->GetMinWidth()
+ */
+int WebApp::GetMinWidth()
+{
+	return config->GetMinWidth();
+}
+
+/**
+ * @brief WebApp::GetMinHeight Renvoie la hauteur minimale de la fenêtre
+ * @return config->GetMinHeight()
+ */
+int WebApp::GetMinHeight()
+{
+	return config->GetMinHeight();
+}
+
+/**
+ * @brief WebApp::SetMinSize Met à jour la taille minimale de la fenêtre
+ * @param minWidth	Nouvelle largeur minimale
+ * @param minHeight	Nouvelle hauteur minimale
+ */
+void WebApp::SetMinSize(int minWidth, int minHeight)
+{
+	qDebug() << "setminsize";
+	config->SetMinSize(minWidth,minHeight);
+}
+
+/**
+ * @brief WebApp::GetDefaultWidth Retourne la largeur par défaut de la fenêtre
+ * @return config->GetDefaultWidth()
+ */
+int WebApp::GetDefaultWidth()
+{
+	return config->GetDefaultWidth();
+}
+
+/**
+ * @brief WebApp::GetDefaultHeight Retourne la hauteur par défaut de la fenêtre
+ * @return config->GetDefaultHeight()
+ */
+int WebApp::GetDefaultHeight()
+{
+	return config->GetDefaultHeight();
+}
+
+/**
+ * @brief WebApp::SetDefaultSize Met à jour la taille par défaut de la fenêtre
+ * @param defaultWidth	Nouvelle largeur par défaut
+ * @param defaultHeight	Nouvelle hauteur par défaut
+ */
+void WebApp::SetDefaultSize(int defaultWidth, int defaultHeight)
+{
+	qDebug() << "setdefaultsize";
+	config->SetDefaultSize(defaultWidth,defaultHeight);
+}

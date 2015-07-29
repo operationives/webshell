@@ -19,6 +19,10 @@ public:
 	bool GetScreenMode();
 	bool GetDeveloperToolsMode();
 	bool GetCloseButtonBehaviour();
+	int GetMinWidth() const;
+	int GetMinHeight() const;
+	int GetDefaultWidth() const;
+	int GetDefaultHeight() const;
 	QString GetLaunchUrl();
 	QString GetIcon();
 	QString GetInfos();
@@ -32,6 +36,8 @@ public slots:
 	void SetScreenMode(bool fullscreen);
 	void SetDeveloperToolsMode(bool developerToolsActivated);
 	void SetCloseButtonBehaviour(bool minimization);
+	void SetMinSize(int minWidth, int minHeight);
+	void SetDefaultSize(int defaultWidth, int defaultHeight);
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
 	void SetInfos(QString infosAppli);
@@ -39,15 +45,21 @@ public slots:
 
 signals:
 	void toolsMode(bool toolsActivated);
+	void minSize(int minWidth, int minHeight);
+	void defaultSize(int defaultWidth, int defaultHeight);
 
 private:
 	//Attributs webshell
-	bool fullscreen;
-	bool minimization;
-	bool developerToolsActivated;
 	QString version;
 
 	//Attributs application
+	bool fullscreen;
+	bool developerToolsActivated;
+	bool minimization;
+	int minWidth;
+	int minHeight;
+	int defaultWidth;
+	int defaultHeight;
 	QString launchUrl;
 	QString icon;
 	QString infosAppli;
