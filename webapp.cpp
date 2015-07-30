@@ -210,7 +210,6 @@ int WebApp::GetMinHeight()
  */
 void WebApp::SetMinSize(int minWidth, int minHeight)
 {
-	qDebug() << "setminsize";
 	config->SetMinSize(minWidth,minHeight);
 }
 
@@ -239,6 +238,5 @@ int WebApp::GetDefaultHeight()
  */
 void WebApp::SetDefaultSize(int defaultWidth, int defaultHeight)
 {
-	qDebug() << "setdefaultsize";
 	config->SetDefaultSize(defaultWidth,defaultHeight);
 }

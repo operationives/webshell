@@ -3,67 +3,105 @@
 #include <QApplication>
 
 /**
- * @brief ConfigManager::ConfigManager Initialise les paramètres du webshell
- */
-ConfigManager::ConfigManager()
-{
-	this->InitWebshellParameters();
-}
-
-/**
  * @brief ConfigManager::ConfigManager Effectue les actions du constructeur de base, puis sauvegarde les paramètres de l'application présents dans le fichier en paramètre
  * @param confFilePath  Chemin vers le fichier xml de l'application
  */
-ConfigManager::ConfigManager(QString confFilePath)
+ConfigManager::ConfigManager(QString launchUrl)
 {
 	this->InitWebshellParameters();
-	this->confFilePath = confFilePath;
+
+	QString appName(launchUrl);
+	if(appName.startsWith("http"))
+	{
+		//On récupère dans appName la partie placée entre :// et le premier / suivant
+		int index = appName.indexOf("//");
+		index = index+2;
+		appName.remove(0,index);
+		index = appName.indexOf("/");
+		if(index!=-1)
+			appName.truncate(index);
+	}
+	else
+	{
+		//Cas file:/// -> On retire l'entête, et on récupère le nom du dossier contenant le fichier html
+		int index = appName.indexOf("///");
+		index = index+3;
+		appName.remove(0,index);
+		index = appName.lastIndexOf("/");
+		if(index==-1)
+		{
+			qWarning() << "Nom de fichier incorrect";
+			return;
+		}
+		appName.truncate(index);
+		QDir localDir(appName);
+		appName = localDir.dirName();
+	}
+
+	confFilePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+appName+".xml";
+	this->launchUrl = launchUrl;
 
 	QDomDocument dom("appli_xml");
 	QFile file(confFilePath);
-	if (!file.open(QIODevice::ReadOnly))
+	if(!file.exists())
 	{
-		qWarning() << "Open appli conf File: constructor error";
-		return;
+		fullscreen = false;
+		developerToolsActivated = false;
+		minimization = false;
+		minWidth = 700;
+		minHeight = 500;
+		defaultWidth = 1000;
+		defaultHeight = 800;
+		icon = "";
+		infosAppli = "";
+		baseUrl = new QStringList();
+		*baseUrl << launchUrl;
+		LoadParametersAppli();
 	}
-	if (!dom.setContent(&file))
+	else
 	{
-		qWarning() << "setContent appli conf File: constructor error";
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Open appli conf File: constructor error";
+			return;
+		}
+		if (!dom.setContent(&file))
+		{
+			qWarning() << "setContent appli conf File: constructor error";
+			file.close();
+			return;
+		}
+
 		file.close();
-		return;
-	}
+		QDomElement docElem = dom.documentElement();
+		QDomNode n = docElem.firstChild();
+		baseUrl = new QStringList();
+		while(!n.isNull())
+		{
+			QDomElement e = n.toElement();
+			if(e.attribute("name") == "fullscreen")
+				fullscreen = (e.attribute("value") == "true" ? true : false);
+			else if(e.attribute("name") == "developerToolsActivated")
+				developerToolsActivated = (e.attribute("value") == "true" ? true : false);
+			else if(e.attribute("name") == "minimization")
+				minimization = (e.attribute("value") == "true" ? true : false);
+			else if(e.attribute("name") == "minWidth")
+				minWidth = e.attribute("value").toInt();
+			else if(e.attribute("name") == "minHeight")
+				minHeight = e.attribute("value").toInt();
+			else if(e.attribute("name") == "defaultWidth")
+				defaultWidth = e.attribute("value").toInt();
+			else if(e.attribute("name") == "defaultHeight")
+				defaultHeight = e.attribute("value").toInt();
+			else if(e.attribute("name") == "icon")
+				icon = e.attribute("value");
+			else if(e.attribute("name") == "infos")
+				infosAppli = e.attribute("value");
+			else if(e.attribute("name") == "baseUrl")
+				baseUrl->append(e.attribute("value"));
 
-	file.close();
-	QDomElement docElem = dom.documentElement();
-	QDomNode n = docElem.firstChild();
-	baseUrl = new QStringList();
-	while(!n.isNull())
-	{
-		QDomElement e = n.toElement();
-		if(e.attribute("name") == "fullscreen")
-			fullscreen = (e.attribute("value") == "true" ? true : false);
-		else if(e.attribute("name") == "developerToolsActivated")
-			developerToolsActivated = (e.attribute("value") == "true" ? true : false);
-		else if(e.attribute("name") == "minimization")
-			minimization = (e.attribute("value") == "true" ? true : false);
-		else if(e.attribute("name") == "minWidth")
-			minWidth = e.attribute("value").toInt();
-		else if(e.attribute("name") == "minHeight")
-			minHeight = e.attribute("value").toInt();
-		else if(e.attribute("name") == "defaultWidth")
-			defaultWidth = e.attribute("value").toInt();
-		else if(e.attribute("name") == "defaultHeight")
-			defaultHeight = e.attribute("value").toInt();
-		else if(e.attribute("name") == "launchUrl")
-			launchUrl = e.attribute("value");
-		else if(e.attribute("name") == "icon")
-			icon = e.attribute("value");
-		else if(e.attribute("name") == "infos")
-			infosAppli = e.attribute("value");
-		else if(e.attribute("name") == "baseUrl")
-			baseUrl->append(e.attribute("value"));
-
-		n = n.nextSibling();
+			n = n.nextSibling();
+		}
 	}
 }
 
@@ -81,28 +119,36 @@ ConfigManager::~ConfigManager()
 void ConfigManager::InitWebshellParameters()
 {
 	QDomDocument dom("webshell_xml");
-	QFile file(QApplication::applicationDirPath()+"/webshell.xml");
-	if (!file.open(QIODevice::ReadOnly))
+	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
+	if(!file.exists())
 	{
-		qWarning() << "Open webshell conf File: constructor error";
-		return;
+		version = "0.42";
+		LoadParametersWebshell();
 	}
-	if (!dom.setContent(&file))
+	else
 	{
-		qWarning() << "setContent webshell conf File: constructor error";
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Open webshell conf File: constructor error";
+			return;
+		}
+		if (!dom.setContent(&file))
+		{
+			qWarning() << "setContent webshell conf File: constructor error";
+			file.close();
+			return;
+		}
 		file.close();
-		return;
-	}
-	file.close();
-	QDomElement docElem = dom.documentElement();
-	QDomNode n = docElem.firstChild();
-	while(!n.isNull())
-	{
-		QDomElement e = n.toElement();
-		if(e.attribute("name") == "version")
-			version = e.attribute("value");
+		QDomElement docElem = dom.documentElement();
+		QDomNode n = docElem.firstChild();
+		while(!n.isNull())
+		{
+			QDomElement e = n.toElement();
+			if(e.attribute("name") == "version")
+				version = e.attribute("value");
 
-		n = n.nextSibling();
+			n = n.nextSibling();
+		}
 	}
 }
 
@@ -111,27 +157,11 @@ void ConfigManager::InitWebshellParameters()
  */
 void ConfigManager::LoadParametersWebshell()
 {
-	QDomDocument dom("webshell_xml");
-	QFile doc_xml(QApplication::applicationDirPath()+"/webshell.xml");
-	if(!doc_xml.open(QIODevice::ReadOnly))
-	{
-		qWarning() << "Open webshell conf File: load error";
-		return;
-	}
-	if(!dom.setContent(&doc_xml))
-	{
-		qWarning() << "setContent webshell conf File: load error";
-		doc_xml.close();
-		return;
-	}
-	QDomElement docElem = dom.documentElement();
-	QDomNode n = docElem.firstChild();
-	while(!n.isNull())
-	{
-		QDomNode remove = n;
-		n = n.nextSibling();
-		docElem.removeChild(remove);
-	}
+	QDomDocument dom;
+	QDomProcessingInstruction header = dom.createProcessingInstruction("xml","version='1.0' encoding='UTF-8'");
+	dom.appendChild(header);
+	QDomElement docElem = dom.createElement("settings");
+	dom.appendChild(docElem);
 
 	QDomElement write_elem;
 
@@ -141,11 +171,9 @@ void ConfigManager::LoadParametersWebshell()
 	write_elem.setAttribute("value", version);
 	docElem.appendChild(write_elem);
 
-	doc_xml.close();
-
 	QString write_doc = dom.toString();
 
-	QFile fichier(QApplication::applicationDirPath()+"/webshell.xml");
+	QFile fichier(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
 	if(!fichier.open(QIODevice::WriteOnly))
 	{
 		fichier.close();
@@ -162,27 +190,11 @@ void ConfigManager::LoadParametersWebshell()
  */
 void ConfigManager::LoadParametersAppli()
 {
-	QDomDocument dom("appli_xml");
-	QFile doc_xml(confFilePath);
-	if(!doc_xml.open(QIODevice::ReadOnly))
-	{
-		qWarning() << "Open appli conf File: load error";
-		return;
-	}
-	if(!dom.setContent(&doc_xml))
-	{
-		qWarning() << "setContent appli conf File: load error";
-		doc_xml.close();
-		return;
-	}
-	QDomElement docElem = dom.documentElement();
-	QDomNode n = docElem.firstChild();
-	while(!n.isNull())
-	{
-		QDomNode remove = n;
-		n = n.nextSibling();
-		docElem.removeChild(remove);
-	}
+	QDomDocument dom;
+	QDomProcessingInstruction header = dom.createProcessingInstruction("xml","version='1.0' encoding='UTF-8'");
+	dom.appendChild(header);
+	QDomElement docElem = dom.createElement("settings");
+	dom.appendChild(docElem);
 
 	QDomElement write_elem;
 
@@ -259,9 +271,8 @@ void ConfigManager::LoadParametersAppli()
 		docElem.appendChild(write_elem);
 	}
 
-	doc_xml.close();
-
-	QString write_doc = dom.toString();
+	QString write_doc;
+	write_doc.append(dom.toString());
 
 	QFile fichier(confFilePath);
 	if(!fichier.open(QIODevice::WriteOnly))

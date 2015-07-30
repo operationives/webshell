@@ -8,8 +8,7 @@ class ConfigManager : public QObject
 	Q_OBJECT
 
 public:
-	ConfigManager();
-	ConfigManager(QString confFilePath);
+	ConfigManager(QString launchUrl);
 	~ConfigManager();
 
 	//Getters pour attributs webshell

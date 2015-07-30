@@ -57,53 +57,47 @@ int main(int argc, char** argv)
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
 
+	QDir appdata(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+	if(!appdata.exists())
+	{
+		appdata.mkpath(appdata.path());
+	}
+
 	QCommandLineParser parser;
-	QCommandLineOption configOption(QStringList() << "f" << "file", "Chemin d'accès au fichier de configuration <confFile>.", "confFile");
-	QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "file:///"+QApplication::applicationDirPath()+"/"+"index.html");
+	//Compléter la gestion de l'option Icône
+	QCommandLineOption iconOption(QStringList() << "i" << "icon", "Chemin d'accès vers l'icône de l'application <confFile>.", "Icône");
+	QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "Url");
 
-	parser.addOption(configOption);
-
+	parser.addOption(iconOption);
 	parser.addOption(urlOption);
-
 	parser.process(app);
 
-	if(parser.isSet(configOption))
+	if(!parser.isSet(urlOption))
 	{
-		config = new ConfigManager(parser.value(configOption));
-	}
-	else
-	{
-		config = new ConfigManager(QApplication::applicationDirPath()+"/appli.xml");
-		config->SetBaseUrl(new QStringList());
-		config->SetIcon("");
-		config->SetInfos("");
-		config->SetCloseButtonBehaviour(false);
+		qWarning() << "Pas d'url fournie en paramètre. Fin de l'application.\nExemple d'utilisation: webshell.exe -u http://www.google.fr/";
+		return 1;
 	}
 
-	QString launch = config->GetLaunchUrl();
-	if(parser.isSet(urlOption))
+	QString launch = parser.value(urlOption);
+	//On remplace webshell:// par http:// et webshells:// par https://
+	if(launch.startsWith("webshell://") || launch.startsWith("webshells://"))
 	{
-		QString str = parser.value(urlOption);
-		//On remplace webshell:// par http:// et webshells:// par https://
-		if(str.startsWith("webshell://") || str.startsWith("webshells://"))
-		{
-			str.replace(0,8,"http");
-		}
-		//On remplace webshellf:// par file:///
-		if(str.startsWith("webshellf://"))
-		{
-			str.replace(0,12,"file:///");
-		}
-		QUrl url = QUrl(str);
-		//Si les conditions de validation de l'url en paramètre sont remplies, on remplace l'url de démarrage
-		if(url.isValid() && !str.endsWith("//"))
-		{
-			launch = url.url();
-		}
+		launch.replace(0,8,"http");
+	}
+	//On remplace webshellf:// par file:///
+	if(launch.startsWith("webshellf://"))
+	{
+		launch.replace(0,12,"file:///");
+	}
+	QUrl url = QUrl(launch);
+	//Si les conditions de validation de l'url en paramètre sont remplies, on continue l'exécution
+	if(!url.isValid() || launch.endsWith("//"))
+	{
+		qWarning() << "URL invalide: On arrête l'application";
+		return 1;
 	}
 
-	if(launch!=config->GetLaunchUrl())
-		config->SetLaunchUrl(launch);
+	config = new ConfigManager(launch);
 
 	//Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ
 	//Sinon, on prend l'url spécifiée plus tôt
