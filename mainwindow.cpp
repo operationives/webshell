@@ -9,7 +9,7 @@
  * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
  * @param url   Url avec laquelle le service est initialisé
  */
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(true);
@@ -70,6 +70,15 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
 
 	infos = new Informations();
+
+	windowIconSpecified = !iconPath.isNull();
+	if(windowIconSpecified)
+	{
+		QIcon windowIcon(iconPath);
+		this->setWindowIcon(windowIcon);
+		infos->setWindowIcon(windowIcon);
+		inspector->setWindowIcon(windowIcon);
+	}
 }
 
 /**
@@ -148,7 +157,6 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	if (selectedItem->text()=="Envoi de logs")
 	{
 		MailSender mail;
-		//qDebug() << QApplication::applicationDirPath()+"/"+qAppName()+".log";
 		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
 		mail.Send("Envoi de lgos");
 	}
@@ -253,6 +261,12 @@ void MainWindow::quit ()
 void MainWindow::changeIcon(QIcon icon)
 {
 	this->trayIcon->setIcon(icon);
+	if(!windowIconSpecified)
+	{
+		this->setWindowIcon(icon);
+		infos->setWindowIcon(icon);
+		inspector->setWindowIcon(icon);
+	}
 }
 
 /**

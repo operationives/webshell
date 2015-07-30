@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = 0);
+	MainWindow(const QString &iconPath = NULL, QWidget *parent = 0);
 	~MainWindow();
 
 private:
@@ -23,6 +23,7 @@ private:
 	QSystemTrayIcon *trayIcon;
 	QWebInspector *inspector;
 	Informations *infos;
+	bool windowIconSpecified;
 	bool stayOpen;
 	void DisplayInfos();
 	void keyPressEvent(QKeyEvent *event);

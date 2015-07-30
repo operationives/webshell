@@ -99,9 +99,12 @@ int main(int argc, char** argv)
 
 	config = new ConfigManager(launch);
 
-	//Si l'url n'a pas été choisie à partir des arguments, on prend celle mise au départ
-	//Sinon, on prend l'url spécifiée plus tôt
-	MainWindow *mw = new MainWindow();
+	//Si l'icône est spécifié on lance la mainWindow avec le bon icône, sinon on le lance tel quel
+	MainWindow *mw;
+	if(parser.isSet(iconOption))
+		mw = new MainWindow(parser.value(iconOption));
+	else
+		mw = new MainWindow();
 
 	//Affichage de la page de démarrage
 	mw->show();
