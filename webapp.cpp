@@ -20,6 +20,8 @@ WebApp::WebApp(MyWebView *view)
  */
 WebApp::~WebApp()
 {
+	if(!currentFileDirectory.isNull())
+		QFile::remove(currentFileDirectory);
 }
 
 /**
@@ -41,9 +43,11 @@ void WebApp::FileDownloaded(const QString &mime_type)
 {
 	QString filename = data->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-	QString filedirectory = QString(QApplication::applicationDirPath()+"/");
-	filedirectory.append(filename);
-	QFile file(filedirectory);
+	if(!currentFileDirectory.isNull())
+		QFile::remove(currentFileDirectory);
+	currentFileDirectory = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/");
+	currentFileDirectory.append(filename);
+	QFile file(currentFileDirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
@@ -52,9 +56,8 @@ void WebApp::FileDownloaded(const QString &mime_type)
 	}
 	file.write(data->DownloadedData());
 	file.close();
-	//QFile::remove(filedirectory);
 
-	QIcon icon(filedirectory);
+	QIcon icon(currentFileDirectory);
 
 	emit changeIcon(icon);
 }

@@ -32,6 +32,7 @@ private:
 	MyWebView *m_webView;
 	WebshellParameters *m_parameters;
 	QString currentTypeMime;
+	QString currentFileDirectory;
 	FileDownloader *data;
 };
 

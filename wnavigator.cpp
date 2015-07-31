@@ -67,9 +67,9 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
 	QString filename = data->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-	QString filedirectory = QString(QApplication::applicationDirPath()+"/");
-	filedirectory.append(filename);
-	QFile file(filedirectory);
+	currentFileDirectory = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/");
+	currentFileDirectory.append(filename);
+	QFile file(currentFileDirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
@@ -82,11 +82,11 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 	//Lancement du fichier téléchargé
 	//Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
 	QString program;
-	QString tmp = QString(filedirectory);
+	QString tmp = QString(currentFileDirectory);
 	if(filename.endsWith(".msi"))
 	{
 		tmp.replace("/","\\");
-		program = "msiexec.exe /i \""+tmp+"\"";
+		program = "msiexec.exe /i \""+tmp+"\" /qb";
 	}
 	else if(filename.endsWith(".exe"))
 	{
@@ -108,7 +108,7 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 
 	if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
 	{
-		myProcess->start("open "+filedirectory);
+		myProcess->start("open "+currentFileDirectory);
 	}
 	else
 	{
@@ -142,4 +142,5 @@ void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
 	{
 		if(m_webView->DispatchJsEvent("InstallSuccess",m_parameters->property("target").toString(),QStringList() << "typemime" << currentTypeMime)){}
 	}
+	QFile::remove(currentFileDirectory);
 }

@@ -28,7 +28,7 @@ NavigatorPlugins::~NavigatorPlugins()
 void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
 {
 	//La partie suivante permet de télécharger depuis la webshell
-	hash[mime_type] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),mime_type);
+	fileDownloaderHash[mime_type] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),mime_type);
 }
 
 /**
@@ -53,11 +53,11 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 	sem->Acquire();
 	currentTypeMime = mime_type;
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
-	QString filename = hash.value(mime_type)->GetUrl();
+	QString filename = fileDownloaderHash.value(mime_type)->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
-	QString filedirectory = QString(QApplication::applicationDirPath()+"/");
-	filedirectory.append(filename);
-	QFile file(filedirectory);
+	currentFileDirectory = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/");
+	currentFileDirectory.append(filename);
+	QFile file(currentFileDirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
@@ -65,17 +65,17 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 		return;
 	}
 
-	file.write(hash.value(mime_type)->DownloadedData());
+	file.write(fileDownloaderHash.value(mime_type)->DownloadedData());
 	file.close();
 
 	//Lancement du fichier téléchargé
 	//Exécution de fichier dans un chemin précis: ne pas oublier les \" éventuels pour encadrer le chemin
 	QString program;
-	QString tmp = QString(filedirectory);
+	QString tmp = QString(currentFileDirectory);
 	if(filename.endsWith(".msi"))
 	{
 		tmp.replace("/","\\");
-		program = "msiexec.exe /i \""+tmp+"\"";
+		program = "msiexec.exe /i \""+tmp+"\" /qb";
 	}
 	else if(filename.endsWith(".exe"))
 	{
@@ -97,7 +97,7 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 
 	if(filename.endsWith(".pkg") || filename.endsWith(".dmg"))
 	{
-		myProcess->start("open "+filedirectory);
+		myProcess->start("open "+currentFileDirectory);
 	}
 	else
 	{
@@ -129,7 +129,7 @@ void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStat
 	{
 		if(m_webView->DispatchJsEvent("InstallSuccess",m_target,QStringList() << "typemime" << currentTypeMime)){}
 	}
-
+	QFile::remove(currentFileDirectory);
 	sem->Release();
 }
 

@@ -29,7 +29,8 @@ private:
 	MyWebView *m_webView;
 	QString m_target;
 	QString currentTypeMime;
-	QHash<QString, FileDownloader *> hash;
+	QString currentFileDirectory;
+	QHash<QString, FileDownloader *> fileDownloaderHash;
 	Semaphore *sem;
 	QString Target() const;
 	void SetTarget(const QString &target);

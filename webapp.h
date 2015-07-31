@@ -38,6 +38,7 @@ signals:
 private:
 	QString m_infos;
 	QString m_target;
+	QString currentFileDirectory;
 	MyWebView *m_webView;
 	FileDownloader *data;
 	QString Icon() const;
