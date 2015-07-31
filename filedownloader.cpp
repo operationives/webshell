@@ -4,15 +4,15 @@
  * @brief FileDownloader::FileDownloader Constructeur permettant d'initialiser le téléchargement
  * @param Url Lien à télécharger
  */
-FileDownloader::FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type)
+FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *listener, const QString &mime_type)
 {
-	this->url = Url.toString();
+	this->url = QString(url);
 	this->mime_type = mime_type;
 	this->listener = listener;
 	connect(&m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
 	this, SLOT (fileDownloaded(QNetworkReply*)));
 
-	QNetworkRequest request(Url);
+	QNetworkRequest request(QUrl(this->url));
 	QNetworkReply *download = m_WebCtrl.get(request);
 	connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
 	connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));

@@ -14,13 +14,13 @@ class WNavigator : public QObject, public DownloadProgressListener
 
 public:
 	WNavigator(MyWebView *view, WebshellParameters *webshellParameters);
-	Q_INVOKABLE void UpdateSoftware(QString url);
+	Q_INVOKABLE void UpdateSoftware(const QString &url);
 	Q_INVOKABLE void InitWebshellAPI();
 	Q_INVOKABLE void Close();
 
-	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
-	void FileDownloaded(QString mime_type);
-	void DownloadFailure(QString mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
+	void FileDownloaded(const QString &mime_type);
+	void DownloadFailure(const QString &mime_type);
 
 signals:
 	void close();

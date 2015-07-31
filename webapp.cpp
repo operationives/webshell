@@ -28,7 +28,7 @@ WebApp::~WebApp()
  * @param bytesTotal	Nombre d'octets total
  * @param mime_type	 String non significatif
  */
-void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
 {
 
 }
@@ -37,7 +37,7 @@ void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString m
  * @brief WebApp::FileDownloaded Envoie un signal avec l'icône téléchargé
  * @param mime_type String non significatif
  */
-void WebApp::FileDownloaded(QString mime_type)
+void WebApp::FileDownloaded(const QString &mime_type)
 {
 	QString filename = data->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -46,7 +46,10 @@ void WebApp::FileDownloaded(QString mime_type)
 	QFile file(filedirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
+	{
 		qWarning() << "Fichier d'installation webapp impossible à ouvrir. Type mime: " << mime_type;
+		return;
+	}
 	file.write(data->DownloadedData());
 	file.close();
 	//QFile::remove(filedirectory);
@@ -60,7 +63,7 @@ void WebApp::FileDownloaded(QString mime_type)
  * @brief WebApp::DownloadFailure Méthode appelée lors de l'échec d'un téléchargement
  * @param mime_type String non significatif
  */
-void WebApp::DownloadFailure(QString mime_type)
+void WebApp::DownloadFailure(const QString &mime_type)
 {
 	qWarning() << "Erreur téléchargement icône " << mime_type;
 }
@@ -81,8 +84,7 @@ QString WebApp::Icon() const
 void WebApp::SetIcon(const QString &icon)
 {
 	config->SetIcon(icon);
-	if(QUrl(icon).isValid())
-		data = new FileDownloader(QUrl(icon),qobject_cast<DownloadProgressListener *>(this),"");
+	data = new FileDownloader(icon,qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
@@ -110,7 +112,7 @@ void WebApp::SetInfos(const QString &infos)
  */
 QStringList WebApp::GetBaseUrl() const
 {
-	return *config->GetBaseUrl();
+	return config->GetBaseUrl();
 }
 
 /**
@@ -120,7 +122,7 @@ QStringList WebApp::GetBaseUrl() const
 void WebApp::SetBaseUrl(const QStringList &value)
 {
 	QStringList newBaseUrl = value;
-	config->SetBaseUrl(&newBaseUrl);
+	config->SetBaseUrl(newBaseUrl);
 }
 
 /**
@@ -131,9 +133,9 @@ bool WebApp::IsPageInApplication()
 {
 	QString urls = m_webView->url().toString();
 	QStringList::iterator i;
-	QStringList *baseUrl = config->GetBaseUrl();
+	QStringList baseUrl = config->GetBaseUrl();
 	bool res = false;
-	for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+	for (i = baseUrl.begin(); i != baseUrl.end(); ++i)
 	{
 		if(urls.startsWith(*i))
 		{
@@ -153,9 +155,9 @@ bool WebApp::IsPageInApplication(QUrl url)
 {
 	QString urls = url.toString();
 	QStringList::iterator i;
-	QStringList *baseUrl = config->GetBaseUrl();
+	QStringList baseUrl = config->GetBaseUrl();
 	bool res = false;
-	for (i = baseUrl->begin(); i != baseUrl->end(); ++i)
+	for (i = baseUrl.begin(); i != baseUrl.end(); ++i)
 	{
 		if(urls.startsWith(*i))
 		{

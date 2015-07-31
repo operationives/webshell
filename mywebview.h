@@ -22,8 +22,8 @@ public:
 	CookieJar *m_cookieJar;
 
 signals:
-	void changeIcon(QIcon icon);
-	void changeTitle(QString appName);
+	void changeIcon(const QIcon &icon);
+	void changeTitle(const QString &appName);
 	void close();
 
 private:
@@ -35,7 +35,7 @@ private:
 
 
 private slots:
-	void handleRedirect(QUrl url);
+	void handleRedirect(const QUrl &url);
 	void updateJavaScriptObjects();
 	void updateTitle();
 };

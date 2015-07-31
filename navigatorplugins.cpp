@@ -28,8 +28,7 @@ NavigatorPlugins::~NavigatorPlugins()
 void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
 {
 	//La partie suivante permet de télécharger depuis la webshell
-	QUrl updateUrl(url);
-	hash[mime_type] = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),mime_type);
+	hash[mime_type] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),mime_type);
 }
 
 /**
@@ -38,7 +37,7 @@ void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
  */
-void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadProgress",m_target,QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
@@ -47,7 +46,7 @@ void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal,
  * @brief NavigatorPlugins::fileDownloaded Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
-void NavigatorPlugins::FileDownloaded(QString mime_type)
+void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << mime_type)){}
 
@@ -61,7 +60,10 @@ void NavigatorPlugins::FileDownloaded(QString mime_type)
 	QFile file(filedirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
+	{
 		qWarning() << "Fichier d'installation navigatorPlugins impossible à ouvrir. Type mime: " << mime_type;
+		return;
+	}
 
 	file.write(hash.value(mime_type)->DownloadedData());
 	file.close();
@@ -107,7 +109,7 @@ void NavigatorPlugins::FileDownloaded(QString mime_type)
  * @brief NavigatorPlugins::DownloadFailure Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
-void NavigatorPlugins::DownloadFailure(QString mime_type)
+void NavigatorPlugins::DownloadFailure(const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadFailure",m_target,QStringList() << "typemime" << mime_type)){}
 }

@@ -19,11 +19,10 @@ WNavigator::WNavigator(MyWebView *view, WebshellParameters *webshellParameters)
  * @brief WNavigator::UpdateSoftware Met à jour le webshell
  * @param url   Lien de téléchargement
  */
-void WNavigator::UpdateSoftware(QString url)
+void WNavigator::UpdateSoftware(const QString &url)
 {
 	//La partie suivante permet de télécharger depuis la webshell
-	QUrl updateUrl(url);
-	data = new FileDownloader(updateUrl,qobject_cast<DownloadProgressListener *>(this),"");
+	data = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
@@ -51,7 +50,7 @@ void WNavigator::Close()
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
  */
-void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type)
+void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadProgress",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
@@ -60,7 +59,7 @@ void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QStri
  * @brief WNavigator::fileDownloaded Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
-void WNavigator::FileDownloaded(QString mime_type)
+void WNavigator::FileDownloaded(const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadComplete",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 
@@ -73,7 +72,10 @@ void WNavigator::FileDownloaded(QString mime_type)
 	QFile file(filedirectory);
 
 	if(!file.open(QIODevice::WriteOnly))
+	{
 		qWarning() << "Fichier d'installation navigator impossible à ouvrir. Type mime: " << mime_type;
+		return;
+	}
 	file.write(data->DownloadedData());
 	file.close();
 
@@ -120,7 +122,7 @@ void WNavigator::FileDownloaded(QString mime_type)
  * @brief WNavigator::DownloadFailure Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
-void WNavigator::DownloadFailure(QString mime_type)
+void WNavigator::DownloadFailure(const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadFailure",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 }

@@ -36,7 +36,7 @@ private slots:
 	void changeMinSize(int minWidth, int minHeight);
 	void changeDefaultSize(int defaultWidth, int defaultHeight);
 	void quit();
-	void changeIcon(QIcon icon);
+	void changeIcon(const QIcon &icon);
 };
 
 #endif

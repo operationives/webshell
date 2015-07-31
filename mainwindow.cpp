@@ -258,7 +258,7 @@ void MainWindow::quit ()
  * @brief MainWindow::changeIcon Change l'icône dans la barre de notification
  * @param icon  Icône à placer
  */
-void MainWindow::changeIcon(QIcon icon)
+void MainWindow::changeIcon(const QIcon &icon)
 {
 	this->trayIcon->setIcon(icon);
 	if(!windowIconSpecified)

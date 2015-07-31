@@ -12,7 +12,7 @@ class FileDownloader : public QObject
 {
 	Q_OBJECT
 public:
-	explicit FileDownloader(QUrl Url, DownloadProgressListener *listener, QString mime_type);
+	explicit FileDownloader(const QString &url, DownloadProgressListener *listener, const QString &mime_type);
 	virtual ~FileDownloader();
 	QByteArray DownloadedData() const;
 	QString GetMimeType();

@@ -54,8 +54,8 @@ ConfigManager::ConfigManager(QString launchUrl)
 		defaultHeight = 800;
 		icon = "";
 		infosAppli = "";
-		baseUrl = new QStringList();
-		*baseUrl << launchUrl;
+		baseUrl = QStringList();
+		baseUrl << launchUrl;
 		LoadParametersAppli();
 	}
 	else
@@ -75,7 +75,7 @@ ConfigManager::ConfigManager(QString launchUrl)
 		file.close();
 		QDomElement docElem = dom.documentElement();
 		QDomNode n = docElem.firstChild();
-		baseUrl = new QStringList();
+		baseUrl = QStringList();
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
@@ -98,7 +98,7 @@ ConfigManager::ConfigManager(QString launchUrl)
 			else if(e.attribute("name") == "infos")
 				infosAppli = e.attribute("value");
 			else if(e.attribute("name") == "baseUrl")
-				baseUrl->append(e.attribute("value"));
+				baseUrl.append(e.attribute("value"));
 
 			n = n.nextSibling();
 		}
@@ -110,7 +110,7 @@ ConfigManager::ConfigManager(QString launchUrl)
  */
 ConfigManager::~ConfigManager()
 {
-	delete baseUrl;
+
 }
 
 /**
@@ -263,7 +263,7 @@ void ConfigManager::LoadParametersAppli()
 
 	//Insertion du paramètre baseUrl
 	QStringList::iterator i;
-	for(i = baseUrl->begin(); i != baseUrl->end();++i)
+	for(i = baseUrl.begin(); i != baseUrl.end();++i)
 	{
 		write_elem = dom.createElement("setting");
 		write_elem.setAttribute("name", "baseUrl");
@@ -485,20 +485,19 @@ void ConfigManager::SetInfos(QString infosAppli)
 
 /**
  * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
- * @return new QStringList(*baseUrl)
+ * @return QStringList(baseUrl)
  */
-QStringList *ConfigManager::GetBaseUrl()
+QStringList ConfigManager::GetBaseUrl()
 {
-	return new QStringList(*baseUrl);
+	return QStringList(baseUrl);
 }
 
 /**
  * @brief ConfigManager::SetBaseUrl Met à jour baseUrl
  * @param baseUrl Nouvelle valeur de this->baseUrl
  */
-void ConfigManager::SetBaseUrl(QStringList *baseUrl)
+void ConfigManager::SetBaseUrl(QStringList baseUrl)
 {
-	delete this->baseUrl;
-	this->baseUrl = new QStringList(*baseUrl);
+	this->baseUrl = QStringList(baseUrl);
 	LoadParametersAppli();
 }

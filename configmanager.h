@@ -25,7 +25,7 @@ public:
 	QString GetLaunchUrl();
 	QString GetIcon();
 	QString GetInfos();
-	QStringList *GetBaseUrl();
+	QStringList GetBaseUrl();
 
 public slots:
 	//Setters pour attributs webshell
@@ -40,7 +40,7 @@ public slots:
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
 	void SetInfos(QString infosAppli);
-	void SetBaseUrl(QStringList *baseUrl);
+	void SetBaseUrl(QStringList baseUrl);
 
 signals:
 	void toolsMode(bool toolsActivated);
@@ -62,7 +62,7 @@ private:
 	QString launchUrl;
 	QString icon;
 	QString infosAppli;
-	QStringList *baseUrl;
+	QStringList baseUrl;
 
 	QString confFilePath;
 

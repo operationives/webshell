@@ -29,8 +29,10 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	this->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 	connect(this,SIGNAL(linkClicked(QUrl)),this,SLOT(handleRedirect(QUrl)));
 
-	//On affecte l'icône présent dans le fichier xml à la page principale
-	wapp->setProperty("icon",config->GetIcon());
+	//Si il est défini, on affecte l'icône présent dans le fichier xml à la page principale
+	QString icon = config->GetIcon();
+	if(!icon.isEmpty())
+		wapp->setProperty("icon",icon);
 
 	m_WebCtrl = new QNetworkAccessManager();
 	m_cookieJar = new CookieJar();
@@ -39,7 +41,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 
 	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
 	{
-		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << *config->GetBaseUrl();
+		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << config->GetBaseUrl();
 		wapp->setProperty("baseUrl",baseUrl);
 	}
 }
@@ -58,7 +60,7 @@ MyWebView::~MyWebView()
  * @brief MyWebView::handleRedirect Place la première page chargée dans baseUrl, puis renvoie vers le navigateur les url externes à baseUrl
  * @param url   Url chargée
  */
-void MyWebView::handleRedirect(QUrl url)
+void MyWebView::handleRedirect(const QUrl &url)
 {
 	if(!wapp->IsPageInApplication(url.url()))
 			QDesktopServices::openUrl(url);

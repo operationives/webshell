@@ -27,14 +27,13 @@ public:
 	Q_INVOKABLE void SetMinSize(int minWidth, int minHeight);
 	Q_INVOKABLE void SetDefaultSize(int defaultWidth, int defaultHeight);
 
-	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, QString mime_type);
-	void FileDownloaded(QString mime_type);
-	void DownloadFailure(QString mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
+	void FileDownloaded(const QString &mime_type);
+	void DownloadFailure(const QString &mime_type);
 
 
 signals:
-	void changeIcon(QIcon icon);
-	void changeTitle(QString appName);
+	void changeIcon(const QIcon &icon);
 
 private:
 	QString m_infos;
