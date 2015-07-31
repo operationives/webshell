@@ -2,16 +2,27 @@
 #include <wchar.h>
 #include "mailsender.h"
 
+/**
+ * @brief Construit l'objet permettant d'envoyer les mails avec pièces jointes
+ */
 MailSender::MailSender()
 {
 	m_hLib = LoadLibrary(QString("MAPI32.DLL").toStdWString().c_str());
 }
 
+/**
+ * @brief Libère la librairie allouée
+ */
 MailSender::~MailSender()
 {
 	FreeLibrary(m_hLib);
 }
 
+/**
+ * @brief Ajoute une pièce jointe
+ * @param file	Chemin du fichier
+ * @param name	Nom du fichier
+ */
 void MailSender::AddFile( QString file, QString name )
 {
 	attachment a;
@@ -29,6 +40,11 @@ void MailSender::AddFile( QString file, QString name )
 	m_Files.push_back(a);
 }
 
+/**
+ * @brief Ouvre l'interface mail par défaut de l'utilisateur avec le mail de la classe
+ * @param szSubject	Sujet du mail
+ * @return true si tout s'est bien passé, false sinon
+ */
 bool MailSender::Send(QString szSubject)
 {
 	if (!m_hLib)

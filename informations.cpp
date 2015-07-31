@@ -1,6 +1,10 @@
 #include "informations.h"
 #include "global.h"
 
+/**
+ * @brief Construit la fenêtre utilisée pour afficher le numéro de version du webshell et les informations liées à l'application
+ * @param parent
+ */
 Informations::Informations(QWidget *parent)
 	: QDialog(parent)
 {
@@ -31,6 +35,11 @@ Informations::~Informations()
 	delete manager;
 }
 
+/**
+ * @brief Met à jour les valeurs de la fenêtre\n
+ * Si l'utilisateur est connecté, les informations de l'application sont celles spécifiées par notre ConfigManager\n
+ * Sinon on indique que l'application est déconnectée
+ */
 void Informations::UpdateValues()
 {
 	version = config->GetVersion();

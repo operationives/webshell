@@ -1,7 +1,7 @@
 #include "filedownloader.h"
 
 /**
- * @brief FileDownloader::FileDownloader Constructeur permettant d'initialiser le téléchargement
+ * @brief Constructeur permettant d'initialiser le téléchargement
  * @param Url Lien à télécharger
  */
 FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *listener, const QString &mime_type)
@@ -17,16 +17,13 @@ FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *lis
 	connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
 	connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
 }
- 
-/**
- * @brief FileDownloader::~FileDownloader Destructeur de FileDownloader
- */
+
 FileDownloader::~FileDownloader()
 {
 }
  
 /**
- * @brief FileDownloader::fileDownloaded Méthode de fin de téléchargement
+ * @brief Prévient le DownloadProgressListener que le téléchargement est fini
  * @param pReply Réponse contenant les données téléchargées si tout s'est bien passé
  */
 void FileDownloader::fileDownloaded(QNetworkReply* pReply)
@@ -37,7 +34,7 @@ void FileDownloader::fileDownloaded(QNetworkReply* pReply)
 }
 
 /**
- * @brief FileDownloader::downloadFailure Méthode signalant une erreur de téléchargement
+ * @brief Méthode signalant une erreur de téléchargement au DownloadProgressListener
  * @param error Type d'erreur reçue
  */
 void FileDownloader::downloadFailure(QNetworkReply::NetworkError error)
@@ -47,7 +44,7 @@ void FileDownloader::downloadFailure(QNetworkReply::NetworkError error)
 }
  
 /**
- * @brief FileDownloader::downloadedData Méthode d'accès aux données téléchargées
+ * @brief Méthode d'accès aux données téléchargées
  * @return Octets téléchargés
  */
 QByteArray FileDownloader::DownloadedData() const
@@ -56,7 +53,7 @@ QByteArray FileDownloader::DownloadedData() const
 }
 
 /**
- * @brief FileDownloader::downloadProgress Indique l'avancement du téléchargement
+ * @brief Indique l'avancement du téléchargement au DownloadProgressListener
  * @param bytesReceived Nombre d'octets téléchargés
  * @param bytesTotal Nombre d'octets au total
  */
@@ -66,7 +63,7 @@ void FileDownloader::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 }
 
 /**
- * @brief FileDownloader::GetMimeType Accesseur de mime_type
+ * @brief Accesseur du type mime
  * @return mime_type
  */
 QString FileDownloader::GetMimeType()
@@ -75,7 +72,7 @@ QString FileDownloader::GetMimeType()
 }
 
 /**
- * @brief FileDownloader::GetUrl Accesseur de l'url de téléchargement
+ * @brief Accesseur de l'url de téléchargement
  * @return url
  */
 QString FileDownloader::GetUrl()

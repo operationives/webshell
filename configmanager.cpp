@@ -3,8 +3,8 @@
 #include <QApplication>
 
 /**
- * @brief ConfigManager::ConfigManager Effectue les actions du constructeur de base, puis sauvegarde les paramètres de l'application présents dans le fichier en paramètre
- * @param confFilePath  Chemin vers le fichier xml de l'application
+ * @brief Initialise les informations du webshell et de l'application à partir de l'URL de démarrage de l'application
+ * @param launchUrl  URL de lancement de l'application
  */
 ConfigManager::ConfigManager(QString launchUrl)
 {
@@ -105,16 +105,13 @@ ConfigManager::ConfigManager(QString launchUrl)
 	}
 }
 
-/**
- * @brief ConfigManager::~ConfigManager Destructeur de ConfigManager
- */
 ConfigManager::~ConfigManager()
 {
 
 }
 
 /**
- * @brief ConfigManager::InitWebshellParameters Place les paramètres spécifiés dans le fichier xml du dossier courant dans les attributs de la classe
+ * @brief Place les paramètres spécifiés dans le fichier xml du webshell dans les attributs de la classe
  */
 void ConfigManager::InitWebshellParameters()
 {
@@ -153,7 +150,7 @@ void ConfigManager::InitWebshellParameters()
 }
 
 /**
- * @brief Xml_Dom::LoadParametersWebshell Enregistre les paramètres webshell dans le fichier xml associé
+ * @brief Enregistre les paramètres webshell dans le fichier xml associé
  */
 void ConfigManager::LoadParametersWebshell()
 {
@@ -186,7 +183,7 @@ void ConfigManager::LoadParametersWebshell()
 }
 
 /**
- * @brief ConfigManager::LoadParametersAppli Enregistre les paramètres application dans le fichier xml associé
+ * @brief Enregistre les paramètres application dans le fichier xml associé
  */
 void ConfigManager::LoadParametersAppli()
 {
@@ -287,7 +284,7 @@ void ConfigManager::LoadParametersAppli()
 }
 
 /**
- * @brief ConfigManager::GetVersion Indique la version du webshell
+ * @brief Indique la version du webshell
  * @return version
  */
 QString ConfigManager::GetVersion()
@@ -296,7 +293,7 @@ QString ConfigManager::GetVersion()
 }
 
 /**
- * @brief ConfigManager::SetVersion Met à jour la version du webshell
+ * @brief Met à jour la version du webshell
  * @param version   Nouveau numéro de version du webshell
  */
 void ConfigManager::SetVersion(QString version)
@@ -306,7 +303,7 @@ void ConfigManager::SetVersion(QString version)
 }
 
 /**
- * @brief ConfigManager::Getscreenmode Indique si l'utilisateur doit être en plein écran ou non
+ * @brief Indique si l'utilisateur doit être en plein écran ou non
  * @return fullscreen
  */
 bool ConfigManager::GetScreenMode()
@@ -315,7 +312,7 @@ bool ConfigManager::GetScreenMode()
 }
 
 /**
- * @brief ConfigManager::SetScreenMode Met à jour le paramètre "fullscreen"
+ * @brief Met à jour le paramètre "fullscreen"
  * @param fullscreen	Nouvelle valeur de this->fullscreen
  */
 void ConfigManager::SetScreenMode(bool fullscreen)
@@ -325,7 +322,7 @@ void ConfigManager::SetScreenMode(bool fullscreen)
 }
 
 /**
- * @brief ConfigManager::GetDeveloperToolsMode Indique si l'utilisateur a accès aux outils développeur
+ * @brief Indique si l'utilisateur a accès aux outils développeur
  * @return developerToolsActivated
  */
 bool ConfigManager::GetDeveloperToolsMode()
@@ -334,7 +331,7 @@ bool ConfigManager::GetDeveloperToolsMode()
 }
 
 /**
- * @brief ConfigManager::SetDeveloperToolsMode Met à jour le paramètre "developerToolsActivated"
+ * @brief Met à jour le paramètre "developerToolsActivated"
  * @param developerToolsActivated Nouvelle valeur de this->developerToolsActivated
  */
 void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
@@ -345,7 +342,7 @@ void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 }
 
 /**
- * @brief ConfigManager::GetCloseButtonBehaviour Indique le comportement du bouton de fermeture
+ * @brief Indique le comportement du bouton de fermeture
  * @return minimization
  */
 bool ConfigManager::GetCloseButtonBehaviour()
@@ -354,7 +351,7 @@ bool ConfigManager::GetCloseButtonBehaviour()
 }
 
 /**
- * @brief ConfigManager::SetCloseButtonBehaviour Met à jour le paramètre "minimization"
+ * @brief Met à jour le paramètre "minimization"
  * @param minimization  Nouvelle valeur de this->minimization
  */
 void ConfigManager::SetCloseButtonBehaviour(bool minimization)
@@ -364,7 +361,7 @@ void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 }
 
 /**
- * @brief ConfigManager::GetMinWidth Renvoie la largeur minimale de l'application
+ * @brief Renvoie la largeur minimale de l'application
  * @return minWidth
  */
 int ConfigManager::GetMinWidth() const
@@ -373,7 +370,7 @@ int ConfigManager::GetMinWidth() const
 }
 
 /**
- * @brief ConfigManager::GetMinHeight Renvoie la hauteur minimale de l'application
+ * @brief Renvoie la hauteur minimale de l'application
  * @return minHeight
  */
 int ConfigManager::GetMinHeight() const
@@ -382,7 +379,7 @@ int ConfigManager::GetMinHeight() const
 }
 
 /**
- * @brief ConfigManager::SetMinSize Met à jour la taille minimale de l'application
+ * @brief Met à jour la taille minimale de l'application
  * @param minWidth	Nouvelle largeur minimale
  * @param minHeight	Nouvelle hauteur minimale
  */
@@ -395,7 +392,7 @@ void ConfigManager::SetMinSize(int minWidth, int minHeight)
 }
 
 /**
- * @brief ConfigManager::GetDefaultWidth Renvoie la largeur par défaut de l'application
+ * @brief Renvoie la largeur par défaut de l'application
  * @return defaultWidth
  */
 int ConfigManager::GetDefaultWidth() const
@@ -404,7 +401,7 @@ int ConfigManager::GetDefaultWidth() const
 }
 
 /**
- * @brief ConfigManager::GetDefaultHeight Renvoie la hauteur par défaut de l'application
+ * @brief Renvoie la hauteur par défaut de l'application
  * @return defaultHeight
  */
 int ConfigManager::GetDefaultHeight() const
@@ -413,7 +410,7 @@ int ConfigManager::GetDefaultHeight() const
 }
 
 /**
- * @brief ConfigManager::SetDefaultSize Met à jour la taille par défaut de l'application
+ * @brief Met à jour la taille par défaut de l'application
  * @param defaultWidth	Nouvelle largeur par défaut
  * @param defaultHeight	Nouvelle hauteur par défaut
  */
@@ -427,7 +424,7 @@ void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
 
 
 /**
- * @brief ConfigManager::GetLaunchUrl Indique l'adresse de démarrage de l'application
+ * @brief Indique l'adresse de démarrage de l'application
  * @return  launchUrl
  */
 QString ConfigManager::GetLaunchUrl()
@@ -436,7 +433,7 @@ QString ConfigManager::GetLaunchUrl()
 }
 
 /**
- * @brief ConfigManager::SetLaunchUrl Met à jour launchUrl
+ * @brief Met à jour launchUrl
  * @param launchUrl Nouvelle valeur de this->launchUrl
  */
 void ConfigManager::SetLaunchUrl(QString launchUrl)
@@ -446,7 +443,7 @@ void ConfigManager::SetLaunchUrl(QString launchUrl)
 }
 
 /**
- * @brief ConfigManager::GetIcon Indique l'url de l'icône par défaut de l'application
+ * @brief Indique l'url de l'icône par défaut de l'application
  * @return icon
  */
 QString ConfigManager::GetIcon()
@@ -455,7 +452,7 @@ QString ConfigManager::GetIcon()
 }
 
 /**
- * @brief ConfigManager::SetIcon Met à jour icon
+ * @brief Met à jour icon
  * @param icon Nouvelle valeur de this->icon
  */
 void ConfigManager::SetIcon(QString icon)
@@ -465,7 +462,7 @@ void ConfigManager::SetIcon(QString icon)
 }
 
 /**
- * @brief ConfigManager::GetIcon Indique les infos du service
+ * @brief Indique les infos du service
  * @return infosAppli
  */
 QString ConfigManager::GetInfos()
@@ -474,7 +471,7 @@ QString ConfigManager::GetInfos()
 }
 
 /**
- * @brief ConfigManager::SetInfos Met à jour les infos service
+ * @brief Met à jour les infos service
  * @param infosAppli Nouvelle valeur des infos service
  */
 void ConfigManager::SetInfos(QString infosAppli)
@@ -484,7 +481,7 @@ void ConfigManager::SetInfos(QString infosAppli)
 }
 
 /**
- * @brief ConfigManager::GetBaseUrl Indique baseUrl associé à l'application
+ * @brief Indique baseUrl associé à l'application
  * @return QStringList(baseUrl)
  */
 QStringList ConfigManager::GetBaseUrl()
@@ -493,7 +490,7 @@ QStringList ConfigManager::GetBaseUrl()
 }
 
 /**
- * @brief ConfigManager::SetBaseUrl Met à jour baseUrl
+ * @brief Met à jour baseUrl
  * @param baseUrl Nouvelle valeur de this->baseUrl
  */
 void ConfigManager::SetBaseUrl(QStringList baseUrl)

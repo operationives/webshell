@@ -158,7 +158,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	{
 		MailSender mail;
 		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
-		mail.Send("Envoi de lgos");
+		mail.Send("Envoi de logs");
 	}
 #endif
 }
