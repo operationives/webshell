@@ -18,6 +18,7 @@ public:
 	bool GetScreenMode();
 	bool GetDeveloperToolsMode();
 	bool GetCloseButtonBehaviour();
+	bool GetMenuBarPresent();
 	int GetMinWidth() const;
 	int GetMinHeight() const;
 	int GetDefaultWidth() const;
@@ -35,6 +36,7 @@ public slots:
 	void SetScreenMode(bool fullscreen);
 	void SetDeveloperToolsMode(bool developerToolsActivated);
 	void SetCloseButtonBehaviour(bool minimization);
+	void SetMenuBarPresent(bool menuBarPresent);
 	void SetMinSize(int minWidth, int minHeight);
 	void SetDefaultSize(int defaultWidth, int defaultHeight);
 	void SetLaunchUrl(QString launchUrl);
@@ -44,6 +46,7 @@ public slots:
 
 signals:
 	void toolsMode(bool toolsActivated);
+	void menuBarPresence(bool menuBarPresent);
 	void minSize(int minWidth, int minHeight);
 	void defaultSize(int defaultWidth, int defaultHeight);
 
@@ -55,6 +58,7 @@ private:
 	bool fullscreen;
 	bool developerToolsActivated;
 	bool minimization;
+	bool menuBarPresent;
 	int minWidth;
 	int minHeight;
 	int defaultWidth;

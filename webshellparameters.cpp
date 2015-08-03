@@ -2,23 +2,21 @@
 #include "global.h"
 
 /**
- * @brief WebshellParameters::DeveloperToolsActivated Initialise les attributs avec ceux de configmanager
+ * @brief WebshellParameters::DeveloperToolsActivated Crée l'objet WebshellParameters
  */
 WebshellParameters::WebshellParameters()
 	:QObject()
 {
-	m_developerToolsActivated = config->GetDeveloperToolsMode();
-	m_minimization = config->GetCloseButtonBehaviour();
 }
 
 
 /**
  * @brief WebshellParameters::DeveloperToolsActivated Indique si les outils développeur sont activés ou non
- * @return m_developerToolsActivated
+ * @return config->GetDeveloperToolsMode()
  */
 bool WebshellParameters::DeveloperToolsActivated() const
 {
-	return m_developerToolsActivated;
+	return config->GetDeveloperToolsMode();
 }
 
 /**
@@ -27,17 +25,16 @@ bool WebshellParameters::DeveloperToolsActivated() const
  */
 void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated)
 {
-	m_developerToolsActivated = developerToolsActivated;
 	config->SetDeveloperToolsMode(developerToolsActivated);
 }
 
 /**
  * @brief WebshellParameters::Minimization Indique si le fait de cliquer sur la croix rouge minimise la fenêtre ou la ferme
- * @return m_minimization
+ * @return config->GetCloseButtonBehaviour()
  */
 bool WebshellParameters::Minimization() const
 {
-	return m_minimization;
+	return config->GetCloseButtonBehaviour();
 }
 
 /**
@@ -46,8 +43,25 @@ bool WebshellParameters::Minimization() const
  */
 void WebshellParameters::SetMinimization(bool minimization)
 {
-	m_minimization = minimization;
 	config->SetCloseButtonBehaviour(minimization);
+}
+
+/**
+ * @brief WebshellParameters::MenuBarPresent Indique si la barre de menu est présente
+ * @return config->GetCloseButtonBehaviour()
+ */
+bool WebshellParameters::MenuBarPresent() const
+{
+	return config->GetMenuBarPresent();
+}
+
+/**
+ * @brief WebshellParameters::SetMenuBarPresent Met à jour l'affichage de la barre de menu
+ * @param menuBarPresent  Si vrai, le menu est affiché, sinon non
+ */
+void WebshellParameters::SetMenuBarPresent(bool menuBarPresent)
+{
+	config->SetMenuBarPresent(menuBarPresent);
 }
 
 /**

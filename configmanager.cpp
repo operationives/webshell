@@ -48,6 +48,7 @@ ConfigManager::ConfigManager(QString launchUrl)
 		fullscreen = false;
 		developerToolsActivated = false;
 		minimization = false;
+		menuBarPresent = false;
 		minWidth = 700;
 		minHeight = 500;
 		defaultWidth = 1000;
@@ -85,6 +86,8 @@ ConfigManager::ConfigManager(QString launchUrl)
 				developerToolsActivated = (e.attribute("value") == "true" ? true : false);
 			else if(e.attribute("name") == "minimization")
 				minimization = (e.attribute("value") == "true" ? true : false);
+			else if(e.attribute("name") == "menuBarPresent")
+				menuBarPresent = (e.attribute("value") == "true" ? true : false);
 			else if(e.attribute("name") == "minWidth")
 				minWidth = e.attribute("value").toInt();
 			else if(e.attribute("name") == "minHeight")
@@ -115,7 +118,7 @@ ConfigManager::~ConfigManager()
  */
 void ConfigManager::InitWebshellParameters()
 {
-	version = "0.1.0";
+	version = "0.2.0";
 	LoadParametersWebshell();
 }
 
@@ -183,6 +186,13 @@ void ConfigManager::LoadParametersAppli()
 	write_elem = dom.createElement("setting");
 	write_elem.setAttribute("name", "minimization");
 	if(minimization) write_elem.setAttribute("value", "true");
+	else write_elem.setAttribute("value", "false");
+	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre menuBarPresent
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "menuBarPresent");
+	if(menuBarPresent) write_elem.setAttribute("value", "true");
 	else write_elem.setAttribute("value", "false");
 	docElem.appendChild(write_elem);
 
@@ -327,6 +337,26 @@ bool ConfigManager::GetCloseButtonBehaviour()
 void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 {
 	this->minimization = minimization;
+	LoadParametersAppli();
+}
+
+/**
+ * @brief Indique si la barre de menu est présente
+ * @return menuBarPresent
+ */
+bool ConfigManager::GetMenuBarPresent()
+{
+	return menuBarPresent;
+}
+
+/**
+ * @brief Met à jour le paramètre "menuBarPresent"
+ * @param menuBarPresent  Nouvelle valeur de this->menuBarPresent
+ */
+void ConfigManager::SetMenuBarPresent(bool menuBarPresent)
+{
+	this->menuBarPresent = menuBarPresent;
+	emit menuBarPresence(menuBarPresent);
 	LoadParametersAppli();
 }
 

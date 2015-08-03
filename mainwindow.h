@@ -20,9 +20,11 @@ public:
 
 private:
 	MyWebView *view;
+	QMenu *fileMenu;
 	QSystemTrayIcon *trayIcon;
 	QWebInspector *inspector;
 	Informations *infos;
+	QWebView *loader;
 	bool windowIconSpecified;
 	bool stayOpen;
 	void DisplayInfos();
@@ -37,6 +39,7 @@ private slots:
 	void changeDefaultSize(int defaultWidth, int defaultHeight);
 	void quit();
 	void changeIcon(const QIcon &icon);
+	void loadFinished();
 };
 
 #endif

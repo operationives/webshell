@@ -14,6 +14,15 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(true);
 
+	loader = new QWebView();
+	loader->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.gif")));
+	loader->setWindowTitle("Chargement en cours");
+	//Taille du gif
+	loader->setFixedSize(441,291);
+	loader->show();
+
+	infos = new Informations();
+
 	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
@@ -30,15 +39,33 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	trayIcon->show();
 
 	//Ajout du menu dans la barre de titre
-	QMenu *fileMenu = menuBar()->addMenu(tr("&Fichier"));
+	fileMenu = menuBar()->addMenu(tr("&Fichier"));
 	fileMenu->addAction(quitAction);
 	QAction *clearCookies = new QAction("&Effacer les cookies", this);
 	fileMenu->addAction(clearCookies);
+	menuBar()->setVisible(config->GetMenuBarPresent());
+	connect(config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
 
 	view = new MyWebView(this);
+
+	//Initialisation de l'inspecteur de la page
+	inspector = new QWebInspector();
+	inspector->setPage(view->page());
+
+	windowIconSpecified = !iconPath.isNull();
+	if(windowIconSpecified)
+	{
+		QIcon windowIcon(iconPath);
+		this->setWindowIcon(windowIcon);
+		infos->setWindowIcon(windowIcon);
+		inspector->setWindowIcon(windowIcon);
+		loader->setWindowIcon(windowIcon);
+	}
+
 	connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
+	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
 	connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
 	view->load(QUrl(config->GetLaunchUrl()));
 	//On met en place la taille minimale
@@ -56,10 +83,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	view->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
 
-	//Initialisation de l'inspecteur de la page
-	inspector = new QWebInspector();
-	inspector->setPage(view->page());
-
 	stayOpen = true;
 	if(config->GetScreenMode())
 		this->showFullScreen();
@@ -68,17 +91,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
 	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
-
-	infos = new Informations();
-
-	windowIconSpecified = !iconPath.isNull();
-	if(windowIconSpecified)
-	{
-		QIcon windowIcon(iconPath);
-		this->setWindowIcon(windowIcon);
-		infos->setWindowIcon(windowIcon);
-		inspector->setWindowIcon(windowIcon);
-	}
 }
 
 /**
@@ -90,6 +102,7 @@ MainWindow::~MainWindow()
 	delete trayIcon;
 	delete inspector;
 	delete infos;
+	delete fileMenu;
 }
 
 /**
@@ -267,6 +280,17 @@ void MainWindow::changeIcon(const QIcon &icon)
 		infos->setWindowIcon(icon);
 		inspector->setWindowIcon(icon);
 	}
+}
+
+/**
+ * @brief Supprime la parge de chargement et affiche la page principale
+ */
+void MainWindow::loadFinished()
+{
+	disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+	loader->stop();
+	delete loader;
+	this->show();
 }
 
 /**

@@ -106,9 +106,5 @@ int main(int argc, char** argv)
 	else
 		mw = new MainWindow();
 
-	//Affichage de la page de démarrage
-	mw->show();
-
-
 	return app.exec();
 }
