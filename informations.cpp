@@ -11,8 +11,6 @@ Informations::Informations(QWidget *parent)
 	//On enlève le bouton "?" inutile
 	this->setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-	this->setWindowIcon(QIcon(QApplication::applicationDirPath()+"/djanah.png"));
-
 	label = new QLabel();
 
 	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);

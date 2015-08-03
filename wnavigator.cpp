@@ -33,7 +33,8 @@ void WNavigator::InitWebshellAPI()
 	m_webView->page()->mainFrame()->evaluateJavaScript(\
 	"navigator.UpdateSoftware = wnavigator.UpdateSoftware;\
 	navigator.webshellParameters = webshellParameters;\
-	navigator.Close = wnavigator.Close;");
+	navigator.Close = wnavigator.Close;\
+	navigator.GetWebshellVersion = wnavigator.GetWebshellVersion;");
 }
 
 /**
@@ -42,6 +43,14 @@ void WNavigator::InitWebshellAPI()
 void WNavigator::Close()
 {
 	emit close();
+}
+
+/**
+ * @brief Renvoie le numéro de version du webshell
+ */
+QString WNavigator::GetWebshellVersion()
+{
+	return config->GetVersion();
 }
 
 /**

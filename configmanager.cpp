@@ -111,42 +111,12 @@ ConfigManager::~ConfigManager()
 }
 
 /**
- * @brief Place les paramètres spécifiés dans le fichier xml du webshell dans les attributs de la classe
+ * @brief Met à jour le fichier xml du webshell avec son numéro de version
  */
 void ConfigManager::InitWebshellParameters()
 {
-	QDomDocument dom("webshell_xml");
-	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
-	if(!file.exists())
-	{
-		version = "0.42";
-		LoadParametersWebshell();
-	}
-	else
-	{
-		if (!file.open(QIODevice::ReadOnly))
-		{
-			qWarning() << "Open webshell conf File: constructor error";
-			return;
-		}
-		if (!dom.setContent(&file))
-		{
-			qWarning() << "setContent webshell conf File: constructor error";
-			file.close();
-			return;
-		}
-		file.close();
-		QDomElement docElem = dom.documentElement();
-		QDomNode n = docElem.firstChild();
-		while(!n.isNull())
-		{
-			QDomElement e = n.toElement();
-			if(e.attribute("name") == "version")
-				version = e.attribute("value");
-
-			n = n.nextSibling();
-		}
-	}
+	version = "0.1.0";
+	LoadParametersWebshell();
 }
 
 /**

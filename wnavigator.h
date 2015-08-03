@@ -17,6 +17,7 @@ public:
 	Q_INVOKABLE void UpdateSoftware(const QString &url);
 	Q_INVOKABLE void InitWebshellAPI();
 	Q_INVOKABLE void Close();
+	Q_INVOKABLE QString GetWebshellVersion();
 
 	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
 	void FileDownloaded(const QString &mime_type);
