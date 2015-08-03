@@ -6,8 +6,8 @@
 #include "global.h"
 
 /**
- * @brief MyWebView::MyWebView  Constructeur de notre webview et des objets à intégrer dans l'application
- * @param parent
+ * @brief Constructeur de notre webview et des objets à intégrer dans l'application
+ * @param parent	Widget parent, dans le cas présent il s'agit de la MainWindow
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
@@ -47,7 +47,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 }
 
 /**
- * @brief MyWebView::~MyWebView Destructeur de la page et des objets de l'application intégrés
+ * @brief MyWebView::~MyWebView Destructeur de la page et des objets intégrés au moteur JavaScript
  */
 MyWebView::~MyWebView()
 {
@@ -57,7 +57,7 @@ MyWebView::~MyWebView()
 }
 
 /**
- * @brief MyWebView::handleRedirect Place la première page chargée dans baseUrl, puis renvoie vers le navigateur les url externes à baseUrl
+ * @brief Place la première page chargée dans baseUrl, puis renvoie vers le navigateur les url externes à baseUrl
  * @param url   Url chargée
  */
 void MyWebView::handleRedirect(const QUrl &url)
@@ -68,13 +68,16 @@ void MyWebView::handleRedirect(const QUrl &url)
 		this->load(url);
 }
 
+/**
+ * @brief Envoie un signal pour mettreà  jour le titre de la MainWindow
+ */
 void MyWebView::updateTitle()
 {
 	emit changeTitle(this->title());
 }
 
 /**
- * @brief MyWebView::updateJavaScriptObjetcs Remet les objets JavaScript sur la page lorsqu'ils sont supprimés
+ * @brief Remet les objets JavaScript sur la page lorsqu'ils sont supprimés
  */
 void MyWebView::updateJavaScriptObjects()
 {
@@ -85,7 +88,7 @@ void MyWebView::updateJavaScriptObjects()
 }
 
 /**
- * @brief MyWebView::DispatchJsEvent Lance un événement depuis une cible particulière avec des clefs et valeurs spécifiques
+ * @brief Lance un événement depuis une cible particulière avec des clefs et valeurs spécifiques
  * @param evtType   Nom de l'événement
  * @param evtTarget Target de l'événement
  * @param keyValues Doublons clés/valeurs, si la liste ne contient pas un nombre pair d'éléments on a une erreur

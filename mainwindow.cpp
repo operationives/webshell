@@ -6,8 +6,9 @@
 #endif
 
 /**
- * @brief MainWindow::MainWindow Initialisation de la fenêtre principale
- * @param url   Url avec laquelle le service est initialisé
+ * @brief Initialisation de la fenêtre principale
+ * @param iconPath	Chemin vers l'icône des fenêtres de l'application
+ * @param parent	Widget parent, placé à NULL dans son utilisation actuelle
  */
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
@@ -94,7 +95,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 }
 
 /**
- * @brief MainWindow::~MainWindow Destructeur de MainWindow
+ * @brief Destructeur de MainWindow et de ses éléments
  */
 MainWindow::~MainWindow()
 {
@@ -106,8 +107,8 @@ MainWindow::~MainWindow()
 }
 
 /**
- * @brief MainWindow::showContextMenu Affichage du menu lors d'un clic droit sur la fenêtre principale
- * @param pos   Position du pointeur lors du clic
+ * @brief Affichage du menu lors d'un clic droit sur la fenêtre principale
+ * @param pos	Position du pointeur lors du clic
  */
 void MainWindow::showContextMenu(const QPoint &pos)
 {
@@ -177,8 +178,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
 }
 
 /**
- * @brief MainWindow::changeScreenMode  Change l'affichage de la fenêtre
- * @param fullscreen	Vrai si mode plein écran, mode fenêtré sinon
+ * @brief Change l'affichage de la fenêtre
+ * @param fullscreen	Vrai: met en mode plein écran, mode fenêtré sinon
  */
 void MainWindow::changeScreenMode(bool fullscreen)
 {
@@ -194,8 +195,8 @@ void MainWindow::changeScreenMode(bool fullscreen)
 }
 
 /**
- * @brief MainWindow::changeToolsMode   Change l'accès aux outils développeur sur la page et dans le fichier xml
- * @param toolsActivated	Vrai si les outils sont activés, désactivés sinon
+ * @brief Change l'accès aux outils développeur sur la page
+ * @param toolsActivated	Vrai: active les outils, les désactive sinon
  */
 void MainWindow::changeToolsMode(bool toolsActivated)
 {
@@ -203,7 +204,7 @@ void MainWindow::changeToolsMode(bool toolsActivated)
 }
 
 /**
- * @brief MainWindow::changeMinSize Change la taille minimale de la fenêtre
+ * @brief Change la taille minimale de la fenêtre
  * @param minWidth	Nouvelle largeur minimale
  * @param minHeight	Nouvelle hauteur minimale
  */
@@ -213,7 +214,7 @@ void MainWindow::changeMinSize(int minWidth, int minHeight)
 }
 
 /**
- * @brief MainWindow::changeDefaultSize Change la taille par défaut de la fenêtre
+ * @brief Change la taille par défaut de la fenêtre
  * @param defaultWidth	Nouvelle largeur par défaut
  * @param defaultHeight	Nouvelle hauteur par défaut
  */
@@ -223,7 +224,7 @@ void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 }
 
 /**
- * @brief MainWindow::keyPressEvent Si la touche tapée est ESC, on quitte le mode plein écran, sinon on traite l'événement normalement
+ * @brief Si la touche tapée est ESC, on quitte le mode plein écran, sinon on traite l'événement normalement
  * @param event Evénement de touche tapée
  */
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -232,6 +233,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 	{
 		if(this->isFullScreen())
 			this->changeScreenMode(false);
+		QMainWindow::keyPressEvent(event); // call the default implementation
 	}
 	else
 	{
@@ -240,7 +242,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 }
 
 /**
- * @brief MainWindow::closeEvent	Indique si la fenêtre doit être femrée ou minimisée
+ * @brief Si la fermeture est associée à la minimisation et que l'application ne force pas la fermeture, on minimise la fenêtre. Sinon, on ferme l'application
  * @param event Evénement de fermeture
  */
 void MainWindow::closeEvent (QCloseEvent *event)
@@ -258,7 +260,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
 }
 
 /**
- * @brief MainWindow::quit Quitte l'application
+ * @brief Quitte l'application
  */
 void MainWindow::quit ()
 {
@@ -268,7 +270,7 @@ void MainWindow::quit ()
 }
 
 /**
- * @brief MainWindow::changeIcon Change l'icône dans la barre de notification
+ * @brief Change l'icône dans la barre de notification
  * @param icon  Icône à placer
  */
 void MainWindow::changeIcon(const QIcon &icon)
@@ -283,7 +285,7 @@ void MainWindow::changeIcon(const QIcon &icon)
 }
 
 /**
- * @brief Supprime la parge de chargement et affiche la page principale
+ * @brief Supprime la page de chargement et affiche la page principale
  */
 void MainWindow::loadFinished()
 {
@@ -294,7 +296,7 @@ void MainWindow::loadFinished()
 }
 
 /**
- * @brief MainWindow::DisplayInfos Met à jour les données de la page d'information et l'affiche
+ * @brief Met à jour les données de la page d'information et l'affiche
  */
 void MainWindow::DisplayInfos()
 {

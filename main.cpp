@@ -9,10 +9,10 @@
 
 //A faire: gestion de la taille maximale du fichier .log
 /**
- * @brief myMessageOutput Gestion des sorties consoles à placer dans les logs
- * @param type		  Catégorie de message
+ * @brief Gestion des sorties consoles à placer dans les logs
+ * @param type			Catégorie de message
  * @param logcontext	Contexte (vide?)
- * @param msg		   Contenu du message
+ * @param msg			Contenu du message
  */
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)
 {
@@ -43,9 +43,9 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
 }
 
 /**
- * @brief main Méthode appelée lors de l'exécution du webshell
+ * @brief Méthode appelée lors de l'exécution du webshell
  * @param argc  Nombre d'arguments
- * @param argv  Arguments
+ * @param argv  Arguments de la forme -u URL -i /chemin/vers/icône.ico
  * @return app.exec()
  */
 int main(int argc, char** argv)
