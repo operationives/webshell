@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 #include <QWebView>
-#include "cookiejar.h"
+#include "mynetworkaccessmanager.h"
 #include "webshellparameters.h"
 
 class WNavigator;
@@ -19,7 +19,6 @@ public:
 	MyWebView(QWidget *parent = 0);
 	~MyWebView();
 	bool DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues = QStringList());
-	CookieJar *m_cookieJar;
 
 signals:
 	void changeIcon(const QIcon &icon);
@@ -27,7 +26,7 @@ signals:
 	void close();
 
 private:
-	QNetworkAccessManager *m_WebCtrl;
+	MyNetworkAccessManager *m_WebCtrl;
 	WNavigator *wnavigator;
 	NavigatorPlugins *navigatorplugins;
 	WebApp *wapp;

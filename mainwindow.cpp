@@ -25,10 +25,13 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	infos = new Informations();
 
 	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled,true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled,true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled,true);
+	QWebSettings::globalSettings()->enablePersistentStorage(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/cache");
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-	QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
 	//On définit les actions du menu de trayIcon
@@ -68,11 +71,11 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	}
 
 	connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
-	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setMainWindowTitle(QString)));
+	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
-	connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
-	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.gif")));
+	connect (clearCookies, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
+	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.html")));
 
 	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
 	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
@@ -294,14 +297,4 @@ void MainWindow::DisplayInfos()
 {
 	infos->UpdateValues();
 	infos->show();
-}
-
-/**
- * @brief Si la page démarre, on ne change pas le titre, sinon on prend celui envoyé par la WebView
- * @param title	Nouveau titre de la fenêtre
- */
-void MainWindow::setMainWindowTitle (QString title)
-{
-	if(launch)
-		this->setWindowTitle(title);
 }

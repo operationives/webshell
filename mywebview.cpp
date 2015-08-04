@@ -38,10 +38,10 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	if(!icon.isEmpty())
 		wapp->setProperty("icon",icon);
 
-	m_WebCtrl = new QNetworkAccessManager();
-	m_cookieJar = new CookieJar();
-	m_WebCtrl->setCookieJar(m_cookieJar);
+	m_WebCtrl = new MyNetworkAccessManager();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
+
+	connect(parent,SIGNAL(clearCookies()),m_WebCtrl,SLOT(clearCookies()));
 
 	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
 	{

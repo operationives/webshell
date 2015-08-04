@@ -31,6 +31,9 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
 
+signals:
+	void clearCookies();
+
 private slots:
 	void showContextMenu(const QPoint& pos);
 	void changeScreenMode(bool fullscreen);
@@ -40,7 +43,6 @@ private slots:
 	void quit();
 	void changeIcon(const QIcon &icon);
 	void loadFinished();
-	void setMainWindowTitle(QString title);
 };
 
 #endif
