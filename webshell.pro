@@ -16,7 +16,8 @@ HEADERS =	mainwindow.h \
 		informations.h \
 		webshellparameters.h \
 		cookiejar.h \
-		autosaver.h
+		autosaver.h \
+		mynetworkaccessmanager.h
 win32 {
     HEADERS +=	mailsender.h \
 		winaddon.h
@@ -36,7 +37,8 @@ SOURCES =	main.cpp \
 		informations.cpp \
 		webshellparameters.cpp \
 		cookiejar.cpp \
-		autosaver.cpp
+		autosaver.cpp \
+		mynetworkaccessmanager.cpp
 win32 {
     SOURCES +=	mailsender.cpp \
 		winaddon.cpp
