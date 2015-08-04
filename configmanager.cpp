@@ -41,22 +41,24 @@ ConfigManager::ConfigManager(QString launchUrl)
 	confFilePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+appName+".xml";
 	this->launchUrl = launchUrl;
 
+	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
+	fullscreen = false;
+	developerToolsActivated = false;
+	minimization = false;
+	menuBarPresent = false;
+	minWidth = 700;
+	minHeight = 500;
+	defaultWidth = 1000;
+	defaultHeight = 800;
+	icon = "";
+	infosAppli = "";
+	baseUrl = QStringList();
+	baseUrl << launchUrl;
+
 	QDomDocument dom("appli_xml");
 	QFile file(confFilePath);
 	if(!file.exists())
 	{
-		fullscreen = false;
-		developerToolsActivated = false;
-		minimization = false;
-		menuBarPresent = false;
-		minWidth = 700;
-		minHeight = 500;
-		defaultWidth = 1000;
-		defaultHeight = 800;
-		icon = "";
-		infosAppli = "";
-		baseUrl = QStringList();
-		baseUrl << launchUrl;
 		LoadParametersAppli();
 	}
 	else
@@ -76,7 +78,6 @@ ConfigManager::ConfigManager(QString launchUrl)
 		file.close();
 		QDomElement docElem = dom.documentElement();
 		QDomNode n = docElem.firstChild();
-		baseUrl = QStringList();
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
