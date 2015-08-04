@@ -5,7 +5,7 @@
 
 
 /**
- * @brief NavigatorPlugins::NavigatorPlugins Constructeur de l'objet NavigatorPlugins
+ * @brief Constructeur de l'objet NavigatorPlugins
  * @param view  WebView sur laquelle effectuer des commandes JavaScript
  */
 NavigatorPlugins::NavigatorPlugins(MyWebView *view)
@@ -22,7 +22,7 @@ NavigatorPlugins::~NavigatorPlugins()
 }
 
 /**
- * @brief NavigatorPlugins::UpdateSoftware Met à jour le webshell
+ * @brief Met à jour le webshell
  * @param url   Lien de téléchargement
  */
 void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
@@ -32,7 +32,7 @@ void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
 }
 
 /**
- * @brief NavigatorPlugins::DownloadProgress Indique à l'application l'avancement du téléchargement
+ * @brief Indique à l'application l'avancement du téléchargement par un événement JavaScript
  * @param bytesReceived Nombre d'octets reçus
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
@@ -43,7 +43,7 @@ void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal,
 }
 
 /**
- * @brief NavigatorPlugins::fileDownloaded Stocke et exécute l'installeur téléchargé
+ * @brief Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
 void NavigatorPlugins::FileDownloaded(const QString &mime_type)
@@ -106,7 +106,7 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 }
 
 /**
- * @brief NavigatorPlugins::DownloadFailure Signale l'application de l'échec du téléchargement
+ * @brief Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
 void NavigatorPlugins::DownloadFailure(const QString &mime_type)
@@ -115,8 +115,10 @@ void NavigatorPlugins::DownloadFailure(const QString &mime_type)
 }
 
 /**
- * @brief NavigatorPlugins::finishInstall Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
- * @param exitCode	  Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
+ * @brief Fonction appelée lors de la fin d'un processus d'installation\n
+ * Efface le fichier d'installation utilisé\n
+ * Prévient l'application si l'installation s'est correctement déroulée ou non
+ * @param exitCode		Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus	Indique si le processus a crashé ou non
  */
 void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)
@@ -134,7 +136,7 @@ void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStat
 }
 
 /**
- * @brief NavigatorPlugins::Target Retourne la cible des événements
+ * @brief Retourne la cible des événements
  * @return m_target
  */
 QString NavigatorPlugins::Target() const
@@ -143,7 +145,7 @@ QString NavigatorPlugins::Target() const
 }
 
 /**
- * @brief NavigatorPlugins::SetTarget met à jour la cible des événements
+ * @brief Met à jour la cible des événements
  * @param target	Nouvelle cible des événements
  */
 void NavigatorPlugins::SetTarget(const QString &target)

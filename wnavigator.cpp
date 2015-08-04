@@ -50,7 +50,7 @@ void WNavigator::Close()
  */
 QString WNavigator::GetWebshellVersion()
 {
-	return config->GetVersion();
+	return qApp->applicationVersion();
 }
 
 /**
@@ -124,6 +124,7 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 		myProcess->start(program);
 	}
 
+	config->SetInstallationFileToRemove(currentFileDirectory);
 	if(m_webView->DispatchJsEvent("NeedRestart",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 }
 

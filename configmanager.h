@@ -12,7 +12,7 @@ public:
 	~ConfigManager();
 
 	//Getters pour attributs webshell
-	QString GetVersion();
+	QString GetInstallationFileToRemove();
 
 	//Getters pour attributs appli
 	bool GetScreenMode();
@@ -30,7 +30,7 @@ public:
 
 public slots:
 	//Setters pour attributs webshell
-	void SetVersion(QString version);
+	void SetInstallationFileToRemove(QString installationFileToRemove);
 
 	//Setters pour attributs appli
 	void SetScreenMode(bool fullscreen);
@@ -52,7 +52,7 @@ signals:
 
 private:
 	//Attributs webshell
-	QString version;
+	QString installationFileToRemove;
 
 	//Attributs application
 	bool fullscreen;

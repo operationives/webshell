@@ -119,8 +119,41 @@ ConfigManager::~ConfigManager()
  */
 void ConfigManager::InitWebshellParameters()
 {
-	version = "0.2.0";
-	LoadParametersWebshell();
+	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
+	installationFileToRemove = "";
+
+	QDomDocument dom("webshell_xml");
+	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
+	if(!file.exists())
+	{
+		LoadParametersWebshell();
+	}
+	else
+	{
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Open webshell conf File: constructor error";
+			return;
+		}
+		if (!dom.setContent(&file))
+		{
+			qWarning() << "setContent webshell conf File: constructor error";
+			file.close();
+			return;
+		}
+
+		file.close();
+		QDomElement docElem = dom.documentElement();
+		QDomNode n = docElem.firstChild();
+		while(!n.isNull())
+		{
+			QDomElement e = n.toElement();
+			if(e.attribute("name") == "installationFileToRemove")
+				installationFileToRemove = e.attribute("value");
+
+			n = n.nextSibling();
+		}
+	}
 }
 
 /**
@@ -136,10 +169,10 @@ void ConfigManager::LoadParametersWebshell()
 
 	QDomElement write_elem;
 
-	//Insertion du paramètre version
+	//Insertion du paramètre installationFileToRemove
 	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "version");
-	write_elem.setAttribute("value", version);
+	write_elem.setAttribute("name", "installationFileToRemove");
+	write_elem.setAttribute("value", installationFileToRemove);
 	docElem.appendChild(write_elem);
 
 	QString write_doc = dom.toString();
@@ -265,21 +298,21 @@ void ConfigManager::LoadParametersAppli()
 }
 
 /**
- * @brief Indique la version du webshell
- * @return version
+ * @brief Indique si il existe le fichier d'installation du webshell à supprimer
+ * @return installationFileToRemove
  */
-QString ConfigManager::GetVersion()
+QString ConfigManager::GetInstallationFileToRemove()
 {
-	return version;
+	return installationFileToRemove;
 }
 
 /**
- * @brief Met à jour la version du webshell
- * @param version   Nouveau numéro de version du webshell
+ * @brief Met à jour le fichier d'installation du webshell à supprimer
+ * @param installationFileToRemove	Si la valeur est non vide, c'est un fichier à supprimer au redémarrage
  */
-void ConfigManager::SetVersion(QString version)
+void ConfigManager::SetInstallationFileToRemove(QString installationFileToRemove)
 {
-	this->version = version;
+	this->installationFileToRemove = installationFileToRemove;
 	LoadParametersWebshell();
 }
 

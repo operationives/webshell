@@ -11,6 +11,10 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
+	//On enlève les barres de défilement inutiles dans le cadre du webshell
+	this->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+	this->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+
 	navigatorplugins = new NavigatorPlugins(this);
 	wapp = new WebApp(this);
 	webshellParameters = new WebshellParameters();

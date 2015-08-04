@@ -40,7 +40,7 @@ Informations::~Informations()
  */
 void Informations::UpdateValues()
 {
-	version = config->GetVersion();
+	version = qApp->applicationVersion();
 	infosAppli = config->GetInfos();
 	if(manager->networkAccessible() == QNetworkAccessManager::Accessible)
 		label->setText(QString("Version du webshell:\n" + version + "\nInformations complémentaires:\n" + infosAppli));

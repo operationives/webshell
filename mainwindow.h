@@ -24,9 +24,9 @@ private:
 	QSystemTrayIcon *trayIcon;
 	QWebInspector *inspector;
 	Informations *infos;
-	QWebView *loader;
 	bool windowIconSpecified;
 	bool stayOpen;
+	bool launch;
 	void DisplayInfos();
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
@@ -40,6 +40,7 @@ private slots:
 	void quit();
 	void changeIcon(const QIcon &icon);
 	void loadFinished();
+	void setMainWindowTitle(QString title);
 };
 
 #endif

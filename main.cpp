@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 	app.setApplicationName(QString("Webshell"));
-	app.setApplicationVersion(QString("1.0"));
+	app.setApplicationVersion(QString("0.1.0"));
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
@@ -99,12 +99,20 @@ int main(int argc, char** argv)
 
 	config = new ConfigManager(launch);
 
+	if(!config->GetInstallationFileToRemove().isEmpty())
+	{
+		QFile::remove(config->GetInstallationFileToRemove());
+		config->SetInstallationFileToRemove("");
+	}
+
 	//Si l'icône est spécifié on lance la mainWindow avec le bon icône, sinon on le lance tel quel
 	MainWindow *mw;
 	if(parser.isSet(iconOption))
 		mw = new MainWindow(parser.value(iconOption));
 	else
 		mw = new MainWindow();
+
+	mw->show();
 
 	return app.exec();
 }

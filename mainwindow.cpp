@@ -6,7 +6,7 @@
 #endif
 
 /**
- * @brief Initialisation de la fenêtre principale
+ * @brief Initialisation de la fenêtre principale avec la page de chargement
  * @param iconPath	Chemin vers l'icône des fenêtres de l'application
  * @param parent	Widget parent, placé à NULL dans son utilisation actuelle
  */
@@ -15,12 +15,12 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-	loader = new QWebView();
-	loader->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.gif")));
-	loader->setWindowTitle("Chargement en cours");
-	//Taille du gif
-	loader->setFixedSize(441,291);
-	loader->show();
+	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
+	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
+
+	stayOpen = true;
+	launch = false;
 
 	infos = new Informations();
 
@@ -29,6 +29,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
 	//On définit les actions du menu de trayIcon
 	QAction *quitAction = new QAction("Quitter", this);
@@ -49,6 +50,10 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	view = new MyWebView(this);
 
+	//On indique qu'on utilise un menu personnalisé
+	view->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
+
 	//Initialisation de l'inspecteur de la page
 	inspector = new QWebInspector();
 	inspector->setPage(view->page());
@@ -60,38 +65,23 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 		this->setWindowIcon(windowIcon);
 		infos->setWindowIcon(windowIcon);
 		inspector->setWindowIcon(windowIcon);
-		loader->setWindowIcon(windowIcon);
 	}
 
 	connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
-	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
+	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setMainWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
 	connect (clearCookies, SIGNAL(triggered()), view->m_cookieJar, SLOT(clear()));
-	view->load(QUrl(config->GetLaunchUrl()));
-	//On met en place la taille minimale
+	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.gif")));
+
 	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
 	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
-
-	//On enlève les barres de défilement inutiles dans le cadre de la webshell
-	view->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
-	view->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+	this->setWindowTitle("Chargement en cours");
+	if(config->GetScreenMode())
+		this->showFullScreen();
 
 	setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
-
-	//On indique qu'on utilise un menu personnalisé
-	view->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
-
-	stayOpen = true;
-	if(config->GetScreenMode())
-		this->showFullScreen();
-	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
-
-	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
-	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
-	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
 }
 
 /**
@@ -285,14 +275,16 @@ void MainWindow::changeIcon(const QIcon &icon)
 }
 
 /**
- * @brief Supprime la page de chargement et affiche la page principale
+ * @brief Fait la transition entre la page de chargement et la page principale
  */
 void MainWindow::loadFinished()
 {
-	disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
-	loader->stop();
-	delete loader;
-	this->show();
+	if(!launch)
+	{
+		disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+		view->load(QUrl(config->GetLaunchUrl()));
+		launch = true;
+	}
 }
 
 /**
@@ -302,4 +294,14 @@ void MainWindow::DisplayInfos()
 {
 	infos->UpdateValues();
 	infos->show();
+}
+
+/**
+ * @brief Si la page démarre, on ne change pas le titre, sinon on prend celui envoyé par la WebView
+ * @param title	Nouveau titre de la fenêtre
+ */
+void MainWindow::setMainWindowTitle (QString title)
+{
+	if(launch)
+		this->setWindowTitle(title);
 }
