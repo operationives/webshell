@@ -1,6 +1,9 @@
 #include "mynetworkaccessmanager.h"
 #include "global.h"
 
+/**
+ * @brief Crée les outils permettant d'utiliser les cookies et en théorie le cache
+ */
 MyNetworkAccessManager::MyNetworkAccessManager()
 	:QNetworkAccessManager()
 {
@@ -12,6 +15,13 @@ MyNetworkAccessManager::MyNetworkAccessManager()
 	this->setCache(m_webCache);
 }
 
+/**
+ * @brief Gestion de requête http
+ * @param op			paramètre de base
+ * @param req			Requête initiale
+ * @param outgoingData	Paramètre de base
+ * @return QNetworkAccessManager::createRequest(op, request, outgoingData)
+ */
 QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData)
 {
 	QNetworkRequest request(req);
@@ -21,6 +31,9 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
 	return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
+/**
+ * @brief Supprime les cookies
+ */
 void MyNetworkAccessManager::clearCookies()
 {
 	m_cookieJar->clear();
