@@ -464,7 +464,7 @@ void ConfigManager::SetMinSize(int minWidth, int minHeight)
 	else
 		this->minHeight = minHeight;
 	LoadParametersAppli();
-	emit minSize(minWidth,minHeight);
+	emit minSize(this->minWidth,this->minHeight);
 }
 
 /**
@@ -503,7 +503,7 @@ void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
 	else
 		this->defaultHeight = defaultHeight;
 	LoadParametersAppli();
-	emit defaultSize(defaultWidth,defaultHeight);
+	emit defaultSize(this->defaultWidth,this->defaultHeight);
 }
 
 
