@@ -247,7 +247,11 @@ void MainWindow::closeEvent (QCloseEvent *event)
 	}
 	else
 	{
-		delete this;
+		view->deleteLater();
+		delete trayIcon;
+		delete inspector;
+		delete infos;
+		delete fileMenu;
 		event->accept();
 	}
 }

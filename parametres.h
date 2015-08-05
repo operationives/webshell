@@ -24,7 +24,7 @@ class Parametres : public QDialog
 	Q_OBJECT
 
 public:
-	Parametres(bool minimization, bool toolsactivated, QWidget *parent = 0);
+	Parametres(QWidget *parent = 0);
 
 private:
 	QTabWidget *tabWidget;

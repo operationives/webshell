@@ -1,7 +1,7 @@
 #include "semaphore.h"
 
 /**
- * @brief Semaphore::Semaphore Création du sémaphore
+ * @brief Création du sémaphore
  * @param nbRessources  Disponibilité du sémaphore
  */
 Semaphore::Semaphore(int nbRessources)
@@ -16,7 +16,7 @@ Semaphore::Semaphore(int nbRessources)
 }
 
 /**
- * @brief Semaphore::~Semaphore
+ * @brief Détruit le mutex interne et la pile de QEventLoop
  */
 Semaphore::~Semaphore()
 {
@@ -25,7 +25,7 @@ Semaphore::~Semaphore()
 }
 
 /**
- * @brief Semaphore::Acquire Si le sémaphore est disponible, il laisse la main, sinon il place l'exécution en attente
+ * @brief Si le sémaphore est disponible, il laisse la main, sinon il place l'exécution en attente
  */
 void Semaphore::Acquire()
 {
@@ -52,7 +52,7 @@ void Semaphore::Acquire()
 }
 
 /**
- * @brief Semaphore::Release Augmente la disponibilité et si nécessaire libère le premier thread à avoir été mis en attente
+ * @brief Augmente la disponibilité et si nécessaire libère le premier thread à avoir été mis en attente
  */
 void Semaphore::Release()
 {

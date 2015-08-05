@@ -73,7 +73,7 @@ void MyWebView::handleRedirect(const QUrl &url)
 }
 
 /**
- * @brief Envoie un signal pour mettreà  jour le titre de la MainWindow
+ * @brief Envoie un signal pour mettre à jour le titre de la MainWindow
  */
 void MyWebView::updateTitle()
 {

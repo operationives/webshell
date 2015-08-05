@@ -1,13 +1,10 @@
 #include "parametres.h"
+#include "global.h"
 
 /**
- * @brief Parametres::Parametres	Fenêtre de paramètres
- * @param fullscreen		Vrai si la page est en plein écran
- * @param minimization	  Vrai si le bouton de fermeture est associé à la minimisation
- * @param toolsactivated	Vrai si les outils développeur sont activés
- * @param parent			Widget parent
+ * @brief Fenêtre de paramètres
  */
-Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent)
+Parametres::Parametres(QWidget *parent)
 	: QDialog(parent)
 {
 
@@ -17,8 +14,8 @@ Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent)
 	this->setWindowIcon(QIcon(QApplication::applicationDirPath()+"/djanah.png"));
 
 	tabWidget = new QTabWidget;
-	Tab *closeOption = new Tab("Action du bouton de fermeture","Minimisation","Fermeture",minimization);
-	Tab *tools = new Tab("Outils de développement","Activés","Désactivés",toolsactivated);
+	Tab *closeOption = new Tab("Action du bouton de fermeture","Minimisation","Fermeture",config->GetCloseButtonBehaviour());
+	Tab *tools = new Tab("Outils de développement","Activés","Désactivés",config->GetDeveloperToolsMode());
 	tabWidget->addTab(closeOption, tr("Fermeture"));
 	tabWidget->addTab(tools, tr("Outils"));
 
@@ -38,11 +35,11 @@ Parametres::Parametres(bool minimization, bool toolsactivated, QWidget *parent)
 }
 
 /**
- * @brief Tab::Tab	  Instancie l'onglet
- * @param title		 Titre de l'onglet
- * @param button1Text   Titre de l'option 1
- * @param button2Text   Titre de l'option 2
- * @param buttonChecked Si vrai, option 1 cochée, sinon, option 2 cochée
+ * @brief Instancie l'onglet
+ * @param title			Titre de l'onglet
+ * @param button1Text	Titre de l'option 1
+ * @param button2Text	Titre de l'option 2
+ * @param buttonChecked	Si vrai, option 1 cochée, sinon, option 2 cochée
  * @param parent		Widget parent
  */
 Tab::Tab(QString title, QString button1Text, QString button2Text, bool buttonChecked, QWidget *parent)
@@ -75,7 +72,7 @@ Tab::Tab(QString title, QString button1Text, QString button2Text, bool buttonChe
 }
 
 /**
- * @brief Tab::option1Clicked   Indique que l'option 1 est choisie
+ * @brief Indique que l'option 1 est choisie
  */
 void Tab::option1Clicked()
 {
@@ -83,7 +80,7 @@ void Tab::option1Clicked()
 }
 
 /**
- * @brief Tab::option2Clicked   Indique que l'option 2 est choisie
+ * @brief Indique que l'option 2 est choisie
  */
 void Tab::option2Clicked()
 {
