@@ -1,6 +1,17 @@
 #include "configmanager.h"
 #include <iostream>
 #include <QApplication>
+#include <QDesktopWidget>
+
+//On définit la taille des bordures de l'écran
+#ifdef Q_OS_WIN
+#define WINDOW_FRAME_HEIGHT 37
+#define WINDOW_FRAME_WIDTH 17
+#else
+//Confirmer la taille des bordures sous mac
+#define WINDOW_FRAME_HEIGHT 37
+#define WINDOW_FRAME_WIDTH 17
+#endif
 
 /**
  * @brief Initialise les informations du webshell et de l'application à partir de l'URL de démarrage de l'application
@@ -46,14 +57,14 @@ ConfigManager::ConfigManager(QString launchUrl)
 	developerToolsActivated = false;
 	minimization = false;
 	menuBarPresent = false;
-	minWidth = 700;
-	minHeight = 500;
-	defaultWidth = 1000;
-	defaultHeight = 800;
+	QRect rec = QApplication::desktop()->availableGeometry();
+	minWidth = rec.width()/2;
+	minHeight = rec.height()/2;
+	defaultWidth = 3*rec.width()/4;
+	defaultHeight = 3*rec.height()/4;
 	icon = "";
 	infosAppli = "";
 	baseUrl = QStringList();
-	baseUrl << launchUrl;
 
 	QDomDocument dom("appli_xml");
 	QFile file(confFilePath);
@@ -106,6 +117,29 @@ ConfigManager::ConfigManager(QString launchUrl)
 
 			n = n.nextSibling();
 		}
+		bool toLoad = false;
+		if((3*rec.width()/4)<minWidth)
+		{
+			toLoad = true;
+			this->minWidth = 3*rec.width()/4;
+		}
+		if((3*rec.height()/4)<minHeight)
+		{
+			toLoad = true;
+			this->minHeight = 3*rec.height()/4;
+		}
+		if((rec.width() - WINDOW_FRAME_WIDTH)<defaultWidth)
+		{
+			toLoad = true;
+			this->defaultWidth = rec.width() - WINDOW_FRAME_WIDTH;
+		}
+		if((rec.height() - WINDOW_FRAME_HEIGHT)<defaultHeight)
+		{
+			toLoad = true;
+			this->defaultHeight = rec.height() - WINDOW_FRAME_HEIGHT;
+		}
+		if(toLoad)
+			LoadParametersAppli();
 	}
 }
 
@@ -413,14 +447,22 @@ int ConfigManager::GetMinHeight() const
 }
 
 /**
- * @brief Met à jour la taille minimale de l'application
+ * @brief Met à jour la taille minimale de l'application\n
+ * Si les dimensions indiquées sont supérieurs aux 3/4 de celles de l'écran, elles seront remplacées par ce seuil
  * @param minWidth	Nouvelle largeur minimale
  * @param minHeight	Nouvelle hauteur minimale
  */
 void ConfigManager::SetMinSize(int minWidth, int minHeight)
 {
-	this->minWidth = minWidth;
-	this->minHeight = minHeight;
+	QRect rec = QApplication::desktop()->availableGeometry();
+	if((3*rec.width()/4)<minWidth)
+		this->minWidth = 3*rec.width()/4;
+	else
+		this->minWidth = minWidth;
+	if((3*rec.height()/4)<minHeight)
+		this->minHeight = 3*rec.height()/4;
+	else
+		this->minHeight = minHeight;
 	LoadParametersAppli();
 	emit minSize(minWidth,minHeight);
 }
@@ -444,14 +486,22 @@ int ConfigManager::GetDefaultHeight() const
 }
 
 /**
- * @brief Met à jour la taille par défaut de l'application
+ * @brief Met à jour la taille par défaut de l'application\n
+ * Si les dimensions indiquées sont supérieurs à celles de l'écran, elles seront remplacées par ce seuil
  * @param defaultWidth	Nouvelle largeur par défaut
  * @param defaultHeight	Nouvelle hauteur par défaut
  */
 void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
 {
-	this->defaultWidth = defaultWidth;
-	this->defaultHeight = defaultHeight;
+	QRect rec = QApplication::desktop()->availableGeometry();
+	if((rec.width() - WINDOW_FRAME_WIDTH)<defaultWidth)
+		this->defaultWidth = rec.width() - WINDOW_FRAME_WIDTH;
+	else
+		this->defaultWidth = defaultWidth;
+	if((rec.height() - WINDOW_FRAME_HEIGHT)<defaultHeight)
+		this->defaultHeight = rec.height() - WINDOW_FRAME_HEIGHT;
+	else
+		this->defaultHeight = defaultHeight;
 	LoadParametersAppli();
 	emit defaultSize(defaultWidth,defaultHeight);
 }

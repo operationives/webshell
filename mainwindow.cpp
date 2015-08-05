@@ -21,7 +21,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	stayOpen = true;
 	launch = false;
-
 	infos = new Informations();
 
 	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
@@ -247,11 +246,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
 	}
 	else
 	{
-		view->deleteLater();
-		delete trayIcon;
-		delete inspector;
-		delete infos;
-		delete fileMenu;
+		this->deleteLater();
 		event->accept();
 	}
 }
