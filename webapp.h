@@ -36,7 +36,6 @@ signals:
 	void changeIcon(const QIcon &icon);
 
 private:
-	QString m_infos;
 	QString m_target;
 	QString currentFileDirectory;
 	MyWebView *m_webView;

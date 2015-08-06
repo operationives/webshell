@@ -1,7 +1,7 @@
 #include "winaddon.h"
 
 /**
- * @brief WinAddon::WinAddon Constructeur de la JumpList de l'application
+ * @brief Constructeur de la JumpList de l'application
  */
 WinAddon::WinAddon()
 {
@@ -17,7 +17,7 @@ WinAddon::WinAddon()
 }
 
 /**
- * @brief WinAddon::~WinAddon Destructeur de la JumpList de l'application
+ * @brief Destructeur de la JumpList de l'application
  */
 WinAddon::~WinAddon()
 {

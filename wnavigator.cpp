@@ -5,8 +5,8 @@
 #include "global.h"
 
 /**
- * @brief WNavigator::WNavigator Constructeur de l'objet WNavigator
- * @param view  WebView sur laquelle effectuer des commandes JavaScript
+ * @brief Constructeur de l'objet WNavigator
+ * @param view	WebView sur laquelle effectuer des commandes JavaScript
  */
 WNavigator::WNavigator(MyWebView *view, WebshellParameters *webshellParameters)
 {
@@ -16,8 +16,8 @@ WNavigator::WNavigator(MyWebView *view, WebshellParameters *webshellParameters)
 }
 
 /**
- * @brief WNavigator::UpdateSoftware Met à jour le webshell
- * @param url   Lien de téléchargement
+ * @brief Met à jour le webshell
+ * @param url	Lien de téléchargement
  */
 void WNavigator::UpdateSoftware(const QString &url)
 {
@@ -26,7 +26,7 @@ void WNavigator::UpdateSoftware(const QString &url)
 }
 
 /**
- * @brief WNavigator::InitWebshellAPI Initialisation des objets JavaScript de l'application
+ * @brief Initialisation des objets JavaScript de l'application
  */
 void WNavigator::InitWebshellAPI()
 {
@@ -38,7 +38,7 @@ void WNavigator::InitWebshellAPI()
 }
 
 /**
- * @brief WNavigator::Close Ferme le webshell
+ * @brief Ferme le webshell
  */
 void WNavigator::Close()
 {
@@ -54,7 +54,7 @@ QString WNavigator::GetWebshellVersion()
 }
 
 /**
- * @brief WNavigator::DownloadProgress Indique à l'application l'avancement du téléchargement
+ * @brief Indique à l'application l'avancement du téléchargement
  * @param bytesReceived Nombre d'octets reçus
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
@@ -65,7 +65,7 @@ void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const
 }
 
 /**
- * @brief WNavigator::fileDownloaded Stocke et exécute l'installeur téléchargé
+ * @brief Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
 void WNavigator::FileDownloaded(const QString &mime_type)
@@ -129,7 +129,7 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 }
 
 /**
- * @brief WNavigator::DownloadFailure Signale l'application de l'échec du téléchargement
+ * @brief Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
 void WNavigator::DownloadFailure(const QString &mime_type)
@@ -138,8 +138,9 @@ void WNavigator::DownloadFailure(const QString &mime_type)
 }
 
 /**
- * @brief WNavigator::finishInstall Fonction appelée lors de la fin d'un processus d'installation libérant la boucle
- * @param exitCode	  Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
+ * @brief Fonction appelée lors de la fin du processus d'installation\n
+ * Comme l'application se ferme dans le cadre de cette installation, elle n'est théoriquement jamais appelée
+ * @param exitCode		Code de sortie du processus, indique si l'installation s'est bien déroulée (en temps normal)
  * @param exitStatus	Indique si le processus a crashé ou non
  */
 void WNavigator::finishInstall(int exitCode, QProcess::ExitStatus exitStatus)

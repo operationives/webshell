@@ -2,7 +2,7 @@
 #include "global.h"
 
 /**
- * @brief WebshellParameters::DeveloperToolsActivated Crée l'objet WebshellParameters
+ * @brief Crée l'objet WebshellParameters
  */
 WebshellParameters::WebshellParameters()
 	:QObject()
@@ -11,7 +11,7 @@ WebshellParameters::WebshellParameters()
 
 
 /**
- * @brief WebshellParameters::DeveloperToolsActivated Indique si les outils développeur sont activés ou non
+ * @brief Indique si les outils développeur sont activés ou non
  * @return config->GetDeveloperToolsMode()
  */
 bool WebshellParameters::DeveloperToolsActivated() const
@@ -20,7 +20,7 @@ bool WebshellParameters::DeveloperToolsActivated() const
 }
 
 /**
- * @brief WebshellParameters::SetDeveloperToolsActivated Active ou désactive les outils développeur
+ * @brief Active ou désactive les outils développeur
  * @param developerToolsActivated Si vrai, active les outils, sinon, les désactive
  */
 void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated)
@@ -29,7 +29,7 @@ void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated
 }
 
 /**
- * @brief WebshellParameters::Minimization Indique si le fait de cliquer sur la croix rouge minimise la fenêtre ou la ferme
+ * @brief Indique si le fait de cliquer sur la croix rouge minimise la fenêtre ou la ferme
  * @return config->GetCloseButtonBehaviour()
  */
 bool WebshellParameters::Minimization() const
@@ -38,7 +38,7 @@ bool WebshellParameters::Minimization() const
 }
 
 /**
- * @brief WebshellParameters::SetMinimization Met à jour le comportement d'un clic sur la croix rouge
+ * @brief Met à jour le comportement d'un clic sur la croix rouge
  * @param minimization  Si vrai, la croix rouge minimise l'application, sinon elle la ferme
  */
 void WebshellParameters::SetMinimization(bool minimization)
@@ -47,7 +47,7 @@ void WebshellParameters::SetMinimization(bool minimization)
 }
 
 /**
- * @brief WebshellParameters::MenuBarPresent Indique si la barre de menu est présente
+ * @brief Indique si la barre de menu est présente
  * @return config->GetCloseButtonBehaviour()
  */
 bool WebshellParameters::MenuBarPresent() const
@@ -56,7 +56,7 @@ bool WebshellParameters::MenuBarPresent() const
 }
 
 /**
- * @brief WebshellParameters::SetMenuBarPresent Met à jour l'affichage de la barre de menu
+ * @brief Met à jour l'affichage de la barre de menu
  * @param menuBarPresent  Si vrai, le menu est affiché, sinon non
  */
 void WebshellParameters::SetMenuBarPresent(bool menuBarPresent)
@@ -65,7 +65,7 @@ void WebshellParameters::SetMenuBarPresent(bool menuBarPresent)
 }
 
 /**
- * @brief WebshellParameters::Target Retourne la cible des événements
+ * @brief Retourne la cible des événements
  * @return m_target
  */
 QString WebshellParameters::Target() const
@@ -74,7 +74,7 @@ QString WebshellParameters::Target() const
 }
 
 /**
- * @brief WebshellParameters::SetTarget Met à jour la cible des événements
+ * @brief Met à jour la cible des événements
  * @param target	Nouvelle cible des événements
  */
 void WebshellParameters::SetTarget(const QString &target)
