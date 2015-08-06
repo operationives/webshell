@@ -182,6 +182,9 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	else
 	{
 		this->showNormal();
+		this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
+		this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
+		this->move(QApplication::desktop()->screen()->rect().center() - this->rect().center());
 	}
 	config->SetScreenMode(fullscreen);
 }
@@ -202,6 +205,7 @@ void MainWindow::changeToolsMode(bool toolsActivated)
  */
 void MainWindow::changeMinSize(int minWidth, int minHeight)
 {
+	if(!this->isFullScreen())
 	this->setMinimumSize(minWidth,minHeight);
 }
 
@@ -212,6 +216,7 @@ void MainWindow::changeMinSize(int minWidth, int minHeight)
  */
 void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 {
+	if(!this->isFullScreen())
 	this->resize(defaultWidth,defaultHeight);
 }
 
@@ -225,6 +230,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 	{
 		if(this->isFullScreen())
 			this->changeScreenMode(false);
+		qDebug() << "on quitte fullscreen";
 		QMainWindow::keyPressEvent(event); // call the default implementation
 	}
 	else
