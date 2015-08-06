@@ -31,7 +31,9 @@ WebApp::~WebApp()
  */
 void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
 {
-
+	Q_UNUSED(bytesReceived);
+	Q_UNUSED(bytesTotal);
+	Q_UNUSED(mime_type);
 }
 
 /**

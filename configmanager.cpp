@@ -64,6 +64,8 @@ ConfigManager::ConfigManager(QString launchUrl)
 	defaultHeight = 3*rec.height()/4;
 	icon = "";
 	infosAppli = "";
+	lang = QLocale::system().name();
+	lang.truncate(2);
 	baseUrl = QStringList();
 
 	QDomDocument dom("appli_xml");
@@ -112,6 +114,8 @@ ConfigManager::ConfigManager(QString launchUrl)
 				icon = e.attribute("value");
 			else if(e.attribute("name") == "infos")
 				infosAppli = e.attribute("value");
+			else if(e.attribute("name") == "lang")
+				lang = e.attribute("value");
 			else if(e.attribute("name") == "baseUrl")
 				baseUrl.append(e.attribute("value"));
 
@@ -305,6 +309,13 @@ void ConfigManager::LoadParametersAppli()
 	write_elem.setAttribute("name", "infos");
 	write_elem.setAttribute("value", infosAppli);
 	docElem.appendChild(write_elem);
+
+	//Insertion du paramètre lang
+	write_elem = dom.createElement("setting");
+	write_elem.setAttribute("name", "lang");
+	write_elem.setAttribute("value", lang);
+	docElem.appendChild(write_elem);
+
 
 	//Insertion du paramètre baseUrl
 	QStringList::iterator i;
@@ -561,6 +572,26 @@ QString ConfigManager::GetInfos()
 void ConfigManager::SetInfos(QString infosAppli)
 {
 	this->infosAppli = infosAppli;
+	LoadParametersAppli();
+}
+
+/**
+ * @brief Indique la langue de l'application
+ * @return lang
+ */
+QString ConfigManager::GetLanguage()
+{
+	return lang;
+}
+
+/**
+ * @brief Met à jour la langue de l'applicaton
+ * @param lang Nouvelle langue de l'application
+ */
+void ConfigManager::SetLanguage(QString lang)
+{
+	this->lang = lang;
+	emit newLanguage(lang);
 	LoadParametersAppli();
 }
 

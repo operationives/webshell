@@ -20,7 +20,19 @@ public:
 
 private:
 	MyWebView *view;
+
 	QMenu *fileMenu;
+	QAction *clearCookiesAction;
+	QAction *quitAction;
+	QAction *inspectAction;
+	QAction *fullscreenAction;
+	QAction *normalscreenAction;
+	QAction *reloadAction;
+	QAction *infoAction;
+#ifdef Q_OS_WIN
+	QAction *sendlogAction;
+#endif
+
 	QSystemTrayIcon *trayIcon;
 	QWebInspector *inspector;
 	Informations *infos;
@@ -40,6 +52,7 @@ private slots:
 	void changeToolsMode(bool toolsActivated);
 	void changeMinSize(int minWidth, int minHeight);
 	void changeDefaultSize(int defaultWidth, int defaultHeight);
+	void changeActionNames(QString lang);
 	void quit();
 	void changeIcon(const QIcon &icon);
 	void loadFinished();

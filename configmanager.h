@@ -26,6 +26,7 @@ public:
 	QString GetLaunchUrl();
 	QString GetIcon();
 	QString GetInfos();
+	QString GetLanguage();
 	QStringList GetBaseUrl();
 
 public slots:
@@ -42,6 +43,7 @@ public slots:
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
 	void SetInfos(QString infosAppli);
+	void SetLanguage(QString lang);
 	void SetBaseUrl(QStringList baseUrl);
 
 signals:
@@ -49,6 +51,7 @@ signals:
 	void menuBarPresence(bool menuBarPresent);
 	void minSize(int minWidth, int minHeight);
 	void defaultSize(int defaultWidth, int defaultHeight);
+	void newLanguage(QString lang);
 
 private:
 	//Attributs webshell
@@ -66,6 +69,7 @@ private:
 	QString launchUrl;
 	QString icon;
 	QString infosAppli;
+	QString lang;
 	QStringList baseUrl;
 
 	QString confFilePath;

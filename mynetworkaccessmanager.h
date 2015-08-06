@@ -19,6 +19,9 @@ public slots:
 private:
 	QNetworkDiskCache *m_webCache;
 	CookieJar *m_cookieJar;
+
+private slots:
+	void getLanguage(QNetworkReply *reply);
 };
 
 #endif // MYNETWORKACCESSMANAGER_H

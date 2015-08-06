@@ -16,6 +16,7 @@
  */
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)
 {
+	Q_UNUSED(logcontext);
 	QFile file(QApplication::applicationDirPath()+"/"+qAppName()+".log");
 	file.open(QIODevice::WriteOnly | QIODevice::Append);
 	file.write(QString("[").toLatin1()+QDateTime::currentDateTime().toString().toLatin1()+QString("]\t").toLatin1());

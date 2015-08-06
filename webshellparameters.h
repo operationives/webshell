@@ -10,6 +10,7 @@ class WebshellParameters : public QObject
 	Q_PROPERTY(bool minimization READ Minimization WRITE SetMinimization)
 	Q_PROPERTY(bool menuBarPresent READ MenuBarPresent WRITE SetMenuBarPresent)
 	Q_PROPERTY(QString target READ Target WRITE SetTarget)
+	Q_PROPERTY(QString lang READ Lang WRITE SetLang)
 public:
 	WebshellParameters();
 
@@ -24,7 +25,8 @@ private:
 	void SetMenuBarPresent(bool menuBarPresent);
 	QString Target() const;
 	void SetTarget(const QString &target);
-
+	QString Lang() const;
+	void SetLang(const QString &lang);
 };
 
 #endif // DEVELOPERTOOLSACTIVATED_H

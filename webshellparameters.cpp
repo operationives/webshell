@@ -81,3 +81,21 @@ void WebshellParameters::SetTarget(const QString &target)
 {
 	m_target = target;
 }
+
+/**
+ * @brief Retourne la langue de l'application
+ * @return config->GetLanguage()
+ */
+QString WebshellParameters::Lang() const
+{
+	return config->GetLanguage();
+}
+
+/**
+ * @brief Met à jour la langue de l'application
+ * @param lang	Nouvelle langue pour l'application
+ */
+void WebshellParameters::SetLang(const QString &lang)
+{
+	config->SetLanguage(lang);
+}

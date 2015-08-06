@@ -42,8 +42,23 @@ void Informations::UpdateValues()
 {
 	version = qApp->applicationVersion();
 	infosAppli = config->GetInfos();
-	if(manager->networkAccessible() == QNetworkAccessManager::Accessible)
-		label->setText(QString("Version du webshell:\n" + version + "\nInformations complémentaires:\n" + infosAppli));
+	QString webshellText;
+	QString appText;
+	QString disconnectedText;
+	if(config->GetLanguage() == "fr")
+	{
+		webshellText = "Version du webshell:\n";
+		appText = "\nInformations complémentaires:\n";
+		disconnectedText = "L'application est déconnectée";
+	}
 	else
-		label->setText(QString("Version du webshell:\n" + version + "\nInformations complémentaires:\nL'application est déconnectée"));
+	{
+		webshellText = "Webshell version:\n";
+		appText = "\nAdditional informations:\n";
+		disconnectedText = "The application is disconnected";
+	}
+	if(manager->networkAccessible() == QNetworkAccessManager::Accessible)
+		label->setText(QString(webshellText + version + appText + infosAppli));
+	else
+		label->setText(QString(webshellText + version + appText + disconnectedText));
 }

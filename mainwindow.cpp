@@ -18,10 +18,23 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
 	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
+	connect(config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
 
 	stayOpen = true;
 	launch = false;
 	infos = new Informations();
+
+	//On initialise les actions des différents menus
+	clearCookiesAction = new QAction(this);
+	quitAction = new QAction(this);
+	inspectAction = new QAction(this);
+	fullscreenAction = new QAction(this);
+	normalscreenAction = new QAction(this);
+	reloadAction = new QAction(this);
+	infoAction = new QAction(this);
+#ifdef Q_OS_WIN
+	sendlogAction = new QAction(this);
+#endif
 
 	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled,true);
@@ -33,8 +46,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
 
-	//On définit les actions du menu de trayIcon
-	QAction *quitAction = new QAction("Quitter", this);
 	connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 	QMenu *trayIconMenu = new QMenu(this);
 	trayIconMenu->addAction (quitAction);
@@ -45,10 +56,11 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	//Ajout du menu dans la barre de titre
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
 	fileMenu->addAction(quitAction);
-	QAction *clearCookies = new QAction("&Effacer les cookies", this);
-	fileMenu->addAction(clearCookies);
+	fileMenu->addAction(clearCookiesAction);
 	menuBar()->setVisible(config->GetMenuBarPresent());
 	connect(config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
+
+	changeActionNames(config->GetLanguage());
 
 	view = new MyWebView(this);
 
@@ -73,7 +85,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
-	connect (clearCookies, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
+	connect (clearCookiesAction, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
 	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.html")));
 
 	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
@@ -108,21 +120,21 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	QMenu myMenu;
 	if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
 	{
-		myMenu.addAction("Inspect");
+		myMenu.addAction(inspectAction);
 	}
 	if(!this->isFullScreen())
 	{
-		myMenu.addAction("Plein écran");
+		myMenu.addAction(fullscreenAction);
 	}
 	else
 	{
-		myMenu.addAction("Fenêtré");
+		myMenu.addAction(normalscreenAction);
 	}
-	myMenu.addAction("Fermer");
-	myMenu.addAction("Reload");
-	myMenu.addAction("Informations");
+	myMenu.addAction(quitAction);
+	myMenu.addAction(reloadAction);
+	myMenu.addAction(infoAction);
 #ifdef Q_OS_WIN
-	myMenu.addAction("Envoi de logs");
+	myMenu.addAction(sendlogAction);
 #endif
 
 	QPoint globalPos = this->mapToGlobal(pos);
@@ -133,34 +145,34 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	if(selectedItem == NULL)
 		return;
 
-	if (selectedItem->text()=="Inspect")
+	if (selectedItem->text()==inspectAction->text())
 	{
 		inspector->show();
 	}
 
-	if (selectedItem->text()=="Plein écran")
+	if (selectedItem->text()==fullscreenAction->text())
 	{
 		changeScreenMode(true);
 	}
 
-	if (selectedItem->text()=="Fenêtré")
+	if (selectedItem->text()==normalscreenAction->text())
 	{
 		changeScreenMode(false);
 	}
-	if (selectedItem->text()=="Fermer")
+	if (selectedItem->text()==quitAction->text())
 	{
-		this->quit();
+		//L'action est déjà connectée à la méthode quit, on ne fait rien
 	}
-	if (selectedItem->text()=="Reload")
+	if (selectedItem->text()==reloadAction->text())
 	{
 	   view->reload();
 	}
-	if (selectedItem->text()=="Informations")
+	if (selectedItem->text()==infoAction->text())
 	{
 		this->DisplayInfos();
 	}
 #ifdef Q_OS_WIN
-	if (selectedItem->text()=="Envoi de logs")
+	if (selectedItem->text()==sendlogAction->text())
 	{
 		MailSender mail;
 		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
@@ -170,7 +182,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
 }
 
 /**
- * @brief Change l'affichage de la fenêtre
+ * @brief Change l'affichage de la fenêtre\n
+ * Si on quitte le mode plein écran, on met la fenêtre au centre de l'écran et on le redimensionne avec les valeurs enregistrées
  * @param fullscreen	Vrai: met en mode plein écran, mode fenêtré sinon
  */
 void MainWindow::changeScreenMode(bool fullscreen)
@@ -199,25 +212,64 @@ void MainWindow::changeToolsMode(bool toolsActivated)
 }
 
 /**
- * @brief Change la taille minimale de la fenêtre
+ * @brief Change la taille minimale de la fenêtre si c'est possible
  * @param minWidth	Nouvelle largeur minimale
  * @param minHeight	Nouvelle hauteur minimale
  */
 void MainWindow::changeMinSize(int minWidth, int minHeight)
 {
 	if(!this->isFullScreen())
-	this->setMinimumSize(minWidth,minHeight);
+		this->setMinimumSize(minWidth,minHeight);
 }
 
 /**
- * @brief Change la taille par défaut de la fenêtre
+ * @brief Change la taille par défaut de la fenêtre si c'est possible
  * @param defaultWidth	Nouvelle largeur par défaut
  * @param defaultHeight	Nouvelle hauteur par défaut
  */
 void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 {
 	if(!this->isFullScreen())
-	this->resize(defaultWidth,defaultHeight);
+		this->resize(defaultWidth,defaultHeight);
+}
+
+/**
+ * @brief Modifie les textes associés aux différents menus et actions associées
+ * @param lang	Langue auquel le texte doit correspondre
+ */
+void MainWindow::changeActionNames(QString lang)
+{
+	//ATTENTION: Si il y a des modifications ici, il faut penser à celles dans informations.cpp
+	if(lang == "fr")
+	{
+		//Valeurs françaises
+		fileMenu->setTitle("Fichier");
+		clearCookiesAction->setText("Nettoyer les cookies");
+		quitAction->setText("Fermer");
+		inspectAction->setText("Inspecter");
+		fullscreenAction->setText("Plein écran");
+		normalscreenAction->setText("Fenêtré");
+		reloadAction->setText("Recharger");
+		infoAction->setText("Informations");
+#ifdef Q_OS_WIN
+		sendlogAction->setText("Envoi de logs");
+#endif
+	}
+	else
+	{
+		//Valeurs anglaises
+		fileMenu->setTitle("File");
+		clearCookiesAction->setText("Clear cookies");
+		quitAction->setText("Quit");
+		inspectAction->setText("Inspect");
+		fullscreenAction->setText("Fullscreen");
+		normalscreenAction->setText("Show normal");
+		reloadAction->setText("Reload");
+		infoAction->setText("Informations");
+#ifdef Q_OS_WIN
+		sendlogAction->setText("Send logs");
+#endif
+	}
 }
 
 /**
@@ -230,7 +282,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 	{
 		if(this->isFullScreen())
 			this->changeScreenMode(false);
-		qDebug() << "on quitte fullscreen";
 		QMainWindow::keyPressEvent(event); // call the default implementation
 	}
 	else

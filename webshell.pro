@@ -1,6 +1,11 @@
-QT += webkitwidgets core network xml winextras
+QT += webkitwidgets core network xml
+win32 {
+    QT += winextras
+}
 
-QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
+CONFIG += warn_off
+
+QMAKE_CXXFLAGS_WARN_OFF += -Wunused-parameter
 
 HEADERS =	mainwindow.h \
 		filedownloader.h \
