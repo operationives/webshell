@@ -86,7 +86,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
 	connect (clearCookiesAction, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
-	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader.html")));
+	view->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader-"+config->GetLanguage()+".html")));
 
 	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
 	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
