@@ -13,21 +13,35 @@ Semaphore::Semaphore(int nbRessources)
 	this->stack = new QList<QEventLoop *>();
 	//Mutex permettant d'assurer l'exclusion mutuelle
 	this->mutex = new QMutex();
+	//Cela permet de savoir si l'acquire s'est effectué avant ou après la destruction de l'objet
+	this->acquireSuccess = true;
 }
 
 /**
- * @brief Détruit le mutex interne et la pile de QEventLoop
+ * @brief libère les threads en attente en leur indiquant qu'ils ne peuvent pas aller plus loin
  */
 Semaphore::~Semaphore()
 {
-	delete mutex;
+	mutex->lock();
+	this->acquireSuccess = false;
+	int i;
+	for(i = 0; i!= stack->length();++i)
+	{
+		QEventLoop *loop = stack->last();
+		loop->quit();
+		stack->removeLast();
+		delete loop;
+	}
+	mutex->unlock();
 	delete stack;
+	delete mutex;
 }
 
 /**
- * @brief Si le sémaphore est disponible, il laisse la main, sinon il place l'exécution en attente
+ * @brief Si le sémaphore est disponible, il laisse la main, sinon il place l'exécution en attente\n
+ * Lorsque le destructeur libère la boucle, le résultat envoyé est faux, sinon Acquire renvoie vrai
  */
-void Semaphore::Acquire()
+bool Semaphore::Acquire()
 {
 	mutex->lock();
 	if(nbRessources>0)
@@ -49,6 +63,7 @@ void Semaphore::Acquire()
 		nbRessources--;
 		mutex->unlock();
 	}
+	return this->acquireSuccess;
 }
 
 /**

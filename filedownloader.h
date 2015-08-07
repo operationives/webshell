@@ -29,7 +29,7 @@ private:
 	QNetworkAccessManager m_WebCtrl;
 	QByteArray m_DownloadedData;
 	DownloadProgressListener *listener;
-
+	QNetworkReply *download;
 };
  
 #endif // FILEDOWNLOADER_H

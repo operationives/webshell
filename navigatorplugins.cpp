@@ -50,7 +50,8 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 {
 	if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << mime_type)){}
 
-	sem->Acquire();
+	if(!sem->Acquire())
+		return;
 	currentTypeMime = mime_type;
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
 	QString filename = fileDownloaderHash.value(mime_type)->GetUrl();

@@ -13,13 +13,15 @@ FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *lis
 	this, SLOT (fileDownloaded(QNetworkReply*)));
 
 	QNetworkRequest request(QUrl(this->url));
-	QNetworkReply *download = m_WebCtrl.get(request);
+	download = m_WebCtrl.get(request);
 	connect(download, SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(downloadProgress(qint64,qint64)));
 	connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
 }
 
 FileDownloader::~FileDownloader()
 {
+	if(download->isRunning())
+		download->abort();
 }
  
 /**

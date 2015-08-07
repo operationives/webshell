@@ -138,8 +138,6 @@ void MainWindow::showContextMenu(const QPoint &pos)
 #endif
 
 	QPoint globalPos = this->mapToGlobal(pos);
-	//Correction de position
-	globalPos.setY(globalPos.ry()+20);
 
 	QAction* selectedItem = myMenu.exec(globalPos);
 	if(selectedItem == NULL)
@@ -175,8 +173,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	if (selectedItem->text()==sendlogAction->text())
 	{
 		MailSender mail;
-		mail.AddFile(QApplication::applicationDirPath(),qAppName()+".log");
-		mail.Send("Envoi de logs");
+		mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".log");
+		mail.Send(sendlogAction->text());
 	}
 #endif
 }

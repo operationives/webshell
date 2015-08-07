@@ -11,10 +11,11 @@ class Semaphore : public QObject
 public:
 	Semaphore(int nbRessources = 1);
 	~Semaphore();
-	void Acquire();
+	bool Acquire();
 	void Release();
 
 private:
+	bool acquireSuccess;
 	int nbRessources;
 	QList<QEventLoop *> *stack;
 	QMutex *mutex;
