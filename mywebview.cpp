@@ -43,6 +43,11 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 
 	connect(parent,SIGNAL(clearCookies()),m_WebCtrl,SLOT(clearCookies()));
 
+	//On fait un test de connexion régulièrement sachant que le signal de perte de connexion n'est parfois pas émis
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(updateConnectivity()));
+	timer->start(5000);
+
 	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
 	{
 		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << config->GetBaseUrl();
@@ -55,6 +60,8 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
  */
 MyWebView::~MyWebView()
 {
+	timer->stop();
+	delete timer;
 	delete wnavigator;
 	delete wapp;
 	delete navigatorplugins;
@@ -90,6 +97,40 @@ void MyWebView::updateJavaScriptObjects()
 	this->page()->mainFrame()->addToJavaScriptWindowObject("webapp", wapp);
 	this->page()->mainFrame()->addToJavaScriptWindowObject("webshellParameters", webshellParameters);
 }
+
+/**
+ * @brief Si la connexion est perdue, on sauvegarde la page courante et on affiche la page de perte de connectivité en local\n
+ * Lorsque la connexion est retrouvée, on charge la page sauvegardée et on la remplace par une chaîne vide dans le ConfigManager
+ */
+void MyWebView::updateConnectivity()
+{
+	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible)
+	{
+		config->SetSavedAdress(this->url().toString());
+		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/disconnected-"+config->GetLanguage()+".html")));
+
+		QEventLoop loop;
+		//On attend que le réseau soit de retour
+		while ((m_WebCtrl->networkAccessible()!=QNetworkAccessManager::Accessible))
+		{
+			QTimer::singleShot(5000, &loop, SLOT(quit()));
+			loop.exec();
+		}
+
+		connect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
+		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader-"+config->GetLanguage()+".html")));
+		loop.exec();
+
+		disconnect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
+		QString savedAdress(config->GetSavedAdress());
+		if(savedAdress.isEmpty())
+			return;
+		this->load(savedAdress);
+		config->SetSavedAdress("");
+
+	}
+}
+
 
 /**
  * @brief Lance un événement depuis une cible particulière avec des clefs et valeurs spécifiques

@@ -26,6 +26,7 @@ signals:
 	void close();
 
 private:
+	QTimer *timer;
 	MyNetworkAccessManager *m_WebCtrl;
 	WNavigator *wnavigator;
 	NavigatorPlugins *navigatorplugins;
@@ -35,8 +36,9 @@ private:
 
 private slots:
 	void handleRedirect(const QUrl &url);
-	void updateJavaScriptObjects();
 	void updateTitle();
+	void updateJavaScriptObjects();
+	void updateConnectivity();
 };
 
 #endif

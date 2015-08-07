@@ -1,6 +1,7 @@
 #include "mynetworkaccessmanager.h"
 #include "global.h"
 #include <QNetworkReply>
+#include <QStandardPaths>
 
 /**
  * @brief Crée les outils permettant d'utiliser les cookies et en théorie le cache

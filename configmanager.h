@@ -1,7 +1,8 @@
 #ifndef CONFIGMANAGER_H
 #define CONFIGMANAGER_H
 
-#include <QtXml>
+#include <QObject>
+#include <QStringList>
 
 class ConfigManager : public QObject
 {
@@ -13,6 +14,7 @@ public:
 
 	//Getters pour attributs webshell
 	QString GetInstallationFileToRemove();
+	QString GetSavedAdress();
 
 	//Getters pour attributs appli
 	bool GetScreenMode();
@@ -32,6 +34,7 @@ public:
 public slots:
 	//Setters pour attributs webshell
 	void SetInstallationFileToRemove(QString installationFileToRemove);
+	void SetSavedAdress(QString savedAdress);
 
 	//Setters pour attributs appli
 	void SetScreenMode(bool fullscreen);
@@ -56,6 +59,7 @@ signals:
 private:
 	//Attributs webshell
 	QString installationFileToRemove;
+	QString savedAdress;
 
 	//Attributs application
 	bool fullscreen;

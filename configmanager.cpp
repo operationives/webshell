@@ -1,4 +1,5 @@
 #include "configmanager.h"
+#include <QtXml>
 #include <iostream>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -159,6 +160,9 @@ void ConfigManager::InitWebshellParameters()
 {
 	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
 	installationFileToRemove = "";
+	//L'adresse sauvegardée correspond à l'adresse de la page en cours lors d'une perte de connexion
+	//Elle n'a d'intérêt que lors de la session courante, il n'y a donc pas besoin de la stocker dans le fichier xml
+	savedAdress= "";
 
 	QDomDocument dom("webshell_xml");
 	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
@@ -359,6 +363,24 @@ void ConfigManager::SetInstallationFileToRemove(QString installationFileToRemove
 {
 	this->installationFileToRemove = installationFileToRemove;
 	LoadParametersWebshell();
+}
+
+/**
+ * @brief Indique l'adresse de la page sauvegardée lors d'une perte de connexion
+ * @return savedAdress
+ */
+QString ConfigManager::GetSavedAdress()
+{
+	return savedAdress;
+}
+
+/**
+ * @brief Sauvegarde l'adresse en cas de perte de connexion ou place une chaîne vide lors d'une reconnexion
+ * @param savedAdress	Si la valeur est non vide, c'est l'adresse à récupérer lorsque la connexion est récupérée
+ */
+void ConfigManager::SetSavedAdress(QString savedAdress)
+{
+	this->savedAdress = savedAdress;
 }
 
 /**
