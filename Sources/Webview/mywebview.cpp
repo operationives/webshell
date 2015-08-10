@@ -175,7 +175,7 @@ bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarg
 void MyWebView::LoadInternalPage(QString page)
 {
 	ConfigManager &config = ConfigManager::Instance();
-	if(QFile::exists(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")))
+	if(QFile::exists(QString(QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")))
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
 	else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
