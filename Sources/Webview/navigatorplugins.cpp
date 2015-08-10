@@ -12,6 +12,8 @@ NavigatorPlugins::NavigatorPlugins(MyWebView *view)
 {
 	this->m_webView = view;
 	this->m_target = "window";
+	//Le sémaphore est utile afin de mettre en pause les threads cherchant à exécuter
+	//un installeur téléchargé alors qu'un autre est déjà en cours d'exécution
 	sem = new Semaphore();
 }
 
@@ -25,10 +27,10 @@ NavigatorPlugins::~NavigatorPlugins()
  * @brief Met à jour le webshell
  * @param url   Lien de téléchargement
  */
-void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
+void NavigatorPlugins::UpdateSoftware(QString url, QString typemime)
 {
 	//La partie suivante permet de télécharger depuis la webshell
-	fileDownloaderHash[mime_type] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),mime_type);
+	fileDownloaderHash[typemime] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),typemime);
 }
 
 /**
@@ -37,24 +39,24 @@ void NavigatorPlugins::UpdateSoftware(QString url, QString mime_type)
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
  */
-void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
+void NavigatorPlugins::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadProgress",m_target,QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
+	if(m_webView->DispatchJsEvent("DownloadProgress",m_target,QStringList() << "typemime" << typemime << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
 
 /**
  * @brief Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
-void NavigatorPlugins::FileDownloaded(const QString &mime_type)
+void NavigatorPlugins::FileDownloaded(const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadComplete",m_target,QStringList() << "typemime" << typemime)){}
 
 	if(!sem->Acquire())
 		return;
-	currentTypeMime = mime_type;
+	currentTypeMime = typemime;
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
-	QString filename = fileDownloaderHash.value(mime_type)->GetUrl();
+	QString filename = fileDownloaderHash.value(typemime)->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
 	currentFileDirectory = QString(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/");
 	currentFileDirectory.append(filename);
@@ -62,11 +64,11 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
-		qWarning() << "Fichier d'installation navigatorPlugins impossible à ouvrir. Type mime: " << mime_type;
+		qWarning() << "Fichier d'installation navigatorPlugins impossible à ouvrir. Type mime: " << typemime;
 		return;
 	}
 
-	file.write(fileDownloaderHash.value(mime_type)->DownloadedData());
+	file.write(fileDownloaderHash.value(typemime)->DownloadedData());
 	file.close();
 
 	//Lancement du fichier téléchargé
@@ -89,7 +91,7 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
 	}
 	else
 	{
-		if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << mime_type)){}
+		if(m_webView->DispatchJsEvent("InstallError",m_target,QStringList() << "typemime" << typemime)){}
 	}
 
 	//Lancement du programme. Lorsqu'il finit, finishInstall est appelé
@@ -110,9 +112,9 @@ void NavigatorPlugins::FileDownloaded(const QString &mime_type)
  * @brief Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
-void NavigatorPlugins::DownloadFailure(const QString &mime_type)
+void NavigatorPlugins::DownloadFailure(const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadFailure",m_target,QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadFailure",m_target,QStringList() << "typemime" << typemime)){}
 }
 
 /**

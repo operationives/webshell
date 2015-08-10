@@ -1,8 +1,12 @@
 #include "configmanager.h"
-#include <QtXml>
 #include <iostream>
 #include <QApplication>
 #include <QDesktopWidget>
+
+#define PARENT_TAG_NAME "settings"
+#define CHILDREN_TAG_NAME "setting"
+#define CHILDREN_NAME_ATTRIBUTE "name"
+#define CHILDREN_VALUE_ATTRIBUTE "value"
 
 //Création de l'instance de ConfigManager
 ConfigManager ConfigManager::m_instance=ConfigManager();
@@ -37,7 +41,7 @@ void ConfigManager::InitWebshellParameters()
 	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
 	if(!file.exists())
 	{
-		LoadParametersWebshell();
+		StoreParametersWebshell();
 	}
 	else
 	{
@@ -54,13 +58,13 @@ void ConfigManager::InitWebshellParameters()
 		}
 
 		file.close();
-		QDomElement docElem = dom.documentElement();
-		QDomNode n = docElem.firstChild();
+		QDomElement domElem = dom.documentElement();
+		QDomNode n = domElem.firstChild();
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
-			if(e.attribute("name") == "installationFileToRemove")
-				installationFileToRemove = e.attribute("value");
+			if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "installationFileToRemove")
+				installationFileToRemove = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 
 			n = n.nextSibling();
 		}
@@ -124,7 +128,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	QFile file(confFilePath);
 	if(!file.exists())
 	{
-		LoadParametersAppli();
+		StoreParametersAppli();
 	}
 	else
 	{
@@ -141,35 +145,46 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 		}
 
 		file.close();
-		QDomElement docElem = dom.documentElement();
-		QDomNode n = docElem.firstChild();
+		QDomElement domElem = dom.documentElement();
+		QDomNode n = domElem.firstChild();
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
-			if(e.attribute("name") == "fullscreen")
-				fullscreen = (e.attribute("value") == "true" ? true : false);
-			else if(e.attribute("name") == "developerToolsActivated")
-				developerToolsActivated = (e.attribute("value") == "true" ? true : false);
-			else if(e.attribute("name") == "minimization")
-				minimization = (e.attribute("value") == "true" ? true : false);
-			else if(e.attribute("name") == "menuBarPresent")
-				menuBarPresent = (e.attribute("value") == "true" ? true : false);
-			else if(e.attribute("name") == "minWidth")
-				minWidth = e.attribute("value").toInt();
-			else if(e.attribute("name") == "minHeight")
-				minHeight = e.attribute("value").toInt();
-			else if(e.attribute("name") == "defaultWidth")
-				defaultWidth = e.attribute("value").toInt();
-			else if(e.attribute("name") == "defaultHeight")
-				defaultHeight = e.attribute("value").toInt();
-			else if(e.attribute("name") == "icon")
-				icon = e.attribute("value");
-			else if(e.attribute("name") == "infos")
-				infosAppli = e.attribute("value");
-			else if(e.attribute("name") == "lang")
-				lang = e.attribute("value");
-			else if(e.attribute("name") == "baseUrl")
-				baseUrl.append(e.attribute("value"));
+			if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "fullscreen")
+				fullscreen = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "developerToolsActivated")
+				developerToolsActivated = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "minimization")
+				minimization = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "menuBarPresent")
+				menuBarPresent = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "minWidth")
+				minWidth = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "minHeight")
+				minHeight = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "defaultWidth")
+				defaultWidth = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "defaultHeight")
+				defaultHeight = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "icon")
+				icon = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "infos")
+				infosAppli = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "lang")
+				lang = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
+
+			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "baseUrl")
+				baseUrl.append(e.attribute(CHILDREN_VALUE_ATTRIBUTE));
 
 			n = n.nextSibling();
 		}
@@ -195,28 +210,28 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 			this->defaultHeight = rec.height() - WINDOW_FRAME_HEIGHT;
 		}
 		if(toLoad)
-			LoadParametersAppli();
+			StoreParametersAppli();
 	}
 }
 
 /**
  * @brief Enregistre les paramètres webshell dans le fichier xml associé
  */
-void ConfigManager::LoadParametersWebshell()
+void ConfigManager::StoreParametersWebshell()
 {
 	QDomDocument dom;
 	QDomProcessingInstruction header = dom.createProcessingInstruction("xml","version='1.0' encoding='UTF-8'");
 	dom.appendChild(header);
-	QDomElement docElem = dom.createElement("settings");
-	dom.appendChild(docElem);
+	QDomElement domElem = dom.createElement(PARENT_TAG_NAME);
+	dom.appendChild(domElem);
 
 	QDomElement write_elem;
 
 	//Insertion du paramètre installationFileToRemove
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "installationFileToRemove");
-	write_elem.setAttribute("value", installationFileToRemove);
-	docElem.appendChild(write_elem);
+	write_elem = dom.createElement(CHILDREN_TAG_NAME);
+	write_elem.setAttribute(CHILDREN_NAME_ATTRIBUTE, "installationFileToRemove");
+	write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, installationFileToRemove);
+	domElem.appendChild(write_elem);
 
 	QString write_doc = dom.toString();
 
@@ -235,102 +250,52 @@ void ConfigManager::LoadParametersWebshell()
 /**
  * @brief Enregistre les paramètres application dans le fichier xml associé
  */
-void ConfigManager::LoadParametersAppli()
+void ConfigManager::StoreParametersAppli()
 {
 	QDomDocument dom;
 	QDomProcessingInstruction header = dom.createProcessingInstruction("xml","version='1.0' encoding='UTF-8'");
 	dom.appendChild(header);
-	QDomElement docElem = dom.createElement("settings");
-	dom.appendChild(docElem);
-
-	QDomElement write_elem;
+	QDomElement domElem = dom.createElement(PARENT_TAG_NAME);
+	dom.appendChild(domElem);
 
 	//Insertion du paramètre fullscreen
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "fullscreen");
-	if(fullscreen) write_elem.setAttribute("value", "true");
-	else write_elem.setAttribute("value", "false");
-	docElem.appendChild(write_elem);
+	AppendNode("fullscreen",fullscreen,domElem);
 
 	//Insertion du paramètre developerToolsActivated
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "developerToolsActivated");
-	if(developerToolsActivated) write_elem.setAttribute("value", "true");
-	else write_elem.setAttribute("value", "false");
-	docElem.appendChild(write_elem);
+	AppendNode("developerToolsActivated",developerToolsActivated,domElem);
 
 	//Insertion du paramètre minimization
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "minimization");
-	if(minimization) write_elem.setAttribute("value", "true");
-	else write_elem.setAttribute("value", "false");
-	docElem.appendChild(write_elem);
+	AppendNode("minimization",minimization,domElem);
 
 	//Insertion du paramètre menuBarPresent
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "menuBarPresent");
-	if(menuBarPresent) write_elem.setAttribute("value", "true");
-	else write_elem.setAttribute("value", "false");
-	docElem.appendChild(write_elem);
+	AppendNode("menuBarPresent",menuBarPresent,domElem);
 
 	//Insertion du paramètre minWidth
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "minWidth");
-	write_elem.setAttribute("value", QString::number(minWidth));
-	docElem.appendChild(write_elem);
+	AppendNode("minWidth",minWidth,domElem);
 
 	//Insertion du paramètre minHeight
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "minHeight");
-	write_elem.setAttribute("value", QString::number(minHeight));
-	docElem.appendChild(write_elem);
+	AppendNode("minHeight",minHeight,domElem);
 
 	//Insertion du paramètre defaultWidth
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "defaultWidth");
-	write_elem.setAttribute("value", QString::number(defaultWidth));
-	docElem.appendChild(write_elem);
+	AppendNode("defaultWidth",defaultWidth,domElem);
 
 	//Insertion du paramètre defaultHeight
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "defaultHeight");
-	write_elem.setAttribute("value", QString::number(defaultHeight));
-	docElem.appendChild(write_elem);
+	AppendNode("defaultHeight",defaultHeight,domElem);
 
 	//Insertion du paramètre launchUrl
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "launchUrl");
-	write_elem.setAttribute("value", launchUrl);
-	docElem.appendChild(write_elem);
+	AppendNode("launchUrl",launchUrl,domElem);
 
 	//Insertion du paramètre icon
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "icon");
-	write_elem.setAttribute("value", icon);
-	docElem.appendChild(write_elem);
+	AppendNode("icon",icon,domElem);
 
 	//Insertion du paramètre infosAppli
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "infos");
-	write_elem.setAttribute("value", infosAppli);
-	docElem.appendChild(write_elem);
+	AppendNode("infos",infosAppli,domElem);
 
-	//Insertion du paramètre lang
-	write_elem = dom.createElement("setting");
-	write_elem.setAttribute("name", "lang");
-	write_elem.setAttribute("value", lang);
-	docElem.appendChild(write_elem);
-
+	//Insertion du lang lang
+	AppendNode("developerToolsActivated",lang,domElem);
 
 	//Insertion du paramètre baseUrl
-	QStringList::iterator i;
-	for(i = baseUrl.begin(); i != baseUrl.end();++i)
-	{
-		write_elem = dom.createElement("setting");
-		write_elem.setAttribute("name", "baseUrl");
-		write_elem.setAttribute("value", *i);
-		docElem.appendChild(write_elem);
-	}
+	AppendNode("baseUrl",baseUrl,domElem);
 
 	QString write_doc;
 	write_doc.append(dom.toString());
@@ -345,6 +310,53 @@ void ConfigManager::LoadParametersAppli()
 	QTextStream stream(&fichier);
 	stream.setCodec(QTextCodec::codecForName("UTF-8"));
 	stream << write_doc; // On utilise l'opérateur << pour écrire write_doc dans le document XML.
+}
+
+/**
+ * @brief Ajoute à l'élément domElem une balise avec les attributs name et value
+ * @param name		Nom de la valeur
+ * @param value		Valeur
+ * @param domElem	Elément auquel ajouter le noeud
+ */
+void ConfigManager::AppendNode(const QString &name, const QVariant &value, QDomElement &domElem)
+{
+	//Insertion du paramètre fullscreen
+	QDomDocument dom;
+	QDomElement write_elem;
+
+	write_elem = dom.createElement(CHILDREN_TAG_NAME);
+
+	QStringList list;
+	switch(value.type())
+	{
+	case QVariant::Bool:
+		write_elem.setAttribute(CHILDREN_NAME_ATTRIBUTE, name);
+		if(value.toBool()) write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, "true");
+		else write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, "false");
+		break;
+	case QVariant::String:
+		write_elem.setAttribute(CHILDREN_NAME_ATTRIBUTE, name);
+		write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, value.toString());
+		break;
+	case QVariant::Int:
+		write_elem.setAttribute(CHILDREN_NAME_ATTRIBUTE, name);
+		write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, QString::number(value.toInt()));
+		break;
+	case QVariant::StringList:
+		list = value.toStringList();
+		for(QStringList::iterator i = list.begin(); i != list.end();++i)
+		{
+			write_elem = dom.createElement(CHILDREN_TAG_NAME);
+			write_elem.setAttribute(CHILDREN_NAME_ATTRIBUTE, name);
+			write_elem.setAttribute(CHILDREN_VALUE_ATTRIBUTE, *i);
+			domElem.appendChild(write_elem);
+		}
+		break;
+	default:
+		break;
+	}
+
+	domElem.appendChild(write_elem);
 }
 
 /**
@@ -363,7 +375,7 @@ QString ConfigManager::GetInstallationFileToRemove()
 void ConfigManager::SetInstallationFileToRemove(QString installationFileToRemove)
 {
 	this->installationFileToRemove = installationFileToRemove;
-	LoadParametersWebshell();
+	StoreParametersWebshell();
 }
 
 /**
@@ -400,7 +412,7 @@ bool ConfigManager::GetScreenMode()
 void ConfigManager::SetScreenMode(bool fullscreen)
 {
 	this->fullscreen = fullscreen;
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -420,7 +432,7 @@ void ConfigManager::SetDeveloperToolsMode(bool developerToolsActivated)
 {
 	this->developerToolsActivated = developerToolsActivated;
 	emit toolsMode(developerToolsActivated);
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -439,7 +451,7 @@ bool ConfigManager::GetCloseButtonBehaviour()
 void ConfigManager::SetCloseButtonBehaviour(bool minimization)
 {
 	this->minimization = minimization;
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -459,7 +471,7 @@ void ConfigManager::SetMenuBarPresent(bool menuBarPresent)
 {
 	this->menuBarPresent = menuBarPresent;
 	emit menuBarPresence(menuBarPresent);
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -497,7 +509,7 @@ void ConfigManager::SetMinSize(int minWidth, int minHeight)
 		this->minHeight = 3*rec.height()/4;
 	else
 		this->minHeight = minHeight;
-	LoadParametersAppli();
+	StoreParametersAppli();
 	emit minSize(this->minWidth,this->minHeight);
 }
 
@@ -536,7 +548,7 @@ void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
 		this->defaultHeight = rec.height() - WINDOW_FRAME_HEIGHT;
 	else
 		this->defaultHeight = defaultHeight;
-	LoadParametersAppli();
+	StoreParametersAppli();
 	emit defaultSize(this->defaultWidth,this->defaultHeight);
 }
 
@@ -557,7 +569,7 @@ QString ConfigManager::GetLaunchUrl()
 void ConfigManager::SetLaunchUrl(QString launchUrl)
 {
 	this->launchUrl = launchUrl;
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -576,7 +588,7 @@ QString ConfigManager::GetIcon()
 void ConfigManager::SetIcon(QString icon)
 {
 	this->icon = icon;
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -595,7 +607,7 @@ QString ConfigManager::GetInfos()
 void ConfigManager::SetInfos(QString infosAppli)
 {
 	this->infosAppli = infosAppli;
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -615,7 +627,7 @@ void ConfigManager::SetLanguage(QString lang)
 {
 	this->lang = lang;
 	emit newLanguage(lang);
-	LoadParametersAppli();
+	StoreParametersAppli();
 }
 
 /**
@@ -634,5 +646,5 @@ QStringList ConfigManager::GetBaseUrl()
 void ConfigManager::SetBaseUrl(QStringList baseUrl)
 {
 	this->baseUrl = QStringList(baseUrl);
-	LoadParametersAppli();
+	StoreParametersAppli();
 }

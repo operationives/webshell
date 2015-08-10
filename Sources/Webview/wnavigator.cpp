@@ -59,20 +59,20 @@ QString WNavigator::GetWebshellVersion()
  * @param bytesTotal	Nombre d'octets au total
  * @param id			Identifiant du FileDownloader
  */
-void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
+void WNavigator::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadProgress",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
+	if(m_webView->DispatchJsEvent("DownloadProgress",m_parameters->property("target").toString(),QStringList() << "typemime" << typemime << "bytesReceived" << QString::number(bytesReceived) << "bytesTotal" << QString::number(bytesTotal))){}
 }
 
 /**
  * @brief Stocke et exécute l'installeur téléchargé
  * @param id	Identifiant du FileDownloader
  */
-void WNavigator::FileDownloaded(const QString &mime_type)
+void WNavigator::FileDownloaded(const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadComplete",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadComplete",m_parameters->property("target").toString(),QStringList() << "typemime" << typemime)){}
 
-	currentTypeMime = mime_type;
+	currentTypeMime = typemime;
 	//Stockage des données téléchargées dans le fichier filename placé dans le répertoire filedirectory
 	QString filename = data->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -82,7 +82,7 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
-		qWarning() << "Fichier d'installation navigator impossible à ouvrir. Type mime: " << mime_type;
+		qWarning() << "Fichier d'installation navigator impossible à ouvrir. Type mime: " << typemime;
 		return;
 	}
 	file.write(data->DownloadedData());
@@ -108,7 +108,7 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 	}
 	else
 	{
-		if(m_webView->DispatchJsEvent("InstallError",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
+		if(m_webView->DispatchJsEvent("InstallError",m_parameters->property("target").toString(),QStringList() << "typemime" << typemime)){}
 	}
 
 	//Lancement du programme. Lorsqu'il finit, finishInstall est appelé
@@ -126,16 +126,16 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 
 	ConfigManager &config = ConfigManager::Instance();
 	config.SetInstallationFileToRemove(currentFileDirectory);
-	if(m_webView->DispatchJsEvent("NeedRestart",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("NeedRestart",m_parameters->property("target").toString(),QStringList() << "typemime" << typemime)){}
 }
 
 /**
  * @brief Signale l'application de l'échec du téléchargement
  * @param id	Identifiant du FileDownloader
  */
-void WNavigator::DownloadFailure(const QString &mime_type)
+void WNavigator::DownloadFailure(const QString &typemime)
 {
-	if(m_webView->DispatchJsEvent("DownloadFailure",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
+	if(m_webView->DispatchJsEvent("DownloadFailure",m_parameters->property("target").toString(),QStringList() << "typemime" << typemime)){}
 }
 
 /**

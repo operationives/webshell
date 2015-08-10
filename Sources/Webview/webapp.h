@@ -27,9 +27,9 @@ public:
 	Q_INVOKABLE void SetMinSize(int minWidth, int minHeight);
 	Q_INVOKABLE void SetDefaultSize(int defaultWidth, int defaultHeight);
 
-	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
-	void FileDownloaded(const QString &mime_type);
-	void DownloadFailure(const QString &mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime);
+	void FileDownloaded(const QString &typemime);
+	void DownloadFailure(const QString &typemime);
 
 
 signals:

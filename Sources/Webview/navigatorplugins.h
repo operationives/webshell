@@ -16,11 +16,11 @@ class NavigatorPlugins : public QObject, public DownloadProgressListener
 public:
 	NavigatorPlugins(MyWebView *view);
 	~NavigatorPlugins();
-	Q_INVOKABLE void UpdateSoftware(QString url, QString mime_type);
+	Q_INVOKABLE void UpdateSoftware(QString url, QString typemime);
 
-	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
-	void FileDownloaded(const QString &mime_type);
-	void DownloadFailure(const QString &mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime);
+	void FileDownloaded(const QString &typemime);
+	void DownloadFailure(const QString &typemime);
 
 public slots:
 	void finishInstall(int exitCode, QProcess::ExitStatus exitStatus);

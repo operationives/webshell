@@ -19,9 +19,9 @@ public:
 	Q_INVOKABLE void Close();
 	Q_INVOKABLE QString GetWebshellVersion();
 
-	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type);
-	void FileDownloaded(const QString &mime_type);
-	void DownloadFailure(const QString &mime_type);
+	void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime);
+	void FileDownloaded(const QString &typemime);
+	void DownloadFailure(const QString &typemime);
 
 signals:
 	void close();

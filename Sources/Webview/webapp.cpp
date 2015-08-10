@@ -27,20 +27,20 @@ WebApp::~WebApp()
  * @brief Méthode de progression de téléchargement, actuellement rien à faire pour un téléchargement si petit
  * @param bytesReceived	Nombre d'octets reçus
  * @param bytesTotal	Nombre d'octets total
- * @param mime_type		String non significatif
+ * @param typemime		String non significatif
  */
-void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
+void WebApp::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime)
 {
 	Q_UNUSED(bytesReceived);
 	Q_UNUSED(bytesTotal);
-	Q_UNUSED(mime_type);
+	Q_UNUSED(typemime);
 }
 
 /**
  * @brief Envoie un signal avec l'icône téléchargé
- * @param mime_type	String non significatif
+ * @param typemime	String non significatif
  */
-void WebApp::FileDownloaded(const QString &mime_type)
+void WebApp::FileDownloaded(const QString &typemime)
 {
 	QString filename = data->GetUrl();
 	filename =  filename.right(filename.length() - filename.lastIndexOf("/") - 1);
@@ -52,7 +52,7 @@ void WebApp::FileDownloaded(const QString &mime_type)
 
 	if(!file.open(QIODevice::WriteOnly))
 	{
-		qWarning() << "Fichier d'installation webapp impossible à ouvrir. Type mime: " << mime_type;
+		qWarning() << "Fichier d'installation webapp impossible à ouvrir. Type mime: " << typemime;
 		return;
 	}
 	file.write(data->DownloadedData());
@@ -65,11 +65,11 @@ void WebApp::FileDownloaded(const QString &mime_type)
 
 /**
  * @brief Méthode appelée lors de l'échec d'un téléchargement, envoie un message d'erreur dans la console
- * @param mime_type String non significatif
+ * @param typemime String non significatif
  */
-void WebApp::DownloadFailure(const QString &mime_type)
+void WebApp::DownloadFailure(const QString &typemime)
 {
-	qWarning() << "Erreur téléchargement icône " << mime_type;
+	qWarning() << "Erreur téléchargement icône " << typemime;
 }
 
 /**

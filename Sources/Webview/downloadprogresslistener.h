@@ -6,19 +6,19 @@
 class DownloadProgressListener
 {
 public:
-	virtual void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &mime_type)
+	virtual void DownloadProgress(qint64 bytesReceived, qint64 bytesTotal, const QString &typemime)
 	{
 		Q_UNUSED(bytesReceived);
 		Q_UNUSED(bytesTotal);
-		Q_UNUSED(mime_type);
+		Q_UNUSED(typemime);
 	}
-	virtual void FileDownloaded(const QString &mime_type)
+	virtual void FileDownloaded(const QString &typemime)
 	{
-		Q_UNUSED(mime_type);
+		Q_UNUSED(typemime);
 	}
-	virtual void DownloadFailure(const QString &mime_type)
+	virtual void DownloadFailure(const QString &typemime)
 	{
-		Q_UNUSED(mime_type);
+		Q_UNUSED(typemime);
 	}
 };
 Q_DECLARE_INTERFACE(DownloadProgressListener,"com.webshell.downloadprogresslistener")

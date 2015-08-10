@@ -1,8 +1,7 @@
 #ifndef CONFIGMANAGER_H
 #define CONFIGMANAGER_H
 
-#include <QObject>
-#include <QStringList>
+#include <QtXml>
 
 //On définit la taille des bordures de l'écran
 #ifdef Q_OS_WIN
@@ -95,8 +94,9 @@ private:
 
 	QString confFilePath;
 
-	void LoadParametersWebshell();
-	void LoadParametersAppli();
+	void StoreParametersWebshell();
+	void StoreParametersAppli();
+	void AppendNode(const QString &name, const QVariant &value, QDomElement &domElem);
 	void InitWebshellParameters();
 };
 
