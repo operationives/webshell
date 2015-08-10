@@ -1,0 +1,10 @@
+# On ignore les fichiers du dossier build à l'exception des fichiers html et gif
+/Build/*
+!/Build/Debug/*.html
+!/Build/Debug/*.gif
+!/Build/Release/*.html
+!/Build/Release/*.gif
+
+#On enregistre uniquement le fichier de configuration permettant d'utiliser doxygen
+/Documentation/*
+!/Documentation/Doxyfile
