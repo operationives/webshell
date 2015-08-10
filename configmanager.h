@@ -4,6 +4,16 @@
 #include <QObject>
 #include <QStringList>
 
+//On définit la taille des bordures de l'écran
+#ifdef Q_OS_WIN
+#define WINDOW_FRAME_HEIGHT 37
+#define WINDOW_FRAME_WIDTH 17
+#else
+//Confirmer la taille des bordures sous mac
+#define WINDOW_FRAME_HEIGHT 37
+#define WINDOW_FRAME_WIDTH 17
+#endif
+
 class ConfigManager : public QObject
 {
 	Q_OBJECT

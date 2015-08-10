@@ -38,8 +38,8 @@ private:
 	Informations *infos;
 	bool windowIconSpecified;
 	bool stayOpen;
-	bool launch;
 	void DisplayInfos();
+	void CenterScreen();
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
 

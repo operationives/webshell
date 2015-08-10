@@ -21,7 +21,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
 
 	stayOpen = true;
-	launch = false;
 	infos = new Informations();
 
 	//On initialise les actions des différents menus
@@ -90,6 +89,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
 	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
+	this->CenterScreen();
 	this->setWindowTitle("Chargement en cours");
 	if(config->GetScreenMode())
 		this->showFullScreen();
@@ -195,7 +195,7 @@ void MainWindow::changeScreenMode(bool fullscreen)
 		this->showNormal();
 		this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
 		this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
-		this->move(QApplication::desktop()->screen()->rect().center() - this->rect().center());
+		this->CenterScreen();
 	}
 	config->SetScreenMode(fullscreen);
 }
@@ -217,7 +217,10 @@ void MainWindow::changeToolsMode(bool toolsActivated)
 void MainWindow::changeMinSize(int minWidth, int minHeight)
 {
 	if(!this->isFullScreen())
+	{
 		this->setMinimumSize(minWidth,minHeight);
+		this->CenterScreen();
+	}
 }
 
 /**
@@ -228,7 +231,10 @@ void MainWindow::changeMinSize(int minWidth, int minHeight)
 void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 {
 	if(!this->isFullScreen())
+	{
 		this->resize(defaultWidth,defaultHeight);
+		this->CenterScreen();
+	}
 }
 
 /**
@@ -336,12 +342,8 @@ void MainWindow::changeIcon(const QIcon &icon)
  */
 void MainWindow::loadFinished()
 {
-	if(!launch)
-	{
 		disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
 		view->load(QUrl(config->GetLaunchUrl()));
-		launch = true;
-	}
 }
 
 /**
@@ -351,4 +353,16 @@ void MainWindow::DisplayInfos()
 {
 	infos->UpdateValues();
 	infos->show();
+}
+
+/**
+ * @brief Met la page principale au centre de l'écran
+ */
+void MainWindow::CenterScreen()
+{
+	QPoint center = this->rect().center();
+	//On recalibre le centre afin que les bordures soient présentes dans le cadre lorsque la taille est au maximum
+	center.setX(center.x() + WINDOW_FRAME_WIDTH/2);
+	center.setY(center.y() + WINDOW_FRAME_HEIGHT);
+	this->move(QApplication::desktop()->screen()->rect().center() - center);
 }

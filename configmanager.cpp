@@ -4,16 +4,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-//On définit la taille des bordures de l'écran
-#ifdef Q_OS_WIN
-#define WINDOW_FRAME_HEIGHT 37
-#define WINDOW_FRAME_WIDTH 17
-#else
-//Confirmer la taille des bordures sous mac
-#define WINDOW_FRAME_HEIGHT 37
-#define WINDOW_FRAME_WIDTH 17
-#endif
-
 /**
  * @brief Initialise les informations du webshell et de l'application à partir de l'URL de démarrage de l'application
  * @param launchUrl  URL de lancement de l'application
