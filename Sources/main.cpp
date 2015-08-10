@@ -4,7 +4,7 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include "mainwindow.h"
+#include "Widgets/mainwindow.h"
 #include "global.h"
 
 /** @mainpage Webshell

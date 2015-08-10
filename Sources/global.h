@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "configmanager.h"
+#include "Outils/configmanager.h"
 
 extern ConfigManager *config;
 

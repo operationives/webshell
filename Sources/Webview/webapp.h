@@ -1,7 +1,7 @@
 #ifndef WEBAPP_H
 #define WEBAPP_H
 
-#include "filedownloader.h"
+#include "Outils/filedownloader.h"
 #include "downloadprogresslistener.h"
 #include "mywebview.h"
 

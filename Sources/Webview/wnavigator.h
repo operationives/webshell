@@ -1,7 +1,7 @@
 #ifndef WNAVIGATOR_H
 #define WNAVIGATOR_H
 
-#include "filedownloader.h"
+#include "Outils/filedownloader.h"
 #include "downloadprogresslistener.h"
 #include "mywebview.h"
 #include "webshellparameters.h"

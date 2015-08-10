@@ -1,8 +1,8 @@
 #include "mainwindow.h"
-#include "wnavigator.h"
+#include "Webview/wnavigator.h"
 #include "global.h"
 #ifdef Q_OS_WIN
-#include "mailsender.h"
+#include "Windows/mailsender.h"
 #endif
 
 /**

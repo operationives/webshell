@@ -6,7 +6,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include "downloadprogresslistener.h"
+#include "Webview/downloadprogresslistener.h"
  
 class FileDownloader : public QObject
 {

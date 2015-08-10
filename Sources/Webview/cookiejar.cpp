@@ -33,7 +33,7 @@
 
 #include "cookiejar.h"
 
-#include "autosaver.h"
+#include "Outils/autosaver.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>

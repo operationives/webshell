@@ -6,7 +6,7 @@
 #include <QtWebKitWidgets>
 #include <QtNetwork>
 #include "parametres.h"
-#include "mywebview.h"
+#include "Webview/mywebview.h"
 #include "informations.h"
 
 class MainWindow : public QMainWindow

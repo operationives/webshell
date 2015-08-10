@@ -1,9 +1,9 @@
 #ifndef NavigatorPlugins_H
 #define NavigatorPlugins_H
 
-#include "filedownloader.h"
+#include "Outils/filedownloader.h"
 #include "downloadprogresslistener.h"
-#include "semaphore.h"
+#include "Outils/semaphore.h"
 #include "mywebview.h"
 
 class NavigatorPlugins : public QObject, public DownloadProgressListener
