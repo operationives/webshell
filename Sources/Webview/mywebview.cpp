@@ -3,7 +3,7 @@
 #include "wnavigator.h"
 #include "navigatorplugins.h"
 #include "webapp.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /**
  * @brief Constructeur de notre webview et des objets à intégrer dans l'application
@@ -34,7 +34,8 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(this,SIGNAL(linkClicked(QUrl)),this,SLOT(handleRedirect(QUrl)));
 
 	//Si il est défini, on affecte l'icône présent dans le fichier xml à la page principale
-	QString icon = config->GetIcon();
+	ConfigManager &config = ConfigManager::Instance();
+	QString icon = config.GetIcon();
 	if(!icon.isEmpty())
 		wapp->setProperty("icon",icon);
 
@@ -50,9 +51,9 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateConnectivity()));
 	timer->start(5000);
 
-	if(!wapp->IsPageInApplication(config->GetLaunchUrl()))
+	if(!wapp->IsPageInApplication(config.GetLaunchUrl()))
 	{
-		QStringList baseUrl = QStringList() << config->GetLaunchUrl() << config->GetBaseUrl();
+		QStringList baseUrl = QStringList() << config.GetLaunchUrl() << config.GetBaseUrl();
 		wapp->setProperty("baseUrl",baseUrl);
 	}
 }
@@ -108,7 +109,8 @@ void MyWebView::updateConnectivity()
 {
 	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible && !connectionLost)
 	{
-		config->SetSavedAdress(this->url().toString());
+		ConfigManager &config = ConfigManager::Instance();
+		config.SetSavedAdress(this->url().toString());
 		LoadInternalPage("disconnected");
 		connectionLost = true;
 	}
@@ -120,11 +122,12 @@ void MyWebView::updateConnectivity()
 		loop.exec();
 
 		disconnect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
-		QString savedAdress(config->GetSavedAdress());
+		ConfigManager &config = ConfigManager::Instance();
+		QString savedAdress(config.GetSavedAdress());
 		if(savedAdress.isEmpty())
 			return;
 		this->load(savedAdress);
-		config->SetSavedAdress("");
+		config.SetSavedAdress("");
 		connectionLost = false;
 	}
 }
@@ -171,8 +174,9 @@ bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarg
  */
 void MyWebView::LoadInternalPage(QString page)
 {
-	if(QFile::exists(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config->GetLanguage()+".html")))
-		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config->GetLanguage()+".html")));
+	ConfigManager &config = ConfigManager::Instance();
+	if(QFile::exists(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")))
+		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
 	else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
 }

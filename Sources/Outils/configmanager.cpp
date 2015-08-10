@@ -4,14 +4,75 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+//Création de l'instance de ConfigManager
+ConfigManager ConfigManager::m_instance=ConfigManager();
+
+ConfigManager& ConfigManager::Instance()
+{
+	return m_instance;
+}
+
+
 /**
- * @brief Initialise les informations du webshell et de l'application à partir de l'URL de démarrage de l'application
- * @param launchUrl  URL de lancement de l'application
+ * @brief Construit le gestionnaire de configuration.\n
+ * Il ne sera correctement initialisé que lorsque la méthode InitApplicationParameters sera appelée.
  */
-ConfigManager::ConfigManager(QString launchUrl)
+ConfigManager::ConfigManager()
 {
 	this->InitWebshellParameters();
+}
 
+/**
+ * @brief Met à jour le fichier xml du webshell avec son numéro de version
+ */
+void ConfigManager::InitWebshellParameters()
+{
+	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
+	installationFileToRemove = "";
+	//L'adresse sauvegardée correspond à l'adresse de la page en cours lors d'une perte de connexion
+	//Elle n'a d'intérêt que lors de la session courante, il n'y a donc pas besoin de la stocker dans le fichier xml
+	savedAdress= "";
+
+	QDomDocument dom("webshell_xml");
+	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
+	if(!file.exists())
+	{
+		LoadParametersWebshell();
+	}
+	else
+	{
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			qWarning() << "Open webshell conf File: constructor error";
+			return;
+		}
+		if (!dom.setContent(&file))
+		{
+			qWarning() << "setContent webshell conf File: constructor error";
+			file.close();
+			return;
+		}
+
+		file.close();
+		QDomElement docElem = dom.documentElement();
+		QDomNode n = docElem.firstChild();
+		while(!n.isNull())
+		{
+			QDomElement e = n.toElement();
+			if(e.attribute("name") == "installationFileToRemove")
+				installationFileToRemove = e.attribute("value");
+
+			n = n.nextSibling();
+		}
+	}
+}
+
+/**
+ * @brief Initialise les informations de l'application à partir de l'URL de démarrage de l'application
+ * @param launchUrl  URL de lancement de l'application
+ */
+void ConfigManager::InitApplicationParameters(QString launchUrl)
+{
 	QString appName(launchUrl);
 	if(appName.startsWith("http"))
 	{
@@ -135,56 +196,6 @@ ConfigManager::ConfigManager(QString launchUrl)
 		}
 		if(toLoad)
 			LoadParametersAppli();
-	}
-}
-
-ConfigManager::~ConfigManager()
-{
-
-}
-
-/**
- * @brief Met à jour le fichier xml du webshell avec son numéro de version
- */
-void ConfigManager::InitWebshellParameters()
-{
-	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
-	installationFileToRemove = "";
-	//L'adresse sauvegardée correspond à l'adresse de la page en cours lors d'une perte de connexion
-	//Elle n'a d'intérêt que lors de la session courante, il n'y a donc pas besoin de la stocker dans le fichier xml
-	savedAdress= "";
-
-	QDomDocument dom("webshell_xml");
-	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/webshell.xml");
-	if(!file.exists())
-	{
-		LoadParametersWebshell();
-	}
-	else
-	{
-		if (!file.open(QIODevice::ReadOnly))
-		{
-			qWarning() << "Open webshell conf File: constructor error";
-			return;
-		}
-		if (!dom.setContent(&file))
-		{
-			qWarning() << "setContent webshell conf File: constructor error";
-			file.close();
-			return;
-		}
-
-		file.close();
-		QDomElement docElem = dom.documentElement();
-		QDomNode n = docElem.firstChild();
-		while(!n.isNull())
-		{
-			QDomElement e = n.toElement();
-			if(e.attribute("name") == "installationFileToRemove")
-				installationFileToRemove = e.attribute("value");
-
-			n = n.nextSibling();
-		}
 	}
 }
 

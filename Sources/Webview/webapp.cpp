@@ -1,7 +1,7 @@
 #include <QApplication>
 #include "webapp.h"
 #include "Outils/filedownloader.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 
 /**
@@ -74,11 +74,12 @@ void WebApp::DownloadFailure(const QString &mime_type)
 
 /**
  * @brief Accesseur de l'icône
- * @return config->GetIcon()
+ * @return config.GetIcon()
  */
 QString WebApp::Icon() const
 {
-	return config->GetIcon();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetIcon();
 }
 
 /**
@@ -87,17 +88,19 @@ QString WebApp::Icon() const
  */
 void WebApp::SetIcon(const QString &icon)
 {
-	config->SetIcon(icon);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetIcon(icon);
 	data = new FileDownloader(icon,qobject_cast<DownloadProgressListener *>(this),"");
 }
 
 /**
  * @brief Accesseur des informations
- * @return config->GetInfos()
+ * @return config.GetInfos()
  */
 QString WebApp::Infos() const
 {
-	return config->GetInfos();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetInfos();
 }
 
 /**
@@ -106,7 +109,8 @@ QString WebApp::Infos() const
  */
 void WebApp::SetInfos(const QString &infos)
 {
-	config->SetInfos(infos);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetInfos(infos);
 }
 
 /**
@@ -115,7 +119,8 @@ void WebApp::SetInfos(const QString &infos)
  */
 QStringList WebApp::GetBaseUrl() const
 {
-	return config->GetBaseUrl();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetBaseUrl();
 }
 
 /**
@@ -124,8 +129,9 @@ QStringList WebApp::GetBaseUrl() const
  */
 void WebApp::SetBaseUrl(const QStringList &value)
 {
+	ConfigManager &config = ConfigManager::Instance();
 	QStringList newBaseUrl = value;
-	config->SetBaseUrl(newBaseUrl);
+	config.SetBaseUrl(newBaseUrl);
 }
 
 /**
@@ -134,9 +140,10 @@ void WebApp::SetBaseUrl(const QStringList &value)
  */
 bool WebApp::IsPageInApplication()
 {
+	ConfigManager &config = ConfigManager::Instance();
 	QString urls = m_webView->url().toString();
 	QStringList::iterator i;
-	QStringList baseUrl = config->GetBaseUrl();
+	QStringList baseUrl = config.GetBaseUrl();
 	bool res = false;
 	for (i = baseUrl.begin(); i != baseUrl.end(); ++i)
 	{
@@ -156,9 +163,10 @@ bool WebApp::IsPageInApplication()
  */
 bool WebApp::IsPageInApplication(QUrl url)
 {
+	ConfigManager &config = ConfigManager::Instance();
 	QString urls = url.toString();
 	QStringList::iterator i;
-	QStringList baseUrl = config->GetBaseUrl();
+	QStringList baseUrl = config.GetBaseUrl();
 	bool res = false;
 	for (i = baseUrl.begin(); i != baseUrl.end(); ++i)
 	{
@@ -192,20 +200,22 @@ void WebApp::SetTarget(const QString &target)
 
 /**
  * @brief Renvoie la largeur minimale de la fenêtre
- * @return config->GetMinWidth()
+ * @return config.GetMinWidth()
  */
 int WebApp::GetMinWidth()
 {
-	return config->GetMinWidth();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetMinWidth();
 }
 
 /**
  * @brief Renvoie la hauteur minimale de la fenêtre
- * @return config->GetMinHeight()
+ * @return config.GetMinHeight()
  */
 int WebApp::GetMinHeight()
 {
-	return config->GetMinHeight();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetMinHeight();
 }
 
 /**
@@ -215,25 +225,28 @@ int WebApp::GetMinHeight()
  */
 void WebApp::SetMinSize(int minWidth, int minHeight)
 {
-	config->SetMinSize(minWidth,minHeight);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetMinSize(minWidth,minHeight);
 }
 
 /**
  * @brief Retourne la largeur par défaut de la fenêtre
- * @return config->GetDefaultWidth()
+ * @return config.GetDefaultWidth()
  */
 int WebApp::GetDefaultWidth()
 {
-	return config->GetDefaultWidth();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetDefaultWidth();
 }
 
 /**
  * @brief Retourne la hauteur par défaut de la fenêtre
- * @return config->GetDefaultHeight()
+ * @return config.GetDefaultHeight()
  */
 int WebApp::GetDefaultHeight()
 {
-	return config->GetDefaultHeight();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetDefaultHeight();
 }
 
 /**
@@ -243,5 +256,6 @@ int WebApp::GetDefaultHeight()
  */
 void WebApp::SetDefaultSize(int defaultWidth, int defaultHeight)
 {
-	config->SetDefaultSize(defaultWidth,defaultHeight);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetDefaultSize(defaultWidth,defaultHeight);
 }

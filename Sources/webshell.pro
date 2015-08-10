@@ -7,8 +7,7 @@ CONFIG += warn_off
 
 QMAKE_CXXFLAGS_WARN_OFF += -Wunused-parameter
 
-HEADERS =	global.h \
-		Outils/autosaver.h \
+HEADERS =	Outils/autosaver.h \
 		Outils/configmanager.h \
 		Outils/filedownloader.h \
 		Outils/semaphore.h \
@@ -29,7 +28,6 @@ win32 {
 }
 
 SOURCES =	main.cpp \
-		global.cpp \
 		Outils/autosaver.cpp \
 		Outils/configmanager.cpp \
 		Outils/filedownloader.cpp \

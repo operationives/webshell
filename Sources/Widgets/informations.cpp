@@ -1,5 +1,5 @@
 #include "informations.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /**
  * @brief Construit la fenêtre utilisée pour afficher le numéro de version du webshell et les informations liées à l'application
@@ -40,12 +40,13 @@ Informations::~Informations()
  */
 void Informations::UpdateValues()
 {
+	ConfigManager &config = ConfigManager::Instance();
 	version = qApp->applicationVersion();
-	infosAppli = config->GetInfos();
+	infosAppli = config.GetInfos();
 	QString webshellText;
 	QString appText;
 	QString disconnectedText;
-	if(config->GetLanguage() == "fr")
+	if(config.GetLanguage() == "fr")
 	{
 		webshellText = "Version du webshell:\n";
 		appText = "\nInformations complémentaires:\n";

@@ -5,7 +5,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include "Widgets/mainwindow.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /** @mainpage Webshell
  *
@@ -109,12 +109,13 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	config = new ConfigManager(launch);
+	ConfigManager &config = ConfigManager::Instance();
+	config.InitApplicationParameters(launch);
 
-	if(!config->GetInstallationFileToRemove().isEmpty())
+	if(!config.GetInstallationFileToRemove().isEmpty())
 	{
-		QFile::remove(config->GetInstallationFileToRemove());
-		config->SetInstallationFileToRemove("");
+		QFile::remove(config.GetInstallationFileToRemove());
+		config.SetInstallationFileToRemove("");
 	}
 
 	//Si l'icône est spécifié on lance la mainWindow avec le bon icône, sinon on le lance tel quel

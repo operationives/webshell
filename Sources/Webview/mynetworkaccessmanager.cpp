@@ -1,5 +1,5 @@
 #include "mynetworkaccessmanager.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 #include <QNetworkReply>
 #include <QStandardPaths>
 
@@ -32,7 +32,8 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
 	if(this->networkAccessible() == QNetworkAccessManager::NotAccessible)
 		request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
 	//Avec ce header, on peut si il n'y a pas de cookie défini pour la langue accéder à une langue spécifique pour la page demandée
-	request.setRawHeader("Accept-Language", config->GetLanguage().toLatin1());
+	ConfigManager &config = ConfigManager::Instance();
+	request.setRawHeader("Accept-Language", config.GetLanguage().toLatin1());
 	return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
@@ -58,6 +59,7 @@ void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
 		int index = langue.indexOf("langue=");
 		langue.replace(0,index+7,"");
 		langue.truncate(2);
-		config->SetLanguage(langue);
+		ConfigManager &config = ConfigManager::Instance();
+		config.SetLanguage(langue);
 	}
 }

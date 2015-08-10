@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "Webview/wnavigator.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 #ifdef Q_OS_WIN
 #include "Windows/mailsender.h"
 #endif
@@ -15,10 +15,11 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 {
 	QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-	connect(config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
-	connect(config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
-	connect(config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
-	connect(config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
+	ConfigManager &config = ConfigManager::Instance();
+	connect(&config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
+	connect(&config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
+	connect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
+	connect(&config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
 
 	stayOpen = true;
 	infos = new Informations();
@@ -43,7 +44,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config->GetDeveloperToolsMode());
+	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config.GetDeveloperToolsMode());
 
 	connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 	QMenu *trayIconMenu = new QMenu(this);
@@ -56,10 +57,10 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
 	fileMenu->addAction(quitAction);
 	fileMenu->addAction(clearCookiesAction);
-	menuBar()->setVisible(config->GetMenuBarPresent());
-	connect(config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
+	menuBar()->setVisible(config.GetMenuBarPresent());
+	connect(&config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
 
-	changeActionNames(config->GetLanguage());
+	changeActionNames(config.GetLanguage());
 
 	view = new MyWebView(this);
 
@@ -87,11 +88,11 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect (clearCookiesAction, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
 	view->LoadInternalPage("loader");
 
-	this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
-	this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
+	this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
+	this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
 	this->CenterScreen();
 	this->setWindowTitle("Chargement en cours");
-	if(config->GetScreenMode())
+	if(config.GetScreenMode())
 		this->showFullScreen();
 
 	setCentralWidget(view);
@@ -186,6 +187,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
  */
 void MainWindow::changeScreenMode(bool fullscreen)
 {
+	ConfigManager &config = ConfigManager::Instance();
 	if(fullscreen)
 	{
 		this->showFullScreen();
@@ -193,11 +195,11 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	else
 	{
 		this->showNormal();
-		this->setMinimumSize(config->GetMinWidth(),config->GetMinHeight());
-		this->resize(config->GetDefaultWidth(),config->GetDefaultHeight());
+		this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
+		this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
 		this->CenterScreen();
 	}
-	config->SetScreenMode(fullscreen);
+	config.SetScreenMode(fullscreen);
 }
 
 /**
@@ -300,7 +302,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
  */
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-	if (config->GetCloseButtonBehaviour() && stayOpen)
+	ConfigManager &config = ConfigManager::Instance();
+	if (config.GetCloseButtonBehaviour() && stayOpen)
 	{
 		event->ignore();
 		this->setWindowState(Qt::WindowMinimized);
@@ -342,8 +345,9 @@ void MainWindow::changeIcon(const QIcon &icon)
  */
 void MainWindow::loadFinished()
 {
-		disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
-		view->load(QUrl(config->GetLaunchUrl()));
+	ConfigManager &config = ConfigManager::Instance();
+	disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+	view->load(QUrl(config.GetLaunchUrl()));
 }
 
 /**

@@ -1,5 +1,5 @@
 #include "webshellparameters.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /**
  * @brief Crée l'objet WebshellParameters
@@ -12,11 +12,12 @@ WebshellParameters::WebshellParameters()
 
 /**
  * @brief Indique si les outils développeur sont activés ou non
- * @return config->GetDeveloperToolsMode()
+ * @return config.GetDeveloperToolsMode()
  */
 bool WebshellParameters::DeveloperToolsActivated() const
 {
-	return config->GetDeveloperToolsMode();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetDeveloperToolsMode();
 }
 
 /**
@@ -25,16 +26,18 @@ bool WebshellParameters::DeveloperToolsActivated() const
  */
 void WebshellParameters::SetDeveloperToolsActivated(bool developerToolsActivated)
 {
-	config->SetDeveloperToolsMode(developerToolsActivated);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetDeveloperToolsMode(developerToolsActivated);
 }
 
 /**
  * @brief Indique si le fait de cliquer sur la croix rouge minimise la fenêtre ou la ferme
- * @return config->GetCloseButtonBehaviour()
+ * @return config.GetCloseButtonBehaviour()
  */
 bool WebshellParameters::Minimization() const
 {
-	return config->GetCloseButtonBehaviour();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetCloseButtonBehaviour();
 }
 
 /**
@@ -43,16 +46,18 @@ bool WebshellParameters::Minimization() const
  */
 void WebshellParameters::SetMinimization(bool minimization)
 {
-	config->SetCloseButtonBehaviour(minimization);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetCloseButtonBehaviour(minimization);
 }
 
 /**
  * @brief Indique si la barre de menu est présente
- * @return config->GetCloseButtonBehaviour()
+ * @return config.GetCloseButtonBehaviour()
  */
 bool WebshellParameters::MenuBarPresent() const
 {
-	return config->GetMenuBarPresent();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetMenuBarPresent();
 }
 
 /**
@@ -61,7 +66,8 @@ bool WebshellParameters::MenuBarPresent() const
  */
 void WebshellParameters::SetMenuBarPresent(bool menuBarPresent)
 {
-	config->SetMenuBarPresent(menuBarPresent);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetMenuBarPresent(menuBarPresent);
 }
 
 /**
@@ -84,11 +90,12 @@ void WebshellParameters::SetTarget(const QString &target)
 
 /**
  * @brief Retourne la langue de l'application
- * @return config->GetLanguage()
+ * @return config.GetLanguage()
  */
 QString WebshellParameters::Lang() const
 {
-	return config->GetLanguage();
+	ConfigManager &config = ConfigManager::Instance();
+	return config.GetLanguage();
 }
 
 /**
@@ -97,5 +104,6 @@ QString WebshellParameters::Lang() const
  */
 void WebshellParameters::SetLang(const QString &lang)
 {
-	config->SetLanguage(lang);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetLanguage(lang);
 }

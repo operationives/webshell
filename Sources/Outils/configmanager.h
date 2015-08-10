@@ -19,8 +19,8 @@ class ConfigManager : public QObject
 	Q_OBJECT
 
 public:
-	ConfigManager(QString launchUrl);
-	~ConfigManager();
+	static ConfigManager& Instance();
+	void InitApplicationParameters(QString launchUrl);
 
 	//Getters pour attributs webshell
 	QString GetInstallationFileToRemove();
@@ -67,6 +67,13 @@ signals:
 	void newLanguage(QString lang);
 
 private:
+	ConfigManager& operator= (const ConfigManager&){}
+	ConfigManager (const ConfigManager&){}
+
+	static ConfigManager m_instance;
+	ConfigManager();
+	~ConfigManager(){}
+
 	//Attributs webshell
 	QString installationFileToRemove;
 	QString savedAdress;

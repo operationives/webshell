@@ -2,7 +2,7 @@
 #include <QProcess>
 #include <QApplication>
 #include "wnavigator.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /**
  * @brief Constructeur de l'objet WNavigator
@@ -124,7 +124,8 @@ void WNavigator::FileDownloaded(const QString &mime_type)
 		myProcess->start(program);
 	}
 
-	config->SetInstallationFileToRemove(currentFileDirectory);
+	ConfigManager &config = ConfigManager::Instance();
+	config.SetInstallationFileToRemove(currentFileDirectory);
 	if(m_webView->DispatchJsEvent("NeedRestart",m_parameters->property("target").toString(),QStringList() << "typemime" << mime_type)){}
 }
 

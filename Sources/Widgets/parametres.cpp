@@ -1,5 +1,5 @@
 #include "parametres.h"
-#include "global.h"
+#include "Outils/configmanager.h"
 
 /**
  * @brief Fenêtre de paramètres
@@ -14,8 +14,9 @@ Parametres::Parametres(QWidget *parent)
 	this->setWindowIcon(QIcon(QApplication::applicationDirPath()+"/djanah.png"));
 
 	tabWidget = new QTabWidget;
-	Tab *closeOption = new Tab("Action du bouton de fermeture","Minimisation","Fermeture",config->GetCloseButtonBehaviour());
-	Tab *tools = new Tab("Outils de développement","Activés","Désactivés",config->GetDeveloperToolsMode());
+	ConfigManager &config = ConfigManager::Instance();
+	Tab *closeOption = new Tab("Action du bouton de fermeture","Minimisation","Fermeture",config.GetCloseButtonBehaviour());
+	Tab *tools = new Tab("Outils de développement","Activés","Désactivés",config.GetDeveloperToolsMode());
 	tabWidget->addTab(closeOption, tr("Fermeture"));
 	tabWidget->addTab(tools, tr("Outils"));
 
