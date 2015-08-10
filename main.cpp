@@ -7,6 +7,17 @@
 #include "mainwindow.h"
 #include "global.h"
 
+/** @mainpage Webshell
+ *
+ * Le webshell est un logiciel permettant d'ouvrir des applications web HTML5 de façon à ce qu'elles réagissent de la même manière que si elles étaient dans un navigateur web supportant les NPAPI Plugins. Le webshell contenant une application spécifique peut s'exécuter de manière similaire à une application de bureau standard.
+ *
+ * Le webshell pourra communiquer avec ces applications à l'aide d'une API JavaScript dédiée. Cela permet d'offrir plus de possibilités pour le développement de l'application ouverte par le webshell.
+ * Le webshell disposera par ailleurs de plusieurs outils natifs indépendants de l'application utilisée.
+ *
+ * Le but de ce projet est de proposer un support aux applications web HTML5 ayant des fonctionnalités plus adaptées qu'un navigateur standard. Cela permettra ainsi de proposer un support sous la forme d'une application bureau, plus accueillante que les étapes à effectuer à travers le navigateur pour accéder aux services de l'application.
+ */
+
+
 //A faire: gestion de la taille maximale du fichier .log
 /**
  * @brief Gestion des sorties consoles à placer dans les logs

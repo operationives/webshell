@@ -2,7 +2,9 @@
 
 /**
  * @brief Constructeur permettant d'initialiser le téléchargement
- * @param Url Lien à télécharger
+ * @param url		Adresse du téléchargement
+ * @param listener	Objet à signaler pour les avancements du téléchargement
+ * @param mime_type	Identifiant du téléchargement
  */
 FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *listener, const QString &mime_type)
 {
@@ -18,6 +20,9 @@ FileDownloader::FileDownloader(const QString &url, DownloadProgressListener *lis
 	connect(download, SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(downloadFailure(QNetworkReply::NetworkError)));
 }
 
+/**
+ * @brief Si le téléchargement est en cours, on le quitte
+ */
 FileDownloader::~FileDownloader()
 {
 	if(download->isRunning())

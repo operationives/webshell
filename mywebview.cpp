@@ -41,6 +41,8 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	m_WebCtrl = new MyNetworkAccessManager();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
 
+	connectionLost = false;
+
 	connect(parent,SIGNAL(clearCookies()),m_WebCtrl,SLOT(clearCookies()));
 
 	//On fait un test de connexion régulièrement sachant que le signal de perte de connexion n'est parfois pas émis
@@ -104,21 +106,17 @@ void MyWebView::updateJavaScriptObjects()
  */
 void MyWebView::updateConnectivity()
 {
-	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible)
+	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible && !connectionLost)
 	{
 		config->SetSavedAdress(this->url().toString());
-		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/disconnected-"+config->GetLanguage()+".html")));
-
+		LoadInternalPage("disconnected");
+		connectionLost = true;
+	}
+	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::Accessible && connectionLost)
+	{
 		QEventLoop loop;
-		//On attend que le réseau soit de retour
-		while ((m_WebCtrl->networkAccessible()!=QNetworkAccessManager::Accessible))
-		{
-			QTimer::singleShot(5000, &loop, SLOT(quit()));
-			loop.exec();
-		}
-
 		connect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
-		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/loader-"+config->GetLanguage()+".html")));
+		LoadInternalPage("loader");
 		loop.exec();
 
 		disconnect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
@@ -127,7 +125,7 @@ void MyWebView::updateConnectivity()
 			return;
 		this->load(savedAdress);
 		config->SetSavedAdress("");
-
+		connectionLost = false;
 	}
 }
 
@@ -165,4 +163,16 @@ bool MyWebView::DispatchJsEvent(const QString & evtType, const QString & evtTarg
 	code.append(evtTarget+".dispatchEvent(webshellEvent);");
 	this->page()->mainFrame()->evaluateJavaScript(code);
 	return true;
+}
+
+/**
+ * @brief Charge une page interne dans la langue par défaut si c'est possible, en anglais sinon
+ * @param page	Type de page à charger ("loader","disconnected")
+ */
+void MyWebView::LoadInternalPage(QString page)
+{
+	if(QFile::exists(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config->GetLanguage()+".html")))
+		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config->GetLanguage()+".html")));
+	else
+		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
 }

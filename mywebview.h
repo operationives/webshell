@@ -19,6 +19,7 @@ public:
 	MyWebView(QWidget *parent = 0);
 	~MyWebView();
 	bool DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues = QStringList());
+	void LoadInternalPage(QString page);
 
 signals:
 	void changeIcon(const QIcon &icon);
@@ -32,6 +33,7 @@ private:
 	NavigatorPlugins *navigatorplugins;
 	WebApp *wapp;
 	WebshellParameters *webshellParameters;
+	bool connectionLost;
 
 
 private slots:
