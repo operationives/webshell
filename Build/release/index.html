@@ -1,0 +1,72 @@
+<html>
+	<title>Ma page html</title>
+	<meta charset="utf-8" />
+    <body>
+        <div id="download"></div>
+		<a href="file:///C:/Users/phvdev64/Documents/Webshell/Build/release/index2.html">index2</a>
+		<a href="https://www.google.fr/">LIEN EXTERNE</a>
+		<button onclick="myclose()">Close</button>
+		<script type='text/javascript'>
+			var str = "Bonjour";
+			
+			function update(e){
+				str = "Chargement: ";
+				str += e.bytesReceived;
+				str += "/";
+				str += e.bytesTotal;
+				str += " TypeMime: ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function install_fail(e){
+				str = "Installation échouée pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function install_success(e){
+				str = "Installation réussie pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function download_done(e){
+				str = "Téléchargement effectué pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function download_fail(e){
+				str = "Téléchargement échoué pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function maj_webshell(){
+				document.getElementById('download').innerHTML = "La webshell est mise à jour et doit donc redémarrer. Merci de relancer l'application une fois l'installation terminée.";
+				//navigator.Close();
+			}
+			function myclose(){
+				navigator.Close();
+			}
+		</script>
+        <script type="text/javascript">
+			document.getElementById('download').innerHTML = str;
+			wnavigator.InitWebshellAPI();
+			window.addEventListener('DownloadProgress',update,false);
+			window.addEventListener('DownloadComplete',download_done,false);
+			window.addEventListener('DownloadFailure',download_fail,false);
+			window.addEventListener('InstallError',install_fail,false);
+			window.addEventListener('InstallSuccess',install_success,false);
+			window.addEventListener('NeedRestart',maj_webshell,false);
+			navigator.webshellParameters.developerToolsActivated = true;
+			navigator.webshellParameters.minimization = false;
+			navigator.webshellParameters.menuBarPresent = true;
+			webapp.icon = "http://a4.mzstatic.com/eu/r30/Purple7/v4/88/89/77/88897797-6434-d784-9c1e-6e9208723fa9/icon75x75.png";
+			webapp.infos = "Version plugin à mettre par le service";
+			webapp.SetDefaultSize(9999,9999);
+			webapp.SetMinSize(9999,9999);
+			//Le choix d'url dans baseUrl devra intégrer des adresses pertinentes
+			webapp.baseUrl = ["http://djanah.dev.ives.fr/","file:///C:/Users/phvdev64/Documents/build-webshell/release/index.html","file:///C:/Users/phvdev64/Documents/build-webshell/release/index2.html"];
+			//navigator.UpdateSoftware("http://download.dev.ives.fr/eConf/3.3.28/LiveVideoPlugin.msi");
+			//navigatorplugins.UpdateSoftware("http://wpkg.org/files/client/stable/WPKG%20Client%201.3.14-x64.msi","mimetype2");
+			//navigatorplugins.UpdateSoftware("http://files.jrsoftware.org/is/5/isetup-5.5.5.exe","mimetype3");
+        </script>
+    </body>
+</html>

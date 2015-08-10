@@ -1,7 +1,11 @@
 # On ignore les fichiers du dossier build à l'exception des fichiers html et gif
 /Build/*
+!/Build/Debug
+!/Build/Release
+/Build/Debug/*
 !/Build/Debug/*.html
 !/Build/Debug/*.gif
+/Build/Release/*
 !/Build/Release/*.html
 !/Build/Release/*.gif
 

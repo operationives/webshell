@@ -1,0 +1,66 @@
+<html>
+	<title>Ma page html</title>
+	<meta charset="utf-8" />
+    <body onload="load();">
+        <div id="download"></div>
+		<a href="file:///C:/Users/phvdev64/Documents/Webshell/Build/release/index.html">index</a>
+		<a href="https://www.google.fr/">LIEN EXTERNE</a>
+		<script type="text/javascript">
+			var str = "Bonjour";
+			
+			function update(e){
+				str = "Chargement: ";
+				str += e.bytesReceived;
+				str += "/";
+				str += e.bytesTotal;
+				str += " TypeMime: ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function install_fail(e){
+				str = "Installation échouée pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function install_success(e){
+				str = "Installation réussie pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function download_done(e){
+				str = "Téléchargement effectué pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function download_fail(e){
+				str = "Téléchargement échoué pour ";
+				str += e.typemime;
+				document.getElementById('download').innerHTML = str;
+			}
+			function maj_webshell(){
+				document.getElementById('download').innerHTML = "La webshell est mise à jour et doit donc redémarrer. Merci de relancer l'application une fois l'installation terminée.";
+			}
+		</script>
+        <script type="text/javascript">
+			document.getElementById('download').innerHTML = str;
+			wnavigator.InitWebshellAPI();
+			window.addEventListener('DownloadProgress',update,false);
+			window.addEventListener('DownloadComplete',download_done,false);
+			window.addEventListener('DownloadFailure',download_fail,false);
+			window.addEventListener('InstallError',install_fail,false);
+			window.addEventListener('InstallSuccess',install_success,false);
+			window.addEventListener('Needrestart',maj_webshell,false);
+			navigator.webshellParameters.developerToolsActivated = true;
+			navigator.webshellParameters.minimization = false;
+			webapp.icon = "http://img2.wikia.nocookie.net/__cb20110725041802/logopedia/images/8/89/Logo_rolling_stones.png";
+			webapp.infos = "Version plugin à mettre par le service";
+			webapp.SetDefaultSize(99999,99999);
+			webapp.SetMinSize(99999,99999);
+			//Le choix d'url dans baseUrl devra intégrer des adresses pertinentes
+			webapp.baseUrl = ["http://djanah.dev.ives.fr/","file:///C:/Users/phvdev64/Documents/build-webshell/release/index.html","file:///C:/Users/phvdev64/Documents/build-webshell/release/index2.html"];
+			//navigator.UpdateSoftware("http://wpkg.org/files/client/stable/WPKG%20Client%201.3.14-x64.msi");
+			//navigatorplugins.UpdateSoftware("http://wpkg.org/files/client/stable/WPKG%20Client%201.3.14-x64.msi","mimetype2");
+			//wnavigatorplugins.UpdateSoftware("http://files.jrsoftware.org/is/5/isetup-5.5.5.exe","mimetype3");
+        </script>
+    </body>
+</html>
