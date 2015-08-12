@@ -44,7 +44,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 
 	connectionLost = false;
 
-	connect(parent,SIGNAL(clearCookies()),m_WebCtrl,SLOT(clearCookies()));
+	connect(parent,SIGNAL(clearAll()),m_WebCtrl,SLOT(clearAll()));
 
 	//On fait un test de connexion régulièrement sachant que le signal de perte de connexion n'est parfois pas émis
 	timer = new QTimer(this);

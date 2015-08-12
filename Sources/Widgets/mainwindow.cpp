@@ -25,7 +25,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	infos = new Informations();
 
 	//On initialise les actions des différents menus
-	clearCookiesAction = new QAction(this);
+	clearAllAction = new QAction(this);
 	quitAction = new QAction(this);
 	inspectAction = new QAction(this);
 	fullscreenAction = new QAction(this);
@@ -56,7 +56,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	//Ajout du menu dans la barre de titre
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
 	fileMenu->addAction(quitAction);
-	fileMenu->addAction(clearCookiesAction);
+	fileMenu->addAction(clearAllAction);
 	menuBar()->setVisible(config.GetMenuBarPresent());
 	connect(&config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
 
@@ -85,7 +85,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
-	connect (clearCookiesAction, SIGNAL(triggered()), this, SIGNAL(clearCookies()));
+	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
 	view->LoadInternalPage("loader");
 
 	this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
@@ -134,6 +134,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	myMenu.addAction(quitAction);
 	myMenu.addAction(reloadAction);
 	myMenu.addAction(infoAction);
+	myMenu.addAction(clearAllAction);
 #ifdef Q_OS_WIN
 	myMenu.addAction(sendlogAction);
 #endif
@@ -157,10 +158,6 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	if (selectedItem->text()==normalscreenAction->text())
 	{
 		changeScreenMode(false);
-	}
-	if (selectedItem->text()==quitAction->text())
-	{
-		//L'action est déjà connectée à la méthode quit, on ne fait rien
 	}
 	if (selectedItem->text()==reloadAction->text())
 	{
@@ -246,11 +243,11 @@ void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 void MainWindow::changeActionNames(QString lang)
 {
 	//ATTENTION: Si il y a des modifications ici, il faut penser à celles dans informations.cpp
-	if(lang == "fr")
+	if(lang == FR)
 	{
 		//Valeurs françaises
 		fileMenu->setTitle("Fichier");
-		clearCookiesAction->setText("Nettoyer les cookies");
+		clearAllAction->setText("Vider le cache");
 		quitAction->setText("Fermer");
 		inspectAction->setText("Inspecter");
 		fullscreenAction->setText("Plein écran");
@@ -265,7 +262,7 @@ void MainWindow::changeActionNames(QString lang)
 	{
 		//Valeurs anglaises
 		fileMenu->setTitle("File");
-		clearCookiesAction->setText("Clear cookies");
+		clearAllAction->setText("Clear cache");
 		quitAction->setText("Quit");
 		inspectAction->setText("Inspect");
 		fullscreenAction->setText("Fullscreen");

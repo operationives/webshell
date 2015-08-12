@@ -13,6 +13,10 @@
 #define WINDOW_FRAME_WIDTH 17
 #endif
 
+//Définition des valeurs de langue
+#define FR "fr"
+#define EN "en"
+
 class ConfigManager : public QObject
 {
 	Q_OBJECT

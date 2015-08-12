@@ -14,7 +14,7 @@ public:
 	QNetworkReply *createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData);
 
 public slots:
-	void clearCookies();
+	void clearAll();
 
 private:
 	QNetworkDiskCache *m_webCache;

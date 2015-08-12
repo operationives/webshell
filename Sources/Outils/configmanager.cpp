@@ -120,7 +120,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	defaultHeight = 3*rec.height()/4;
 	icon = "";
 	infosAppli = "";
-	lang = QLocale::system().name();
+	lang = QLocale::system().uiLanguages().first();
 	lang.truncate(2);
 	baseUrl = QStringList();
 
@@ -292,7 +292,7 @@ void ConfigManager::StoreParametersAppli()
 	AppendNode("infos",infosAppli,domElem);
 
 	//Insertion du lang lang
-	AppendNode("developerToolsActivated",lang,domElem);
+	AppendNode("lang",lang,domElem);
 
 	//Insertion du paramètre baseUrl
 	AppendNode("baseUrl",baseUrl,domElem);

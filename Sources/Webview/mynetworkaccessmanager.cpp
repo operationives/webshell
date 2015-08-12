@@ -38,11 +38,12 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
 }
 
 /**
- * @brief Supprime les cookies
+ * @brief Supprime les cookies et le cache
  */
-void MyNetworkAccessManager::clearCookies()
+void MyNetworkAccessManager::clearAll()
 {
 	m_cookieJar->clear();
+	m_webCache->clear();
 }
 
 /**

@@ -22,7 +22,7 @@ private:
 	MyWebView *view;
 
 	QMenu *fileMenu;
-	QAction *clearCookiesAction;
+	QAction *clearAllAction;
 	QAction *quitAction;
 	QAction *inspectAction;
 	QAction *fullscreenAction;
@@ -44,7 +44,7 @@ private:
 	void closeEvent(QCloseEvent *event);
 
 signals:
-	void clearCookies();
+	void clearAll();
 
 private slots:
 	void showContextMenu(const QPoint& pos);
