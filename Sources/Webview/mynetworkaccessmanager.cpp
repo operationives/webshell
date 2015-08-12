@@ -3,6 +3,18 @@
 #include <QNetworkReply>
 #include <QStandardPaths>
 
+
+MyNetworkAccessManager* MyNetworkAccessManager::m_instance=NULL;
+
+MyNetworkAccessManager* MyNetworkAccessManager::Instance()
+{
+	if(!m_instance)
+	{
+		m_instance = new MyNetworkAccessManager();
+	}
+	return m_instance;
+}
+
 /**
  * @brief Crée les outils permettant d'utiliser les cookies et en théorie le cache
  */
@@ -12,7 +24,8 @@ MyNetworkAccessManager::MyNetworkAccessManager()
 	m_cookieJar = new CookieJar();
 	this->setCookieJar(m_cookieJar);
 	m_webCache = new QNetworkDiskCache(this);
-	m_webCache->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/cache");
+	ConfigManager &config = ConfigManager::Instance();
+	m_webCache->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
 	m_webCache->setMaximumCacheSize(10*1024*1024); // 10Mo
 	this->setCache(m_webCache);
 	connect(this,SIGNAL(finished(QNetworkReply*)),this,SLOT(getLanguage(QNetworkReply*)));

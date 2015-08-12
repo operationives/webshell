@@ -1,4 +1,5 @@
 #include "informations.h"
+#include "Webview/mynetworkaccessmanager.h"
 #include "Outils/configmanager.h"
 
 /**
@@ -21,8 +22,6 @@ Informations::Informations(QWidget *parent)
 	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);
 
-	manager = new QNetworkAccessManager();
-
 	setWindowTitle(tr("Informations"));
 }
 
@@ -30,7 +29,6 @@ Informations::~Informations()
 {
 	delete label;
 	delete buttonBox;
-	delete manager;
 }
 
 /**
@@ -58,6 +56,7 @@ void Informations::UpdateValues()
 		appText = "\nAdditional informations:\n";
 		disconnectedText = "The application is disconnected";
 	}
+	MyNetworkAccessManager *manager = MyNetworkAccessManager::Instance();
 	if(manager->networkAccessible() == QNetworkAccessManager::Accessible)
 		label->setText(QString(webshellText + version + appText + infosAppli));
 	else

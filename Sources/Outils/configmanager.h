@@ -43,6 +43,7 @@ public:
 	QString GetInfos();
 	QString GetLanguage();
 	QStringList GetBaseUrl();
+	QString GetAppName();
 
 public slots:
 	//Setters pour attributs webshell
@@ -96,6 +97,7 @@ private:
 	QString lang;
 	QStringList baseUrl;
 
+	QString appName;
 	QString confFilePath;
 
 	void StoreParametersWebshell();

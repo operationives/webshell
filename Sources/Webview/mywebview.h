@@ -3,7 +3,6 @@
 
 #include <QtWidgets>
 #include <QWebView>
-#include "mynetworkaccessmanager.h"
 #include "webshellparameters.h"
 
 class WNavigator;
@@ -28,7 +27,6 @@ signals:
 
 private:
 	QTimer *timer;
-	MyNetworkAccessManager *m_WebCtrl;
 	WNavigator *wnavigator;
 	NavigatorPlugins *navigatorplugins;
 	WebApp *wapp;

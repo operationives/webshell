@@ -34,6 +34,7 @@
 #include "cookiejar.h"
 
 #include "Outils/autosaver.h"
+#include "Outils/configmanager.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
@@ -125,7 +126,8 @@ void CookieJar::load()
 		return;
 	// load cookies and exceptions
 	qRegisterMetaTypeStreamOperators<QList<QNetworkCookie> >("QList<QNetworkCookie>");
-	QSettings cookieSettings(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/cookies.ini"), QSettings::IniFormat);
+	ConfigManager &config = ConfigManager::Instance();
+	QSettings cookieSettings(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/" + config.GetAppName().toLatin1() + ".ini"), QSettings::IniFormat);
 	setAllCookies(qvariant_cast<QList<QNetworkCookie> >(cookieSettings.value(QLatin1String("cookies"))));
 	cookieSettings.beginGroup(QLatin1String("Exceptions"));
 	m_exceptions_block = cookieSettings.value(QLatin1String("block")).toStringList();
@@ -174,7 +176,8 @@ void CookieJar::save()
 		QDir dir;
 		dir.mkpath(directory);
 	}
-	QSettings cookieSettings(directory + QLatin1String("/cookies.ini"), QSettings::IniFormat);
+	ConfigManager &config = ConfigManager::Instance();
+	QSettings cookieSettings(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/" + config.GetAppName().toLatin1() + ".ini"), QSettings::IniFormat);
 	QList<QNetworkCookie> cookies = allCookies();
 	for (int i = cookies.count() - 1; i >= 0; --i) {
 		if (cookies.at(i).isSessionCookie())

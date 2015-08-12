@@ -77,7 +77,7 @@ void ConfigManager::InitWebshellParameters()
  */
 void ConfigManager::InitApplicationParameters(QString launchUrl)
 {
-	QString appName(launchUrl);
+	appName = launchUrl;
 	if(appName.startsWith("http"))
 	{
 		//On récupère dans appName la partie placée entre :// et le premier / suivant
@@ -647,4 +647,13 @@ void ConfigManager::SetBaseUrl(QStringList baseUrl)
 {
 	this->baseUrl = QStringList(baseUrl);
 	StoreParametersAppli();
+}
+
+/**
+ * @brief Renvoie le nom de l'application
+ * @return appName
+ */
+QString ConfigManager::GetAppName()
+{
+	return appName;
 }

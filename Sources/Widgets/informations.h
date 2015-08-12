@@ -19,7 +19,6 @@ private:
 	QString infosAppli;
 	QLabel *label;
 	QDialogButtonBox *buttonBox;
-	QNetworkAccessManager *manager;
 };
 
 #endif // INFORMATIONS_H

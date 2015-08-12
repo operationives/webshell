@@ -3,6 +3,7 @@
 #include "wnavigator.h"
 #include "navigatorplugins.h"
 #include "webapp.h"
+#include "mynetworkaccessmanager.h"
 #include "Outils/configmanager.h"
 
 /**
@@ -39,7 +40,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	if(!icon.isEmpty())
 		wapp->setProperty("icon",icon);
 
-	m_WebCtrl = new MyNetworkAccessManager();
+	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
 
 	connectionLost = false;
@@ -107,6 +108,7 @@ void MyWebView::updateJavaScriptObjects()
  */
 void MyWebView::updateConnectivity()
 {
+	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible && !connectionLost)
 	{
 		ConfigManager &config = ConfigManager::Instance();
