@@ -13,7 +13,7 @@
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
 	//On enlève les barres de défilement inutiles dans le cadre du webshell
-	this->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+    this->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
 	this->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
 
 	navigatorplugins = new NavigatorPlugins(this);
@@ -77,10 +77,38 @@ MyWebView::~MyWebView()
  */
 void MyWebView::handleRedirect(const QUrl &url)
 {
+    qDebug() << "handleRedirect \t| request a redirection to the url: " << url.url();
+
 	if(!wapp->IsPageInApplication(url.url()))
-			QDesktopServices::openUrl(url);
+    {
+        qDebug() << "handleRedirect  \t| external url detected \t| action: load it in the default browser";
+        QDesktopServices::openUrl(url);
+    }
 	else
-		this->load(url);
+    {
+        QString anchor;
+        if ((anchor = IsCurrentUrlWithAnchor(url.url())) != "")
+        {
+            qDebug() << "handleRedirect  \t| anchor [" << anchor << "] detected \t| action: scroll to it";
+            if(QString::compare(anchor,"#top")==0)
+            {
+                //this->page()->mainFrame()->scrollToAnchor(anchor); // Doesn't work!
+                QPoint current_scroll_position = this->page()->mainFrame()->scrollPosition();
+                this->page()->mainFrame()->scroll(0,-current_scroll_position.ry());
+            }
+            else if(QString::compare(anchor,"#bottom")==0)
+            {
+                this->page()->mainFrame()->scroll(0,this->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
+            }
+            else
+                return;
+        }
+        else
+        {
+            qDebug() << "handleRedirect  \t| app url detected \t| action: loads it";
+            this->load(url);
+        }
+    }
 }
 
 /**
@@ -181,4 +209,24 @@ void MyWebView::LoadInternalPage(QString page)
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
 	else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
+}
+
+/**
+ * @brief Vérifie si l'url passée en paramètre et l'url courante avec une ancre
+ * @param url	url pour laquelle on on veut tester la présence d'une ancre
+ * @return l'ancre si l'url est l'url courante avec une ancre, une chaine vide sinon
+ */
+QString MyWebView::IsCurrentUrlWithAnchor(QString url)
+{
+    QString current_url     = this->page()->mainFrame()->url().url();
+    QString anchor_prefix   = "#";
+    QString anchor          = "";
+
+    if( url.contains(anchor_prefix) )
+    {
+        QString requested_url   = url.split(anchor_prefix)[0];
+        if ( QString::compare(current_url,requested_url) == 0 )
+            anchor = anchor_prefix.append(url.split(anchor_prefix)[1]);
+    }
+    return anchor;
 }

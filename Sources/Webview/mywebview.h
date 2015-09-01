@@ -33,6 +33,8 @@ private:
 	WebshellParameters *webshellParameters;
 	bool connectionLost;
 
+    QString IsCurrentUrlWithAnchor(QString url);
+
 
 private slots:
 	void handleRedirect(const QUrl &url);
