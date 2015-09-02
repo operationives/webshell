@@ -129,7 +129,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
 		myMenu.addAction(normalscreenAction);
 	}
 	myMenu.addAction(quitAction);
-	myMenu.addAction(reloadAction);
+    if (view->IsUpdating() == false)
+        myMenu.addAction(reloadAction);
 	myMenu.addAction(infoAction);
 	myMenu.addAction(clearAllAction);
 #ifdef Q_OS_WIN

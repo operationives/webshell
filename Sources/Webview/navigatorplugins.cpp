@@ -15,6 +15,7 @@ NavigatorPlugins::NavigatorPlugins(MyWebView *view)
 	//Le sémaphore est utile afin de mettre en pause les threads cherchant à exécuter
 	//un installeur téléchargé alors qu'un autre est déjà en cours d'exécution
 	sem = new Semaphore();
+    m_currentUdpateCount = 0;
 }
 
 
@@ -31,6 +32,8 @@ void NavigatorPlugins::UpdateSoftware(QString url, QString typemime)
 {
 	//La partie suivante permet de télécharger depuis la webshell
 	fileDownloaderHash[typemime] = new FileDownloader(url,qobject_cast<DownloadProgressListener *>(this),typemime);
+    m_currentUdpateCount++;
+    m_webView->SetUpdatingStatus(true);
 }
 
 /**
@@ -136,6 +139,9 @@ void NavigatorPlugins::finishInstall(int exitCode, QProcess::ExitStatus exitStat
 	}
 	QFile::remove(currentFileDirectory);
 	sem->Release();
+    m_currentUdpateCount--;
+    if (m_currentUdpateCount == 0)
+        m_webView->SetUpdatingStatus(false);
 }
 
 /**

@@ -32,6 +32,7 @@ private:
 	QString currentFileDirectory;
 	QHash<QString, FileDownloader *> fileDownloaderHash;
 	Semaphore *sem;
+    int m_currentUdpateCount;
 	QString Target() const;
 	void SetTarget(const QString &target);
 };
