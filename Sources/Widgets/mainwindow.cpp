@@ -94,6 +94,8 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
+
+    this->statusBar()->showMessage("");
 }
 
 /**
