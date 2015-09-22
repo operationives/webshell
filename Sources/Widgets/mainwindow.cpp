@@ -71,14 +71,18 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	windowIconSpecified = !iconPath.isNull();
 	if(windowIconSpecified)
-	{
-		QIcon windowIcon(iconPath);
+    {
+        QIcon windowIcon(iconPath);
 		this->setWindowIcon(windowIcon);
 		infos->setWindowIcon(windowIcon);
-		inspector->setWindowIcon(windowIcon);
+        inspector->setWindowIcon(windowIcon);
+
+        this->trayIcon->setIcon(windowIcon);
 	}
 
-	connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
+
+
+    //connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
 	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
