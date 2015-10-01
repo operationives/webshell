@@ -18,8 +18,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	ConfigManager &config = ConfigManager::Instance();
 	connect(&config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 	connect(&config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
-	connect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
-	connect(&config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
+    connect(&config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
 
 	stayOpen = true;
 	infos = new Informations();
@@ -89,9 +88,19 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
 	view->LoadInternalPage("loader");
 
+    // Size configuration:
 	this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
-	this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
-	this->CenterScreen();
+    if (config.GetUserWidth() < config.GetMinWidth() || config.GetUserHeight() < config.GetMinHeight())
+    {
+        this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
+        connect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
+    }
+    else
+    {
+        this->resize(config.GetUserWidth(),config.GetUserHeight());
+        disconnect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
+    }
+
 	this->setWindowTitle("Chargement en cours");
 	if(config.GetScreenMode())
 		this->showFullScreen();
@@ -197,7 +206,7 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	{
 		this->showNormal();
 		this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
-		this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
+        this->resize(config.GetUserWidth(),config.GetUserHeight());
 		this->CenterScreen();
 	}
 	config.SetScreenMode(fullscreen);
@@ -222,7 +231,6 @@ void MainWindow::changeMinSize(int minWidth, int minHeight)
 	if(!this->isFullScreen())
 	{
 		this->setMinimumSize(minWidth,minHeight);
-		this->CenterScreen();
 	}
 }
 
@@ -236,7 +244,7 @@ void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 	if(!this->isFullScreen())
 	{
 		this->resize(defaultWidth,defaultHeight);
-		this->CenterScreen();
+        this->CenterScreen();
 	}
 }
 
@@ -370,4 +378,16 @@ void MainWindow::CenterScreen()
 	center.setX(center.x() + WINDOW_FRAME_WIDTH/2);
 	center.setY(center.y() + WINDOW_FRAME_HEIGHT);
 	this->move(QApplication::desktop()->screen()->rect().center() - center);
+}
+
+/**
+ * @brief Enregistre la taille courante de la fenêtre lors du resize par l'utilisateur
+ */
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+   QMainWindow::resizeEvent(event);
+   ConfigManager &config = ConfigManager::Instance();
+
+   if(!this->isFullScreen())
+    config.SetUserSize(event->size().width(),event->size().height());
 }

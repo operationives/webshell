@@ -42,6 +42,7 @@ private:
 	void CenterScreen();
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent* event);
 
 signals:
 	void clearAll();

@@ -174,6 +174,12 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "defaultHeight")
 				defaultHeight = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
 
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "userWidth")
+                userWidth = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "userHeight")
+                userHeight = e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
+
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "icon")
 				icon = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 
@@ -281,6 +287,12 @@ void ConfigManager::StoreParametersAppli()
 
 	//Insertion du paramètre defaultHeight
 	AppendNode("defaultHeight",defaultHeight,domElem);
+
+    //Insertion du paramètre userWidth
+    AppendNode("userWidth",userWidth,domElem);
+
+    //Insertion du paramètre userHeight
+    AppendNode("userHeight",userHeight,domElem);
 
 	//Insertion du paramètre launchUrl
 	AppendNode("launchUrl",launchUrl,domElem);
@@ -532,6 +544,24 @@ int ConfigManager::GetDefaultHeight() const
 }
 
 /**
+ * @brief Renvoie la largeur de l'application personnalisée par l'utilisateur
+ * @return defaultWidth
+ */
+int ConfigManager::GetUserWidth() const
+{
+    return userWidth;
+}
+
+/**
+ * @brief Renvoie la hauteur de l'application personnalisée par l'utilisateur
+ * @return defaultHeight
+ */
+int ConfigManager::GetUserHeight() const
+{
+    return userHeight;
+}
+
+/**
  * @brief Met à jour la taille par défaut de l'application\n
  * Si les dimensions indiquées sont supérieurs à celles de l'écran, elles seront remplacées par ce seuil
  * @param defaultWidth	Nouvelle largeur par défaut
@@ -552,6 +582,17 @@ void ConfigManager::SetDefaultSize(int defaultWidth, int defaultHeight)
 	emit defaultSize(this->defaultWidth,this->defaultHeight);
 }
 
+/**
+ * @brief Met à jour la taille de l'application personnalisée par l'utilisateur\n
+ * @param defaultWidth	Nouvelle largeur par défaut
+ * @param defaultHeight	Nouvelle hauteur par défaut
+ */
+void ConfigManager::SetUserSize(int userWidth, int userHeight)
+{
+    this->userWidth = userWidth;
+    this->userHeight = userHeight;
+    StoreParametersAppli();
+}
 
 /**
  * @brief Indique l'adresse de démarrage de l'application

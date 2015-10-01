@@ -38,6 +38,8 @@ public:
 	int GetMinHeight() const;
 	int GetDefaultWidth() const;
 	int GetDefaultHeight() const;
+    int GetUserWidth() const;
+    int GetUserHeight() const;
 	QString GetLaunchUrl();
 	QString GetIcon();
 	QString GetInfos();
@@ -57,6 +59,7 @@ public slots:
 	void SetMenuBarPresent(bool menuBarPresent);
 	void SetMinSize(int minWidth, int minHeight);
 	void SetDefaultSize(int defaultWidth, int defaultHeight);
+    void SetUserSize(int userWidth, int userHeight);
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
 	void SetInfos(QString infosAppli);
@@ -91,6 +94,8 @@ private:
 	int minHeight;
 	int defaultWidth;
 	int defaultHeight;
+    int userWidth;
+    int userHeight;
 	QString launchUrl;
 	QString icon;
 	QString infosAppli;
