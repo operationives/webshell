@@ -84,7 +84,9 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 		int index = appName.indexOf("//");
 		index = index+2;
 		appName.remove(0,index);
-		index = appName.indexOf("/");
+        if (appName.contains(":")) // preprod case
+            index = appName.indexOf(":");
+        else index = appName.indexOf("/");
 		if(index!=-1)
 			appName.truncate(index);
 	}
