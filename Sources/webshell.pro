@@ -21,7 +21,8 @@ HEADERS =	Outils/autosaver.h \
 		Webview/navigatorplugins.h \
 		Webview/webapp.h \
 		Webview/webshellparameters.h \
-		Webview/wnavigator.h
+		Webview/wnavigator.h \
+    Widgets/singleapplication.h
 win32 {
     HEADERS +=	Windows/mailsender.h \
 		Windows/winaddon.h
@@ -41,7 +42,8 @@ SOURCES =	main.cpp \
 		Webview/navigatorplugins.cpp \
 		Webview/webapp.cpp \
 		Webview/webshellparameters.cpp \
-		Webview/wnavigator.cpp
+		Webview/wnavigator.cpp \
+    Widgets/singleapplication.cpp
 win32 {
     SOURCES +=	Windows/mailsender.cpp \
 		Windows/winaddon.cpp

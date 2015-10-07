@@ -26,6 +26,7 @@ private:
 
 	QNetworkDiskCache *m_webCache;
 	CookieJar *m_cookieJar;
+    QString m_pending_login;
 
 private slots:
 	void getLanguage(QNetworkReply *reply);

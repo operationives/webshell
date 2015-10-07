@@ -194,6 +194,12 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "baseUrl")
 				baseUrl.append(e.attribute(CHILDREN_VALUE_ATTRIBUTE));
 
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "lastLogin")
+                lastLogin.append(e.attribute(CHILDREN_VALUE_ATTRIBUTE));
+
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "loginList")
+                loginList.append(e.attribute(CHILDREN_VALUE_ATTRIBUTE));
+
 			n = n.nextSibling();
 		}
 		bool toLoad = false;
@@ -310,6 +316,12 @@ void ConfigManager::StoreParametersAppli()
 
 	//Insertion du paramètre baseUrl
 	AppendNode("baseUrl",baseUrl,domElem);
+
+    //Insertion du paramètre lastLogin
+    AppendNode("lastLogin",lastLogin,domElem);
+
+    //Insertion du paramètre loginList
+    AppendNode("loginList",loginList,domElem);
 
 	QString write_doc;
 	write_doc.append(dom.toString());
@@ -690,6 +702,44 @@ void ConfigManager::SetBaseUrl(QStringList baseUrl)
 {
 	this->baseUrl = QStringList(baseUrl);
 	StoreParametersAppli();
+}
+
+/**
+ * @brief Indique lastLogin associé à l'application
+ * @return QStringList(lastLogin)
+ */
+QString ConfigManager::GetLastLogin()
+{
+    return QString(lastLogin);
+}
+
+/**
+ * @brief Met à jour lastLogin
+ * @param lastLogin Nouvelle valeur de this->lastLogin
+ */
+void ConfigManager::SetLastLogin(QString lastLogin)
+{
+    this->lastLogin = QString(lastLogin);
+    StoreParametersAppli();
+}
+
+/**
+ * @brief Indique la liste de login associé à l'application
+ * @return QStringList(loginList)
+ */
+QStringList ConfigManager::GetLoginList()
+{
+    return QStringList(loginList);
+}
+
+/**
+ * @brief Met à jour loginList
+ * @param lastLogin Nouvelle valeur de this->loginList
+ */
+void ConfigManager::SetLoginList(QStringList loginList)
+{
+    this->loginList = QStringList(loginList);
+    StoreParametersAppli();
 }
 
 /**

@@ -6,6 +6,7 @@
 #include <QCommandLineOption>
 #include "Widgets/mainwindow.h"
 #include "Outils/configmanager.h"
+#include "Widgets/singleapplication.h"
 
 /** @mainpage Webshell
  *
@@ -62,9 +63,10 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
  */
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv);
-	app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.0"));
+    //QApplication app(argc, argv);
+    SingleApplication app(argc, argv);
+    app.setApplicationName(QString("Webshell"));
+    app.setApplicationVersion(QString("1.0.1"));
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
@@ -125,7 +127,7 @@ int main(int argc, char** argv)
 	else
 		mw = new MainWindow();
 
-	mw->show();
+    mw->show();
 
 	return app.exec();
 }

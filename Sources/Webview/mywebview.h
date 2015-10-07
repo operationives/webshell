@@ -42,6 +42,7 @@ private:
 private slots:
 	void handleRedirect(const QUrl &url);
 	void updateTitle();
+    void updateLogin();
 	void updateJavaScriptObjects();
 	void updateConnectivity();
 };

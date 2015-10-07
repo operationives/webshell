@@ -29,6 +29,7 @@ MyNetworkAccessManager::MyNetworkAccessManager()
 	m_webCache->setMaximumCacheSize(10*1024*1024); // 10Mo
 	this->setCache(m_webCache);
 	connect(this,SIGNAL(finished(QNetworkReply*)),this,SLOT(getLanguage(QNetworkReply*)));
+    m_pending_login = "";
 }
 
 /**
@@ -40,7 +41,32 @@ MyNetworkAccessManager::MyNetworkAccessManager()
  */
 QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData)
 {
-	QNetworkRequest request(req);
+    QNetworkRequest request(req);
+
+    if (outgoingData)
+    {
+        // Get user data:
+        char buffer[256];
+        outgoingData -> peek(buffer,256);
+
+        QString data(buffer);
+        // Buffer parsing:
+        QStringList parameters;
+        parameters = data.split("&");
+
+        for (int i = 0; i < parameters.size(); ++i)
+        {
+            QString parameter = parameters.at(i);
+            QStringList values;
+            values = parameter.split("=");
+            if (values.at(0) == QString("email"))
+            {
+                qDebug() << "Potential login detected: " << values[1];
+                m_pending_login = values[1];
+            }
+        }
+    }
+
 	//Avec ce passage, l'application est censée accéder au cache lorsque le réseau n'est pas accessible, mais cela ne fonctionne pas
 	if(this->networkAccessible() == QNetworkAccessManager::NotAccessible)
 		request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
@@ -65,9 +91,29 @@ void MyNetworkAccessManager::clearAll()
  */
 void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
 {
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 302) // redirection detected
+    {
+        if (m_pending_login != "")
+        {
+            // Set the login as the last one:
+            ConfigManager &config = ConfigManager::Instance();
+            config.SetLastLogin(m_pending_login);
+
+            QStringList login_list(config.GetLoginList());
+            if (!login_list.contains(m_pending_login))
+            {
+                qDebug() << "Storage of the new login: " << m_pending_login;
+                login_list.append(m_pending_login);
+                config.SetLoginList(login_list);
+            }
+            m_pending_login = "";
+        }
+    }
+
 	if(reply->hasRawHeader("Set-Cookie"))
 	{
-		QString langue(reply->rawHeader("Set-Cookie"));
+        QString langue(reply->rawHeader("Set-Cookie"));
 		if(!langue.contains("langue="))
 			return;
 		int index = langue.indexOf("langue=");

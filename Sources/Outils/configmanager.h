@@ -45,6 +45,8 @@ public:
 	QString GetInfos();
 	QString GetLanguage();
 	QStringList GetBaseUrl();
+    QStringList GetLoginList();
+    QString GetLastLogin();
 	QString GetAppName();
 
 public slots:
@@ -65,6 +67,8 @@ public slots:
 	void SetInfos(QString infosAppli);
 	void SetLanguage(QString lang);
 	void SetBaseUrl(QStringList baseUrl);
+    void SetLoginList(QStringList loginList);
+    void SetLastLogin(QString lastLogin);
 
 signals:
 	void toolsMode(bool toolsActivated);
@@ -100,7 +104,9 @@ private:
 	QString icon;
 	QString infosAppli;
 	QString lang;
+    QString lastLogin;
 	QStringList baseUrl;
+    QStringList loginList;
 
 	QString appName;
 	QString confFilePath;

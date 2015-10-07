@@ -1,4 +1,5 @@
 #include <QWebFrame>
+#include <QWebElementCollection>
 #include "mywebview.h"
 #include "wnavigator.h"
 #include "navigatorplugins.h"
@@ -29,6 +30,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 	connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
 	connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
+    connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateLogin()));
 	connect(this->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(updateJavaScriptObjects()));
 
 	this->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -120,6 +122,64 @@ void MyWebView::updateTitle()
 }
 
 /**
+ * @brief Renseigne le dernier login utilisé et affiche un menu déroulant avec les logins utilisés
+ */
+void MyWebView::updateLogin()
+{
+    QWebFrame* frame = this->page()->currentFrame();
+    QWebElementCollection login_button = frame->findAllElements("input[name=loginbutton]");
+    if (login_button.count() != 0)
+    {
+        qDebug() << "Login page detected";
+        QWebElement user_auth_field = frame->findFirstElement("input[name=email]");
+
+        if (!user_auth_field.isNull())
+        {
+            ConfigManager &config = ConfigManager::Instance();
+            QStringList login_list(config.GetLoginList());
+            QString last_login = config.GetLastLogin();
+
+            if (!last_login.isEmpty())
+            {
+                qDebug() << "A login already exists: show it. Last login: " << last_login;
+                user_auth_field.setAttribute("value", last_login);
+            }
+
+            if (login_list.size()>1)
+            {
+                QString onfocus_attribute;
+
+                onfocus_attribute = user_auth_field.attribute("onfocus");
+                onfocus_attribute.append("this.previousElementSibling.selectedIndex = 0;");
+                user_auth_field.setAttribute("onfocus",onfocus_attribute);
+
+                // Reduce the width of the login field:
+                int arrow_width = 35;
+                QString width_css_property = user_auth_field.styleProperty("width",QWebElement::ComputedStyle);
+                width_css_property.replace(QString("px"),QString(""));
+                bool ok;
+                int new_width = width_css_property.toInt(&ok,10)-arrow_width;
+                QString new_width_css_property = QString::number(new_width).append("px");
+                user_auth_field.setStyleProperty("width",QString(new_width_css_property));
+
+                // Add the selector with all stored logins:
+                QString html;
+                html.append("<select class='ws_loginfield' onchange='if (this.selectedIndex != 0){ this.nextElementSibling.value=this.value; this.nextElementSibling.nextElementSibling.focus(); this.selectedIndex = 0;}'>");
+                html.append("<option></option>");
+                for (int i = 0; i < login_list.size(); ++i)
+                {
+                   html.append("<option>");
+                   html.append(login_list.at(i));
+                   html.append("</option>");
+                }
+                html.append("</select>");
+                user_auth_field.prependOutside(html);
+            }
+        }
+    }
+}
+
+/**
  * @brief Remet les objets JavaScript sur la page lorsqu'ils sont supprimés
  */
 void MyWebView::updateJavaScriptObjects()
@@ -139,7 +199,7 @@ void MyWebView::updateConnectivity()
 	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible && !connectionLost)
 	{
-		ConfigManager &config = ConfigManager::Instance();
+        ConfigManager &config = ConfigManager::Instance();
 		config.SetSavedAdress(this->url().toString());
 		LoadInternalPage("disconnected");
 		connectionLost = true;
