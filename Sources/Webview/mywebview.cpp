@@ -132,7 +132,7 @@ void MyWebView::updateLogin()
     {
         qDebug() << "Login page detected";
         QWebElement user_auth_field = frame->findFirstElement("input[name=email]");
-
+        QWebElement pwd_auth_field = frame->findFirstElement("input[name=password]");
         if (!user_auth_field.isNull())
         {
             ConfigManager &config = ConfigManager::Instance();
@@ -143,6 +143,7 @@ void MyWebView::updateLogin()
             {
                 qDebug() << "A login already exists: show it. Last login: " << last_login;
                 user_auth_field.setAttribute("value", last_login);
+                pwd_auth_field.setAttribute("value", "");
             }
 
             if (login_list.size()>1)
