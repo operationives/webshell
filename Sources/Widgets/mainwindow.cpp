@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "Webview/mynetworkaccessmanager.h"
 #include "Webview/wnavigator.h"
 #include "Outils/configmanager.h"
 #ifdef Q_OS_WIN
@@ -317,6 +318,16 @@ void MainWindow::closeEvent (QCloseEvent *event)
 		event->ignore();
 		this->setWindowState(Qt::WindowMinimized);
 	}
+    else if (view->page()->mainFrame()->evaluateJavaScript("(typeof onbeforeunload == 'function');") == true)
+    {
+        //view->page()->mainFrame()->evaluateJavaScript("window.onbeforeunload();");
+        view->LoadInternalPage("loader");
+        MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
+        CookieJar *cookieJar = m_WebCtrl->getCookieJar();
+        connect(cookieJar,SIGNAL(cookieSaved()),this,SLOT(quit()));
+        event->ignore();
+        QTimer::singleShot(3000, this, SLOT(quitNow()));
+    }
 	else
 	{
 		this->deleteLater();
@@ -327,11 +338,20 @@ void MainWindow::closeEvent (QCloseEvent *event)
 /**
  * @brief Quitte l'application
  */
-void MainWindow::quit ()
+void MainWindow::quitNow()
 {
-	stayOpen = false;
-	view->DispatchJsEvent("Exit","window");
-	this->close();
+    stayOpen = false;
+    view->DispatchJsEvent("Exit","window");
+    this->close();
+}
+
+/**
+ * @brief Quitte l'application
+ */
+void MainWindow::quit()
+{
+    view->DispatchJsEvent("Exit","window");
+    this->close();
 }
 
 /**

@@ -127,7 +127,7 @@ void CookieJar::load()
 	// load cookies and exceptions
 	qRegisterMetaTypeStreamOperators<QList<QNetworkCookie> >("QList<QNetworkCookie>");
 	ConfigManager &config = ConfigManager::Instance();
-	QSettings cookieSettings(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/" + config.GetAppName().toLatin1() + ".ini"), QSettings::IniFormat);
+    QSettings cookieSettings(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/" + config.GetAppName().toLatin1() + ".ini"), QSettings::IniFormat);
 	setAllCookies(qvariant_cast<QList<QNetworkCookie> >(cookieSettings.value(QLatin1String("cookies"))));
 	cookieSettings.beginGroup(QLatin1String("Exceptions"));
 	m_exceptions_block = cookieSettings.value(QLatin1String("block")).toStringList();
@@ -138,6 +138,11 @@ void CookieJar::load()
 	qSort(m_exceptions_allowForSession.begin(), m_exceptions_allowForSession.end());
 
 	loadSettings();
+
+    QList<QNetworkCookie> cookies = allCookies();
+    for (int i = cookies.count() - 1; i >= 0; --i) {
+        emit cookieLoaded(cookies.at(i).name(), cookies.at(i).value());
+    }
 }
 
 void CookieJar::loadSettings()
@@ -197,6 +202,7 @@ void CookieJar::save()
 
 	QMetaEnum keepPolicyEnum = staticMetaObject.enumerator(staticMetaObject.indexOfEnumerator("KeepPolicy"));
 	settings.setValue(QLatin1String("keepCookiesUntil"), QLatin1String(keepPolicyEnum.valueToKey(m_keepCookies)));
+    emit cookieSaved();
 }
 
 void CookieJar::purgeOldCookies()

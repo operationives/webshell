@@ -63,6 +63,8 @@ class CookieJar : public QNetworkCookieJar
 
 signals:
 	void cookiesChanged();
+    void cookieSaved();
+    void cookieLoaded(QString name, QString value);
 
 public:
 	enum AcceptPolicy {

@@ -123,6 +123,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	icon = "";
 	infosAppli = "";
 	lang = QLocale::system().uiLanguages().first();
+    qDebug() << "Detected system language: " << lang;
 	lang.truncate(2);
 	baseUrl = QStringList();
 

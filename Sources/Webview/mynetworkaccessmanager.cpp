@@ -22,14 +22,28 @@ MyNetworkAccessManager::MyNetworkAccessManager()
 	:QNetworkAccessManager()
 {
 	m_cookieJar = new CookieJar();
+    connect(m_cookieJar,SIGNAL(cookieLoaded(QString,QString)),this,SLOT(cookieLoaded(QString,QString)));
 	this->setCookieJar(m_cookieJar);
 	m_webCache = new QNetworkDiskCache(this);
 	ConfigManager &config = ConfigManager::Instance();
-	m_webCache->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
+    m_webCache->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
 	m_webCache->setMaximumCacheSize(10*1024*1024); // 10Mo
 	this->setCache(m_webCache);
 	connect(this,SIGNAL(finished(QNetworkReply*)),this,SLOT(getLanguage(QNetworkReply*)));
     m_pending_login = "";
+}
+
+/**
+ * @brief Intercepte les cookies chargés depuis le disque
+ * synchronise la langue entre l'xml de config et le cookie
+ */
+void MyNetworkAccessManager::cookieLoaded(QString name, QString value)
+{
+    if (name == "langue")
+    {
+        ConfigManager &config = ConfigManager::Instance();
+        config.SetLanguage(value);
+    }
 }
 
 /**
@@ -72,7 +86,7 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
 		request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
 	//Avec ce header, on peut si il n'y a pas de cookie défini pour la langue accéder à une langue spécifique pour la page demandée
 	ConfigManager &config = ConfigManager::Instance();
-	request.setRawHeader("Accept-Language", config.GetLanguage().toLatin1());
+    request.setRawHeader("Accept-Language", config.GetLanguage().toLatin1());
 	return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
@@ -119,7 +133,15 @@ void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
 		int index = langue.indexOf("langue=");
 		langue.replace(0,index+7,"");
 		langue.truncate(2);
-		ConfigManager &config = ConfigManager::Instance();
+        ConfigManager &config = ConfigManager::Instance();
 		config.SetLanguage(langue);
 	}
+}
+
+/**
+ * @brief renvoie le cookie jar
+ */
+CookieJar* MyNetworkAccessManager::getCookieJar()
+{
+    return m_cookieJar;
 }

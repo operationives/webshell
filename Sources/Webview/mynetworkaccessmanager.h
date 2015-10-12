@@ -12,9 +12,11 @@ class MyNetworkAccessManager : public QNetworkAccessManager
 public:
 	static MyNetworkAccessManager *Instance();
 	QNetworkReply *createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData);
+    CookieJar *getCookieJar();
 
 public slots:
 	void clearAll();
+    void cookieLoaded(QString name, QString value);
 
 private:
 	MyNetworkAccessManager& operator= (const MyNetworkAccessManager&){}
