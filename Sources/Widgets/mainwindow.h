@@ -55,7 +55,6 @@ private slots:
 	void changeDefaultSize(int defaultWidth, int defaultHeight);
 	void changeActionNames(QString lang);
 	void quit();
-    void quitNow();
 	void changeIcon(const QIcon &icon);
     void loadFinished();
 };

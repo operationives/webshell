@@ -109,7 +109,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
 
-    this->statusBar()->showMessage("");
 }
 
 /**
@@ -313,7 +312,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::closeEvent (QCloseEvent *event)
 {
 	ConfigManager &config = ConfigManager::Instance();
-	if (config.GetCloseButtonBehaviour() && stayOpen)
+    if (config.GetCloseButtonBehaviour() && stayOpen)
 	{
 		event->ignore();
 		this->setWindowState(Qt::WindowMinimized);
@@ -326,7 +325,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
         CookieJar *cookieJar = m_WebCtrl->getCookieJar();
         connect(cookieJar,SIGNAL(cookieSaved()),this,SLOT(quit()));
         event->ignore();
-        QTimer::singleShot(3000, this, SLOT(quitNow()));
+        QTimer::singleShot(3000, this, SLOT(quit()));
     }
 	else
 	{
@@ -338,18 +337,9 @@ void MainWindow::closeEvent (QCloseEvent *event)
 /**
  * @brief Quitte l'application
  */
-void MainWindow::quitNow()
-{
-    stayOpen = false;
-    view->DispatchJsEvent("Exit","window");
-    this->close();
-}
-
-/**
- * @brief Quitte l'application
- */
 void MainWindow::quit()
 {
+    stayOpen = false;
     view->DispatchJsEvent("Exit","window");
     this->close();
 }
