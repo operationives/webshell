@@ -400,6 +400,29 @@ void MainWindow::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
    ConfigManager &config = ConfigManager::Instance();
 
-   if(!this->isFullScreen())
+   if (!this->isFullScreen())
     config.SetUserSize(event->size().width(),event->size().height());
+
+   oldSize = event->oldSize(); //Used to retrieve the old size after maximising event
+
+   qApp->processEvents();
 }
+
+void MainWindow::changeEvent( QEvent* e )
+{
+    if( e->type() == QEvent::WindowStateChange )
+    {
+        QWindowStateChangeEvent* event = static_cast< QWindowStateChangeEvent* >( e );
+        /*if( event->oldState() & Qt::WindowMinimized )
+        {
+            qDebug() << "Window restored (to normal or maximized state)!";
+        }
+        else*/
+        if( event->oldState() == Qt::WindowNoState && this->windowState() == Qt::WindowMaximized )
+        {
+            ConfigManager &config = ConfigManager::Instance();
+            config.SetUserSize(oldSize.width(),oldSize.height());
+        }
+    }
+}
+

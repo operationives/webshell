@@ -20,7 +20,7 @@ public:
 
 private:
 	MyWebView *view;
-
+    QSize oldSize;
 	QMenu *fileMenu;
 	QAction *clearAllAction;
 	QAction *quitAction;
@@ -43,6 +43,7 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent* event);
+    void changeEvent( QEvent* event );
 
 signals:
 	void clearAll();
