@@ -1,6 +1,7 @@
 #include <QWebFrame>
 #include <QWebElementCollection>
 #include "mywebview.h"
+#include "mywebpage.h"
 #include "wnavigator.h"
 #include "navigatorplugins.h"
 #include "webapp.h"
@@ -13,7 +14,8 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
-	//On enlève les barres de défilement inutiles dans le cadre du webshell
+    this->setPage(new MyWebPage(this));
+    //On enlève les barres de défilement inutiles dans le cadre du webshell
     this->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
 	this->page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
 
@@ -33,9 +35,6 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateLogin()));
 	connect(this->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(updateJavaScriptObjects()));
 
-	this->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-	connect(this,SIGNAL(linkClicked(QUrl)),this,SLOT(handleRedirect(QUrl)));
-
 	//Si il est défini, on affecte l'icône présent dans le fichier xml à la page principale
 	ConfigManager &config = ConfigManager::Instance();
 	QString icon = config.GetIcon();
@@ -50,9 +49,9 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(parent,SIGNAL(clearAll()),m_WebCtrl,SLOT(clearAll()));
 
 	//On fait un test de connexion régulièrement sachant que le signal de perte de connexion n'est parfois pas émis
-	timer = new QTimer(this);
+    timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateConnectivity()));
-	timer->start(5000);
+    timer->start(5000);
 
 	if(!wapp->IsPageInApplication(config.GetLaunchUrl()))
 	{
@@ -71,46 +70,6 @@ MyWebView::~MyWebView()
 	delete wnavigator;
 	delete wapp;
 	delete navigatorplugins;
-}
-
-/**
- * @brief Place la première page chargée dans baseUrl, puis renvoie vers le navigateur les url externes à baseUrl
- * @param url   Url chargée
- */
-void MyWebView::handleRedirect(const QUrl &url)
-{
-    qDebug() << "handleRedirect \t| request a redirection to the url: " << url.url();
-
-	if(!wapp->IsPageInApplication(url.url()))
-    {
-        qDebug() << "handleRedirect  \t| external url detected \t| action: load it in the default browser";
-        QDesktopServices::openUrl(url);
-    }
-	else
-    {
-        QString anchor;
-        if ((anchor = IsCurrentUrlWithAnchor(url.url())) != "")
-        {
-            qDebug() << "handleRedirect  \t| anchor [" << anchor << "] detected \t| action: scroll to it";
-            if(QString::compare(anchor,"#top")==0)
-            {
-                //this->page()->mainFrame()->scrollToAnchor(anchor); // Doesn't work!
-                QPoint current_scroll_position = this->page()->mainFrame()->scrollPosition();
-                this->page()->mainFrame()->scroll(0,-current_scroll_position.ry());
-            }
-            else if(QString::compare(anchor,"#bottom")==0)
-            {
-                this->page()->mainFrame()->scroll(0,this->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
-            }
-            else
-                return;
-        }
-        else
-        {
-            qDebug() << "handleRedirect  \t| app url detected \t| action: loads it";
-            this->load(url);
-        }
-    }
 }
 
 /**
@@ -270,24 +229,4 @@ void MyWebView::LoadInternalPage(QString page)
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
 	else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
-}
-
-/**
- * @brief Vérifie si l'url passée en paramètre et l'url courante avec une ancre
- * @param url	url pour laquelle on on veut tester la présence d'une ancre
- * @return l'ancre si l'url est l'url courante avec une ancre, une chaine vide sinon
- */
-QString MyWebView::IsCurrentUrlWithAnchor(QString url)
-{
-    QString current_url     = this->page()->mainFrame()->url().url();
-    QString anchor_prefix   = "#";
-    QString anchor          = "";
-
-    if( url.contains(anchor_prefix) )
-    {
-        QString requested_url   = url.split(anchor_prefix)[0];
-        if ( QString::compare(current_url,requested_url) == 0 )
-            anchor = anchor_prefix.append(url.split(anchor_prefix)[1]);
-    }
-    return anchor;
 }

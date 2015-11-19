@@ -366,6 +366,8 @@ void MainWindow::loadFinished()
 {
 	ConfigManager &config = ConfigManager::Instance();
 	disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+    qDebug() << "Launch url: " << config.GetLaunchUrl();
+    qDebug() << "Base url(s): " << config.GetBaseUrl();
 	view->load(QUrl(config.GetLaunchUrl()));
 }
 

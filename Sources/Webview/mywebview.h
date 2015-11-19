@@ -19,8 +19,9 @@ public:
 	~MyWebView();
 	bool DispatchJsEvent(const QString & evtType, const QString & evtTarget, const QStringList &keyValues = QStringList());
 	void LoadInternalPage(QString page);
-    void SetUpdatingStatus(bool updatingStatus){isUpdating = updatingStatus;};
-    bool IsUpdating() {return isUpdating;};
+    void SetUpdatingStatus(bool updatingStatus){isUpdating = updatingStatus;}
+    bool IsUpdating() {return isUpdating;}
+    WebApp* getWebApp() {return wapp;}
 
 signals:
 	void changeIcon(const QIcon &icon);
@@ -36,11 +37,7 @@ private:
 	bool connectionLost;
     bool isUpdating;
 
-    QString IsCurrentUrlWithAnchor(QString url);
-
-
 private slots:
-	void handleRedirect(const QUrl &url);
 	void updateTitle();
     void updateLogin();
 	void updateJavaScriptObjects();
