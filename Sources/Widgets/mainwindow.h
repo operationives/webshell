@@ -21,6 +21,7 @@ public:
 private:
 	MyWebView *view;
     QSize oldSize;
+    QTimer *refreshTimer;
 	QMenu *fileMenu;
 	QAction *clearAllAction;
 	QAction *quitAction;
@@ -58,6 +59,9 @@ private slots:
 	void quit();
 	void changeIcon(const QIcon &icon);
     void loadFinished();
+    void forceGuiUpdate();
+    void stopForceGuiUpdate();
+    void startForceGuiUpdate();
 };
 
 #endif

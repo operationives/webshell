@@ -109,6 +109,9 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
 
+    refreshTimer = new QTimer(this);
+    connect(refreshTimer, SIGNAL(timeout()), this, SLOT(forceGuiUpdate()));
+    connect(view, SIGNAL(mousePressed()), this, SLOT(startForceGuiUpdate()));
 }
 
 /**
@@ -121,6 +124,7 @@ MainWindow::~MainWindow()
 	delete inspector;
 	delete infos;
 	delete fileMenu;
+    delete refreshTimer;
 }
 
 /**
@@ -404,8 +408,6 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     config.SetUserSize(event->size().width(),event->size().height());
 
    oldSize = event->oldSize(); //Used to retrieve the old size after maximising event
-
-   qApp->processEvents();
 }
 
 void MainWindow::changeEvent( QEvent* e )
@@ -424,5 +426,26 @@ void MainWindow::changeEvent( QEvent* e )
             config.SetUserSize(oldSize.width(),oldSize.height());
         }
     }
+
+    startForceGuiUpdate();
+}
+
+void MainWindow::startForceGuiUpdate()
+{
+    if (refreshTimer->isActive() == false)
+    {
+        refreshTimer->start(200); // Refresh UI every 200ms during 5s to avoid visual artifacts!
+        QTimer::singleShot(3000, this, SLOT(stopForceGuiUpdate()));
+    }
+}
+
+void MainWindow::forceGuiUpdate()
+{
+    view->update();
+}
+
+void MainWindow::stopForceGuiUpdate()
+{
+    refreshTimer->stop();
 }
 

@@ -27,6 +27,7 @@ signals:
 	void changeIcon(const QIcon &icon);
 	void changeTitle(const QString &appName);
 	void close();
+    void mousePressed();
 
 private:
 	QTimer *timer;
@@ -36,12 +37,14 @@ private:
 	WebshellParameters *webshellParameters;
 	bool connectionLost;
     bool isUpdating;
+    void mousePressEvent(QMouseEvent * ev);
 
 private slots:
 	void updateTitle();
     void updateLogin();
 	void updateJavaScriptObjects();
 	void updateConnectivity();
+
 };
 
 #endif

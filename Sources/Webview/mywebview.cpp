@@ -230,3 +230,9 @@ void MyWebView::LoadInternalPage(QString page)
 	else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
 }
+
+void MyWebView::mousePressEvent(QMouseEvent * ev)
+{
+    QWebView::mousePressEvent(ev);
+    emit mousePressed();
+}
