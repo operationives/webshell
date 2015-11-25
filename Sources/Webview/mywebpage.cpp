@@ -17,6 +17,9 @@ bool MyWebPage::acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest
     url_scheme = url.left(url.indexOf(":"));
     local_scheme_list = QWebSecurityOrigin::localSchemes();
 
+    if (QString::compare(url_scheme,"about") == 0)
+        return false;
+
     for (int i = 0 ; i <  local_scheme_list.length() ; i++)
     {
         if (QString::compare(url_scheme,local_scheme_list.at(i)) == 0)
@@ -37,7 +40,7 @@ bool MyWebPage::acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest
     {
         ConfigManager &config = ConfigManager::Instance();
         qDebug() << "Navigation request rejected. Open it in a browser. url: " << request.url();
-        qDebug() << "> Base url: " << config.GetBaseUrl();
+        qDebug() << "> Base url(s): " << config.GetBaseUrl();
         QString str_sheme_list = "";
         for (int i = 0 ; i <  local_scheme_list.length() ; i++)
         {

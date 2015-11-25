@@ -150,6 +150,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 		file.close();
 		QDomElement domElem = dom.documentElement();
 		QDomNode n = domElem.firstChild();
+        qDebug() << "Configuration:";
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
@@ -201,6 +202,8 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
             else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "loginList")
                 loginList.append(e.attribute(CHILDREN_VALUE_ATTRIBUTE));
 
+            if ( (e.attribute(CHILDREN_NAME_ATTRIBUTE) != NULL) && (e.attribute(CHILDREN_VALUE_ATTRIBUTE) != NULL) )
+                qDebug() << "> " << e.attribute(CHILDREN_NAME_ATTRIBUTE) << ": \t" << e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 			n = n.nextSibling();
 		}
 		bool toLoad = false;

@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 		config.SetInstallationFileToRemove("");
 	}
 
-    QWebSecurityOrigin::addLocalScheme("about");
+    //QWebSecurityOrigin::addLocalScheme("about");
 
 	//Si l'icône est spécifié on lance la mainWindow avec le bon icône, sinon on le lance tel quel
 	MainWindow *mw;

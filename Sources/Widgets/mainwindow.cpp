@@ -68,8 +68,9 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	//Initialisation de l'inspecteur de la page
 	inspector = new QWebInspector();
 	inspector->setPage(view->page());
+    inspector->resize(QSize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height()/4));
 
-	windowIconSpecified = !iconPath.isNull();
+    windowIconSpecified = !iconPath.isNull();
 	if(windowIconSpecified)
     {
         QIcon windowIcon(iconPath);
@@ -135,10 +136,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
 {
 
 	QMenu myMenu;
-	if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
-	{
-		myMenu.addAction(inspectAction);
-	}
+
 	if(!this->isFullScreen())
 	{
 		myMenu.addAction(fullscreenAction);
@@ -147,14 +145,22 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	{
 		myMenu.addAction(normalscreenAction);
 	}
-	myMenu.addAction(quitAction);
+    myMenu.addAction(infoAction);
+
+    myMenu.addSeparator();
+    if(QWebSettings::globalSettings()->testAttribute(QWebSettings::DeveloperExtrasEnabled))
+    {
+        myMenu.addAction(inspectAction);
+    }
     if (view->IsUpdating() == false)
         myMenu.addAction(reloadAction);
-	myMenu.addAction(infoAction);
 	myMenu.addAction(clearAllAction);
 #ifdef Q_OS_WIN
 	myMenu.addAction(sendlogAction);
 #endif
+
+    myMenu.addSeparator();
+    myMenu.addAction(quitAction);
 
 	QPoint globalPos = this->mapToGlobal(pos);
 
@@ -264,7 +270,7 @@ void MainWindow::changeActionNames(QString lang)
 		//Valeurs françaises
 		fileMenu->setTitle("Fichier");
 		clearAllAction->setText("Vider le cache");
-		quitAction->setText("Fermer");
+        quitAction->setText("Quitter");
 		inspectAction->setText("Inspecter");
 		fullscreenAction->setText("Plein écran");
 		normalscreenAction->setText("Fenêtré");
@@ -423,7 +429,8 @@ void MainWindow::changeEvent( QEvent* e )
         if( event->oldState() == Qt::WindowNoState && this->windowState() == Qt::WindowMaximized )
         {
             ConfigManager &config = ConfigManager::Instance();
-            config.SetUserSize(oldSize.width(),oldSize.height());
+            if (oldSize.width() && oldSize.height())
+                config.SetUserSize(oldSize.width(),oldSize.height());
         }
     }
 

@@ -4,10 +4,49 @@
 #include <QtWidgets>
 #include <QWebView>
 #include "webshellparameters.h"
+#include <QNetworkReply>
 
 class WNavigator;
 class NavigatorPlugins;
 class WebApp;
+
+class DownloadItem : public QWidget
+{
+    Q_OBJECT
+
+signals:
+    void downloadFinished(DownloadItem *item);
+
+public:
+    DownloadItem(QNetworkReply *reply = 0, QWidget *parent = 0);
+
+    void setUserFileName(QString p_file_name);
+    //bool downloading() const;
+    //bool downloadedSuccessfully() const;
+
+    //qint64 bytesTotal() const;
+    //qint64 bytesReceived() const;
+    //double remainingTime() const;
+    //double currentSpeed() const;
+
+    //QUrl m_url;
+
+
+
+private slots:
+    //void downloadReadyRead();
+    void error(QNetworkReply::NetworkError code);
+    //void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void finished();
+
+private:
+    QFile m_output;
+    QNetworkReply *m_reply;
+    QString m_userFileName;
+    QByteArray m_data;
+    bool m_fileIsSaved;
+
+};
 
 class MyWebView : public QWebView
 {
@@ -38,12 +77,15 @@ private:
 	bool connectionLost;
     bool isUpdating;
     void mousePressEvent(QMouseEvent * ev);
+    QList<DownloadItem*> m_downloads;
 
 private slots:
 	void updateTitle();
     void updateLogin();
 	void updateJavaScriptObjects();
 	void updateConnectivity();
+    void downloadContent(QNetworkReply *reply);
+    void downloadFinished(DownloadItem *item);
 
 };
 
