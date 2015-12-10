@@ -4,6 +4,7 @@
 #include <QLocalServer>
 #include <QMutex>
 #include <cstdlib>
+#include <QDataStream>
 
 #ifdef Q_OS_UNIX
     #include <signal.h>
@@ -77,6 +78,9 @@ public:
 SingleApplication::SingleApplication(int &argc, char *argv[])
     : QAPPLICATION_CLASS(argc, argv), d_ptr(new SingleApplicationPrivate(this))
 {
+    QApplication::setApplicationName(QString("Webshell"));
+    QApplication::setOrganizationName(QString("IVèS"));
+
     QString serverName = QAPPLICATION_CLASS::organizationName() + QAPPLICATION_CLASS::applicationName();
     serverName.replace(QRegExp("[^\\w\\-. ]"), "");
 
@@ -104,6 +108,22 @@ SingleApplication::SingleApplication(int &argc, char *argv[])
         // So only after a successful connection is the second instance terminated
         if( d_ptr->socket->waitForConnected(100) )
         {
+            if (this->arguments().size() > 1)
+            {
+                QStringList arguments = this->arguments();
+                for (int i = 0 ; i < arguments.length() ; i++)
+                {
+                    if (arguments.at(i) == "--quit")
+                    {
+                        const char* str = "--quit";
+                        qint64 c = d_ptr->socket->write(str);
+                        d_ptr->socket->waitForBytesWritten();
+                        if (c == -1)
+                            qWarning() << "Failed to transfer arguments between instances:" << d_ptr->socket->errorString();
+                        d_ptr->socket->flush();
+                    }
+                }
+            }
             ::exit(EXIT_SUCCESS); // Terminate the program using STDLib's exit function
         } else {
             delete d_ptr->memory;
@@ -127,7 +147,25 @@ SingleApplication::~SingleApplication()
 void SingleApplication::slotConnectionEstablished()
 {
     QLocalSocket *socket = d_ptr->server->nextPendingConnection();
+    QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(messageReceived()));
+    emit showUp();
+}
+
+void SingleApplication::messageReceived()
+{
+    QLocalSocket *socket = (QLocalSocket *) sender();
+    qDebug("SingleApplication: ready to read. socket addr = %p", socket);
+    if (socket == NULL)
+    {
+        qDebug() << "SingleApplication: socket NULL: abort";
+        return;
+    }
+    QByteArray data;
+    data = socket->readAll();
+    QString str(data);
+
+    if (str == "--quit")
+        QApplication::instance()->quit();
     socket->close();
     delete socket;
-    emit showUp();
 }

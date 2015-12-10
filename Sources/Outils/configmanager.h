@@ -17,6 +17,9 @@
 #define FR "fr"
 #define EN "en"
 
+#define FORCED_REFRESH_TICK_TIMER 100
+#define FORCED_REFRESH_DURATION 3000
+
 class ConfigManager : public QObject
 {
 	Q_OBJECT

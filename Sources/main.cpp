@@ -7,6 +7,10 @@
 #include "Widgets/mainwindow.h"
 #include "Outils/configmanager.h"
 #include "Widgets/singleapplication.h"
+#ifdef Q_OS_WIN
+    #include <QtWinExtras>
+#endif
+
 
 /** @mainpage Webshell
  *
@@ -64,6 +68,11 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
 int main(int argc, char** argv)
 {
     //QApplication app(argc, argv);
+    //QApplication::setApplicationName(QString("Webshell"));
+    //QApplication::setOrganizationName(QString("IVèS"));
+    //QApplication::setApplicationVersion(QString("1.0.1"));
+
+
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
     app.setApplicationVersion(QString("1.0.1"));
@@ -128,6 +137,8 @@ int main(int argc, char** argv)
 		mw = new MainWindow(parser.value(iconOption));
 	else
 		mw = new MainWindow();
+
+    QObject::connect(QApplication::instance(), SIGNAL(showUp()), mw, SLOT(raise()));
 
     mw->show();
 

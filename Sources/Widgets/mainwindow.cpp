@@ -14,7 +14,8 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
-	QNetworkProxyFactory::setUseSystemConfiguration(true);
+
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
 
 	ConfigManager &config = ConfigManager::Instance();
 	connect(&config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
@@ -37,7 +38,10 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 #endif
 
 	//Les settings initiaux permettent d'autoriser les npapi plugins, javascript, et la console javascript (clic droit->inspect)
-	QWebSettings::globalSettings()->enablePersistentStorage(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled,true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled,true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled,true);
+    QWebSettings::globalSettings()->enablePersistentStorage(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
@@ -48,7 +52,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	trayIconMenu->addAction (quitAction);
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setContextMenu (trayIconMenu);
-	trayIcon->show();
+    trayIcon->show();
 
 	//Ajout du menu dans la barre de titre
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
@@ -81,12 +85,33 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         this->trayIcon->setIcon(windowIcon);
 	}
 
-
+#ifdef Q_OS_WIN
+    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7 && QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS10)
+    {
+        jumplist = new QWinJumpList(this);
+        tasks = jumplist->tasks();
+        quitItem = new QWinJumpListItem(QWinJumpListItem::Link);
+        if (config.GetLanguage() == FR)
+        {
+            quitItem->setDescription("Quitter l'application");
+            quitItem->setTitle("Quitter");
+        }
+        else
+        {
+            quitItem->setDescription("Quit the application");
+            quitItem->setTitle("Quit");
+        }
+        quitItem->setArguments(QStringList("--quit"));
+        quitItem->setFilePath(QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
+        tasks->addItem(quitItem);
+        tasks->setVisible(true);
+    }
+#endif
 
     //connect(view,SIGNAL(changeIcon(QIcon)),this,SLOT(changeIcon(QIcon)));
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
-	connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+    connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
 	view->LoadInternalPage("loader");
 
@@ -103,16 +128,52 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         disconnect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
     }
 
-	this->setWindowTitle("Chargement en cours");
+    //this->setWindowTitle("Chargement en cours");
 	if(config.GetScreenMode())
 		this->showFullScreen();
 
-	setCentralWidget(view);
+    setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
 
+    // Handle the UI refresh:
     refreshTimer = new QTimer(this);
+    stopRefreshTimer = new QTimer(this);
+    stopRefreshTimer->setSingleShot(true);
+    stopRefreshTimer->setInterval(FORCED_REFRESH_DURATION);
     connect(refreshTimer, SIGNAL(timeout()), this, SLOT(forceGuiUpdate()));
     connect(view, SIGNAL(mousePressed()), this, SLOT(startForceGuiUpdate()));
+
+    // PROGRESS BAR
+    m_progressBar = new QProgressBar(this);
+    m_progressBar->setMinimum(0);
+    m_progressBar->setMaximum(100);
+    m_progressBar->setTextVisible(true);
+    m_progressBar->hide();
+    m_progressBar->setTextVisible(false);
+    //QString style = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #2978FF,stop: 0.4999 #FF78FF,stop: 0.5 #2978FF,stop: 1 #FF78FF );}";
+    QString style = "QProgressBar::chunk {background-color: #2978FF;}";
+    m_progressBar->setStyleSheet(style);
+
+#ifdef Q_OS_WIN
+    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
+    {
+        m_taskbarButton = new QWinTaskbarButton(this);
+        m_taskbarButton->setWindow(windowHandle());
+
+        m_taskbarProgress = m_taskbarButton->progress();
+        m_taskbarProgress->setVisible(true);
+        m_taskbarProgress->setRange(0, 100);
+        m_taskbarProgress->setValue(50);
+
+        connect(view,SIGNAL(loadFinished(bool)),this,SLOT(handleLoadFinished(bool)));
+        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+    }
+    else
+    {
+        m_taskbarButton     = NULL;
+        m_taskbarProgress   = NULL;
+    }
+#endif
 }
 
 /**
@@ -125,7 +186,16 @@ MainWindow::~MainWindow()
 	delete inspector;
 	delete infos;
 	delete fileMenu;
+    if (refreshTimer->isActive())
+        refreshTimer->stop();
     delete refreshTimer;
+    if (stopRefreshTimer->isActive())
+        stopRefreshTimer->stop();
+    delete stopRefreshTimer;
+
+#ifdef Q_OS_WIN
+    if (m_taskbarButton) delete m_taskbarButton;
+#endif
 }
 
 /**
@@ -184,7 +254,20 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	}
 	if (selectedItem->text()==reloadAction->text())
 	{
-	   view->reload();
+        /*ConfigManager &config = ConfigManager::Instance();
+        QString url = config.GetSavedAdress();
+        if (!url.isEmpty() && !url.isNull())
+        {
+            qDebug() << "Reload saved address: [" << url << "]";
+            view->load(QUrl(url));
+            //view->reload();
+        }
+        else
+        {
+            qDebug() << "Reload current page: [" << view->url().url() << "]";
+            view->reload();
+        }*/
+        view->reload();
 	}
 	if (selectedItem->text()==infoAction->text())
 	{
@@ -372,10 +455,16 @@ void MainWindow::changeIcon(const QIcon &icon)
 /**
  * @brief Fait la transition entre la page de chargement et la page principale
  */
-void MainWindow::loadFinished()
+void MainWindow::loadFinished(bool ok)
 {
 	ConfigManager &config = ConfigManager::Instance();
-	disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished()));
+    disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
+    if (!ok)
+    {
+        view->LoadInternalPage("disconnected");
+        qCritical() << __FUNCTION__ << " : La page n'est pas accessible";
+        return;
+    }
     qDebug() << "Launch url: " << config.GetLaunchUrl();
     qDebug() << "Base url(s): " << config.GetBaseUrl();
 	view->load(QUrl(config.GetLaunchUrl()));
@@ -439,11 +528,8 @@ void MainWindow::changeEvent( QEvent* e )
 
 void MainWindow::startForceGuiUpdate()
 {
-    if (refreshTimer->isActive() == false)
-    {
-        refreshTimer->start(200); // Refresh UI every 200ms during 5s to avoid visual artifacts!
-        QTimer::singleShot(3000, this, SLOT(stopForceGuiUpdate()));
-    }
+    refreshTimer->start(FORCED_REFRESH_TICK_TIMER);       // Refresh UI every 200ms...
+    stopRefreshTimer->start(FORCED_REFRESH_DURATION);    // ...during 3s to avoid visual artifacts!
 }
 
 void MainWindow::forceGuiUpdate()
@@ -456,3 +542,77 @@ void MainWindow::stopForceGuiUpdate()
     refreshTimer->stop();
 }
 
+void MainWindow::showEvent(QShowEvent *e)
+{
+#ifdef Q_OS_WIN32
+    m_taskbarButton->setWindow(windowHandle());
+#endif
+
+    e->accept();
+}
+
+void MainWindow::handleLoadProgress(int progress)
+{
+    m_progressBar->setValue(progress);
+    m_progressBar->show();
+    m_progressBar->resize(QSize(this->size().width(),10));
+    m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
+
+#ifdef Q_OS_WIN
+    if (m_taskbarProgress)
+    {
+        m_taskbarProgress->setVisible(true);
+        m_taskbarProgress->setValue(progress);
+    }
+#endif
+}
+
+void MainWindow::handleLoadFinished(bool ok)
+{
+    m_progressBar->hide();
+
+#ifdef Q_OS_WIN
+    if (m_taskbarProgress)
+        m_taskbarProgress->setVisible(false);
+#endif
+
+    if (!ok)
+    {
+        disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+        view->LoadInternalPage("disconnected");
+        qCritical() << "MainWindow:" << __FUNCTION__ << " : La page n'est pas accessible";
+        return;
+    }
+}
+
+void MainWindow::handleDownloadFinished()
+{
+    qDebug() << "TEST FINISH";
+    m_progressBar->hide();
+
+#ifdef Q_OS_WIN
+    if (m_taskbarProgress)
+        m_taskbarProgress->setVisible(false);
+#endif
+}
+
+void MainWindow::handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+    qDebug() << "TEST DOWNLOAD PROGRESS";
+    int progress = 0;
+    if (bytesReceived && bytesTotal)
+        progress = (float)bytesReceived/bytesTotal*100;
+
+    m_progressBar->setValue(progress);
+    m_progressBar->show();
+    m_progressBar->resize(QSize(this->size().width(),10));
+    m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
+
+#ifdef Q_OS_WIN
+    if (m_taskbarProgress)
+    {
+        m_taskbarProgress->setVisible(true);
+        m_taskbarProgress->setValue(progress);
+    }
+#endif
+}

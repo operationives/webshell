@@ -26,6 +26,7 @@ signals:
 
 private slots:
   void slotConnectionEstablished();
+  void messageReceived();
 
 private:
   SingleApplicationPrivate *d_ptr;

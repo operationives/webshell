@@ -5,6 +5,8 @@
 #include <QWebView>
 #include "webshellparameters.h"
 #include <QNetworkReply>
+#include <QWinTaskbarProgress>
+#include <QWinTaskbarButton>
 
 class WNavigator;
 class NavigatorPlugins;
@@ -16,11 +18,13 @@ class DownloadItem : public QWidget
 
 signals:
     void downloadFinished(DownloadItem *item);
+    //void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 public:
     DownloadItem(QNetworkReply *reply = 0, QWidget *parent = 0);
 
     void setUserFileName(QString p_file_name);
+    void abortDownload();
     //bool downloading() const;
     //bool downloadedSuccessfully() const;
 
@@ -69,7 +73,7 @@ signals:
     void mousePressed();
 
 private:
-	QTimer *timer;
+    QTimer *timer;
 	WNavigator *wnavigator;
 	NavigatorPlugins *navigatorplugins;
 	WebApp *wapp;
@@ -78,6 +82,8 @@ private:
     bool isUpdating;
     void mousePressEvent(QMouseEvent * ev);
     QList<DownloadItem*> m_downloads;
+    QProgressBar * m_progressBar;
+    QWinTaskbarProgress * m_winTaskBarProgress;
 
 private slots:
 	void updateTitle();
@@ -85,7 +91,9 @@ private slots:
 	void updateJavaScriptObjects();
 	void updateConnectivity();
     void downloadContent(QNetworkReply *reply);
-    void downloadFinished(DownloadItem *item);
+    //void downloadFinished(DownloadItem *item);
+    /*void handleLoadProgress(int progress);
+    void handleLoadFinished(bool ok);*/
 
 };
 

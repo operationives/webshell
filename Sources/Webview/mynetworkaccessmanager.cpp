@@ -75,7 +75,7 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
             values = parameter.split("=");
             if (values.at(0) == QString("email"))
             {
-                qDebug() << "Potential login detected: " << values[1];
+                qDebug() << "Potential login detected: [" << values[1] << "]";
                 m_pending_login = values[1];
             }
         }
@@ -117,7 +117,7 @@ void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
             QStringList login_list(config.GetLoginList());
             if (!login_list.contains(m_pending_login))
             {
-                qDebug() << "Storage of the new login: " << m_pending_login;
+                qDebug() << "Storage of the new login: [" << m_pending_login << "]";
                 login_list.append(m_pending_login);
                 config.SetLoginList(login_list);
             }

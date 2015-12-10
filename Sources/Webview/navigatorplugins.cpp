@@ -12,10 +12,10 @@ NavigatorPlugins::NavigatorPlugins(MyWebView *view)
 {
 	this->m_webView = view;
 	this->m_target = "window";
+    m_currentUdpateCount = 0;
 	//Le sémaphore est utile afin de mettre en pause les threads cherchant à exécuter
 	//un installeur téléchargé alors qu'un autre est déjà en cours d'exécution
 	sem = new Semaphore();
-    m_currentUdpateCount = 0;
 }
 
 

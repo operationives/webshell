@@ -57,11 +57,23 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateConnectivity()));
     timer->start(5000);
 
+
+    /*QNetworkConfigurationManager manager;
+    // Is there default access point, use it
+    QNetworkConfiguration cfg = manager.defaultConfiguration();
+    QNetworkSession *m_session = new QNetworkSession(cfg);*/
+    //connect(m_session, SIGNAL(closed()), this, SLOT(closed()));
+    //connect(m_session, SIGNAL(stateChanged(QNetworkSession::State)), this,  SLOT(updateConnectivity())/*SLOT(stateChanged(QNetworkSession::State))*/);
+    //connect(QNetworkSession,SIGNAL(stateChanged(QNetworkSession::State)), this, SLOT(updateConnectivity())
+
+
 	if(!wapp->IsPageInApplication(config.GetLaunchUrl()))
 	{
 		QStringList baseUrl = QStringList() << config.GetLaunchUrl() << config.GetBaseUrl();
 		wapp->setProperty("baseUrl",baseUrl);
 	}
+
+    isUpdating = false;
 }
 
 /**
@@ -69,11 +81,13 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
  */
 MyWebView::~MyWebView()
 {
-	timer->stop();
-	delete timer;
+    timer->stop();
+    delete timer;
 	delete wnavigator;
 	delete wapp;
 	delete navigatorplugins;
+    qDeleteAll(m_downloads.begin(), m_downloads.end());
+    m_downloads.clear();
 }
 
 /**
@@ -160,16 +174,18 @@ void MyWebView::updateJavaScriptObjects()
  */
 void MyWebView::updateConnectivity()
 {
-	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
+    MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::NotAccessible && !connectionLost)
 	{
+        qDebug() << "Network is not accessible";
         ConfigManager &config = ConfigManager::Instance();
 		config.SetSavedAdress(this->url().toString());
-		LoadInternalPage("disconnected");
+        //LoadInternalPage("disconnected");
 		connectionLost = true;
 	}
 	if(m_WebCtrl->networkAccessible() == QNetworkAccessManager::Accessible && connectionLost)
 	{
+        qDebug() << "Network is accessible. Reload the saved page";
 		QEventLoop loop;
 		connect(this,SIGNAL(loadFinished(bool)),&loop,SLOT(quit()));
 		LoadInternalPage("loader");
@@ -180,7 +196,7 @@ void MyWebView::updateConnectivity()
 		QString savedAdress(config.GetSavedAdress());
 		if(savedAdress.isEmpty())
 			return;
-		this->load(savedAdress);
+        this->load(savedAdress);
 		config.SetSavedAdress("");
 		connectionLost = false;
 	}
@@ -256,7 +272,8 @@ void MyWebView::downloadContent(QNetworkReply *reply)
 
     DownloadItem *unsupported_item = new DownloadItem(reply, this);
     m_downloads.append(unsupported_item);
-    connect(unsupported_item, SIGNAL(downloadFinished(DownloadItem *)), this, SLOT(downloadFinished(DownloadItem *)));
+    //connect(unsupported_item, SIGNAL(downloadFinished(DownloadItem *)), this, SLOT(downloadFinished(DownloadItem *)));
+    connect(unsupported_item, SIGNAL(downloadFinished(DownloadItem *)), this->parent(), SLOT(handleDownloadFinished()));
 
     QString caption;
     if(ConfigManager::Instance().GetLanguage() == FR)
@@ -295,30 +312,40 @@ void MyWebView::downloadContent(QNetworkReply *reply)
 
     QString pictureFileName = QFileDialog::getSaveFileName(this, caption, dir , filter);
 
-    if (!pictureFileName.isEmpty())
+    if (!pictureFileName.isEmpty() && !pictureFileName.isNull())
         unsupported_item->setUserFileName(pictureFileName);
     else
-        m_downloads.removeOne(unsupported_item);
+    {
+        unsupported_item->abortDownload();
+        //emit unsupported_item->downloadFinished(unsupported_item);
+        //m_downloads.removeOne(unsupported_item);
+    }
+
 }
 
-void MyWebView::downloadFinished(DownloadItem* item)
+/*void MyWebView::downloadFinished(DownloadItem* item)
 {
     if (item == NULL) return;
 
     if (ConfigManager::Instance().GetDeveloperToolsMode())
         qDebug() << "MyWebView::" << __FUNCTION__ << "Download Finished: remove download item";
     m_downloads.removeOne(item);
-}
+}*/
+
+
+/*
+ * DOWNLOAD ITEM:
+ * */
 
 DownloadItem::DownloadItem(QNetworkReply *reply, QWidget *parent)
     : QWidget(parent)
     , m_reply(reply)
 {
-    //connect(m_reply, SIGNAL(readyRead()), this, SLOT(downloadReadyRead()));
     connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(error(QNetworkReply::NetworkError)));
-    //connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64, qint64)));
-    //connect(m_reply, SIGNAL(metaDataChanged()), this, SLOT(metaDataChanged()));
     connect(m_reply, SIGNAL(finished()), this, SLOT(finished()));
+    connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this->parent()->parent(), SLOT(handleDownloadProgress(qint64, qint64)));
+    //connect(m_reply, SIGNAL(readyRead()), this, SLOT(downloadReadyRead()));
+    //connect(m_reply, SIGNAL(metaDataChanged()), this, SLOT(metaDataChanged()));
 
     m_data = NULL;
     m_fileIsSaved = false;
@@ -348,10 +375,12 @@ void DownloadItem::finished()
                     }
                     m_fileIsSaved = true;
                     emit downloadFinished(this);
+                    disconnect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this->parent()->parent(), SLOT(handleDownloadProgress(qint64, qint64)));
+                    m_reply->deleteLater();
                 }
             break;
         }
-        m_reply->deleteLater();
+
     }
 }
 
@@ -372,5 +401,15 @@ void DownloadItem::setUserFileName(QString p_file_name)
             qDebug() << "Written " <<  file.write(m_data) << " BYTES";
             file.close();
         }
+        m_data.clear();
+        emit downloadFinished(this);
+        disconnect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this->parent()->parent(), SLOT(handleDownloadProgress(qint64, qint64)));
+        m_reply->deleteLater();
     }
+}
+
+void DownloadItem::abortDownload()
+{
+    emit downloadFinished(this);
+    disconnect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this->parent()->parent(), SLOT(handleDownloadProgress(qint64, qint64)));
 }
