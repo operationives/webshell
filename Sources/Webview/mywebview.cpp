@@ -53,19 +53,9 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(parent,SIGNAL(clearAll()),m_WebCtrl,SLOT(clearAll()));
 
 	//On fait un test de connexion régulièrement sachant que le signal de perte de connexion n'est parfois pas émis
-    timer = new QTimer(this);
+    /*timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateConnectivity()));
-    timer->start(5000);
-
-
-    /*QNetworkConfigurationManager manager;
-    // Is there default access point, use it
-    QNetworkConfiguration cfg = manager.defaultConfiguration();
-    QNetworkSession *m_session = new QNetworkSession(cfg);*/
-    //connect(m_session, SIGNAL(closed()), this, SLOT(closed()));
-    //connect(m_session, SIGNAL(stateChanged(QNetworkSession::State)), this,  SLOT(updateConnectivity())/*SLOT(stateChanged(QNetworkSession::State))*/);
-    //connect(QNetworkSession,SIGNAL(stateChanged(QNetworkSession::State)), this, SLOT(updateConnectivity())
-
+    timer->start(5000);*/
 
 	if(!wapp->IsPageInApplication(config.GetLaunchUrl()))
 	{
@@ -81,8 +71,8 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
  */
 MyWebView::~MyWebView()
 {
-    timer->stop();
-    delete timer;
+    //timer->stop();
+    //delete timer;
 	delete wnavigator;
 	delete wapp;
 	delete navigatorplugins;
@@ -246,8 +236,8 @@ void MyWebView::LoadInternalPage(QString page)
 {
 	ConfigManager &config = ConfigManager::Instance();
 	if(QFile::exists(QString(QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")))
-		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
-	else
+        this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-"+config.GetLanguage()+".html")));
+    else
 		this->load(QUrl(QString("file:///"+QApplication::applicationDirPath()+"/" + page + "-en"+".html")));
 }
 

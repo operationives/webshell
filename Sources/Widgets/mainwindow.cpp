@@ -14,6 +14,20 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
+    m_currentNetworkState = QNetworkSession::Invalid;
+    m_lastNetworkState = m_currentNetworkState;
+
+    QNetworkConfiguration cfg = m_networkConfigurationManager.defaultConfiguration();
+    if (!cfg.isValid())
+    {
+        m_session = NULL;
+        qWarning() << "Invalid network configuration at start. The app won't be able to handle automatic reconnection";
+    }
+    else
+    {
+        m_session = new QNetworkSession(cfg);
+        connect(m_session, SIGNAL(stateChanged(QNetworkSession::State)), this,  SLOT(handleNetworkStateChanged(QNetworkSession::State))/*SLOT(stateChanged(QNetworkSession::State))*/);
+    }
 
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -52,7 +66,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	trayIconMenu->addAction (quitAction);
 	trayIcon = new QSystemTrayIcon(this);
 	trayIcon->setContextMenu (trayIconMenu);
-    trayIcon->show();
+    //trayIcon->show();
 
 	//Ajout du menu dans la barre de titre
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
@@ -83,6 +97,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         inspector->setWindowIcon(windowIcon);
 
         this->trayIcon->setIcon(windowIcon);
+        trayIcon->show();
 	}
 
 #ifdef Q_OS_WIN
@@ -164,9 +179,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         m_taskbarProgress->setVisible(true);
         m_taskbarProgress->setRange(0, 100);
         m_taskbarProgress->setValue(50);
-
-        connect(view,SIGNAL(loadFinished(bool)),this,SLOT(handleLoadFinished(bool)));
-        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
     }
     else
     {
@@ -196,6 +208,7 @@ MainWindow::~MainWindow()
 #ifdef Q_OS_WIN
     if (m_taskbarButton) delete m_taskbarButton;
 #endif
+    delete m_session;
 }
 
 /**
@@ -267,7 +280,11 @@ void MainWindow::showContextMenu(const QPoint &pos)
             qDebug() << "Reload current page: [" << view->url().url() << "]";
             view->reload();
         }*/
-        view->reload();
+        ConfigManager &config = ConfigManager::Instance();
+        QString savedAdress(config.GetSavedAdress());
+        qDebug() << "Reload the current page: " << savedAdress;
+        view->load(QUrl(savedAdress));
+        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
 	}
 	if (selectedItem->text()==infoAction->text())
 	{
@@ -392,6 +409,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 			this->changeScreenMode(false);
 		QMainWindow::keyPressEvent(event); // call the default implementation
 	}
+    if (event->key() == Qt::Key_F5)
+    {
+        ConfigManager &config = ConfigManager::Instance();
+        QString savedAdress(config.GetSavedAdress());
+        qDebug() << "Reload the current page: " << savedAdress;
+        view->load(QUrl(savedAdress));
+        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+        QMainWindow::keyPressEvent(event); // call the default implementation
+    }
 	else
 	{
 		QMainWindow::keyPressEvent(event); // call the default implementation
@@ -450,6 +476,7 @@ void MainWindow::changeIcon(const QIcon &icon)
 		infos->setWindowIcon(icon);
 		inspector->setWindowIcon(icon);
 	}
+    trayIcon->show();
 }
 
 /**
@@ -458,16 +485,23 @@ void MainWindow::changeIcon(const QIcon &icon)
 void MainWindow::loadFinished(bool ok)
 {
 	ConfigManager &config = ConfigManager::Instance();
-    disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
+
+    ConfigManager::Instance().SetSavedAdress(config.GetLaunchUrl());
     if (!ok)
     {
         view->LoadInternalPage("disconnected");
-        qCritical() << __FUNCTION__ << " : La page n'est pas accessible";
+        qCritical() << __FUNCTION__ << " : Le service n'est pas accessible";
         return;
     }
+    disconnect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
     qDebug() << "Launch url: " << config.GetLaunchUrl();
     qDebug() << "Base url(s): " << config.GetBaseUrl();
+
+    connect(view,SIGNAL(loadFinished(bool)),this,SLOT(handleLoadFinished(bool)));
+    connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+
 	view->load(QUrl(config.GetLaunchUrl()));
+
 }
 
 /**
@@ -580,14 +614,18 @@ void MainWindow::handleLoadFinished(bool ok)
     {
         disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
         view->LoadInternalPage("disconnected");
-        qCritical() << "MainWindow:" << __FUNCTION__ << " : La page n'est pas accessible";
+        qWarning() << "MainWindow:" << __FUNCTION__ << " : La page n'est pas accessible %p" << m_session;
         return;
+    }
+    else
+    {
+        qDebug() << "Save current page: " << view->url().toString();
+        ConfigManager::Instance().SetSavedAdress(view->url().toString());
     }
 }
 
 void MainWindow::handleDownloadFinished()
 {
-    qDebug() << "TEST FINISH";
     m_progressBar->hide();
 
 #ifdef Q_OS_WIN
@@ -598,7 +636,6 @@ void MainWindow::handleDownloadFinished()
 
 void MainWindow::handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    qDebug() << "TEST DOWNLOAD PROGRESS";
     int progress = 0;
     if (bytesReceived && bytesTotal)
         progress = (float)bytesReceived/bytesTotal*100;
@@ -615,4 +652,23 @@ void MainWindow::handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
         m_taskbarProgress->setValue(progress);
     }
 #endif
+}
+
+void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
+{
+    m_currentNetworkState = state;
+    qDebug() << "Network state changed: from [" << m_lastNetworkState << "] to [" << m_currentNetworkState << "]";
+
+    // Restart the service when a network reconection occured after display the local disconnected page:
+    if (    m_currentNetworkState == QNetworkSession::Connected &&
+            m_currentNetworkState != m_lastNetworkState &&
+            view->url().url().startsWith("file:") )
+    {
+        ConfigManager &config = ConfigManager::Instance();
+        qDebug() << "Reconnection => load the service url: " << config.GetLaunchUrl();
+        view->load(QUrl(config.GetLaunchUrl()));
+        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+
+    }
+    m_lastNetworkState = m_currentNetworkState;
 }

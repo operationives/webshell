@@ -50,6 +50,10 @@ private:
     QWinTaskbarButton *m_taskbarButton;
     QWinTaskbarProgress * m_taskbarProgress;
 #endif
+    QNetworkConfigurationManager m_networkConfigurationManager;
+    QNetworkSession *m_session;
+    QNetworkSession::State m_currentNetworkState;
+    QNetworkSession::State m_lastNetworkState;
 
 	bool windowIconSpecified;
 	bool stayOpen;
@@ -81,6 +85,7 @@ private slots:
     void handleLoadFinished(bool ok);
     void handleDownloadFinished();
     void handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void handleNetworkStateChanged(QNetworkSession::State);
 };
 
 #endif
