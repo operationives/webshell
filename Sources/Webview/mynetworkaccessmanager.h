@@ -1,6 +1,7 @@
 #ifndef MYNETWORKACCESSMANAGER_H
 #define MYNETWORKACCESSMANAGER_H
 
+#include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include "cookiejar.h"
@@ -30,8 +31,12 @@ private:
 	CookieJar *m_cookieJar;
     QString m_pending_login;
 
+//signals:
+//    void cancelRequest();
+
 private slots:
 	void getLanguage(QNetworkReply *reply);
+    //void handlReplyError(QNetworkReply::NetworkError error);
 };
 
 #endif // MYNETWORKACCESSMANAGER_H

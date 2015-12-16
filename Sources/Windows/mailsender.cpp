@@ -36,7 +36,7 @@ void MailSender::AddFile( QString file, QString name )
 		a.name.remove(0,a.name.lastIndexOf('/'));
 	}
 	else
-		a.name = name;
+        a.name = name;
 	m_Files.push_back(a);
 }
 
@@ -51,7 +51,7 @@ bool MailSender::Send(QString szSubject)
 		return false;
 
 	LPMAPISENDMAIL SendMail;
-	SendMail = (LPMAPISENDMAIL) GetProcAddress(m_hLib, QString("MAPISendMail").toStdString().c_str());
+    SendMail = (LPMAPISENDMAIL) GetProcAddress(m_hLib, QString("MAPISendMail").toStdString().c_str());
 
 	if (!SendMail)
 		return false;
@@ -86,10 +86,10 @@ bool MailSender::Send(QString szSubject)
 	message.nFileCount = filedesc.size();
 	message.lpFiles = (lpMapiFileDesc)  &filedesc[0];
 
-	int nError = SendMail(0, (ULONG)HWND_DESKTOP, &message, MAPI_LOGON_UI|MAPI_DIALOG, 0);
+    int nError = SendMail(0, (ULONG)HWND_DESKTOP, &message, MAPI_LOGON_UI|MAPI_DIALOG, 0);
 
 	if (nError != SUCCESS_SUCCESS && nError != MAPI_USER_ABORT && nError != MAPI_E_LOGIN_FAILURE)
-		return false;
+        return false;
 
 	return true;
 }

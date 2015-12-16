@@ -59,6 +59,8 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
 
     if (outgoingData)
     {
+
+
         // Get user data:
         char buffer[256];
         outgoingData -> peek(buffer,256);
@@ -82,12 +84,27 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
     }
 
 	//Avec ce passage, l'application est censée accéder au cache lorsque le réseau n'est pas accessible, mais cela ne fonctionne pas
-	if(this->networkAccessible() == QNetworkAccessManager::NotAccessible)
-		request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
+    request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
+    //if(this->networkAccessible() == QNetworkAccessManager::NotAccessible)
+    //	request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
 	//Avec ce header, on peut si il n'y a pas de cookie défini pour la langue accéder à une langue spécifique pour la page demandée
 	ConfigManager &config = ConfigManager::Instance();
     request.setRawHeader("Accept-Language", config.GetLanguage().toLatin1());
-	return QNetworkAccessManager::createRequest(op, request, outgoingData);
+
+    /*QNetworkReply *reply = QNetworkAccessManager::createRequest(op, request, outgoingData);
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),this, SLOT(handlReplyError(QNetworkReply::NetworkError)));
+    if (outgoingData)
+        if(this->networkAccessible() == QNetworkAccessManager::NotAccessible)
+        {
+            qDebug() << "Network is not accessible. Abort the post request";
+            //connect(this, SIGNAL(cancelRequest()), reply, SLOT(abort()));
+            //emit cancelRequest();
+            reply->abort();
+            //emit reply->error(QNetworkReply::TemporaryNetworkFailureError);
+        }
+    return reply;*/
+
+    return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
 /**
@@ -145,3 +162,17 @@ CookieJar* MyNetworkAccessManager::getCookieJar()
 {
     return m_cookieJar;
 }
+
+
+/*void MyNetworkAccessManager::handlReplyError(QNetworkReply::NetworkError error)
+{
+    switch(error)
+    {
+     case QNetworkReply::NoError:
+        qDebug() << "No error";
+        break;
+     default:
+        qDebug() << "Reply error";
+        break;
+    }
+}*/

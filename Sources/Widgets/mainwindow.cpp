@@ -267,23 +267,19 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	}
 	if (selectedItem->text()==reloadAction->text())
 	{
-        /*ConfigManager &config = ConfigManager::Instance();
-        QString url = config.GetSavedAdress();
-        if (!url.isEmpty() && !url.isNull())
+        ConfigManager &config = ConfigManager::Instance();
+        QUrl reloading_url;
+        if ( m_currentNetworkState == QNetworkSession::Connected && view->url().url().startsWith("file:") )
         {
-            qDebug() << "Reload saved address: [" << url << "]";
-            view->load(QUrl(url));
-            //view->reload();
+            reloading_url = QUrl(config.GetLaunchUrl());
+            qDebug() << "Reconnection => load the base url: " << reloading_url.url();
         }
         else
         {
-            qDebug() << "Reload current page: [" << view->url().url() << "]";
-            view->reload();
-        }*/
-        ConfigManager &config = ConfigManager::Instance();
-        QString savedAdress(config.GetSavedAdress());
-        qDebug() << "Reload the current page: " << savedAdress;
-        view->load(QUrl(savedAdress));
+            reloading_url = QUrl(config.GetSavedAdress());
+            qDebug() << "Reload the current page: " << reloading_url.url();
+        }
+        view->load(reloading_url);
         connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
 	}
 	if (selectedItem->text()==infoAction->text())
@@ -293,9 +289,9 @@ void MainWindow::showContextMenu(const QPoint &pos)
 #ifdef Q_OS_WIN
 	if (selectedItem->text()==sendlogAction->text())
 	{
-		MailSender mail;
-		mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".log");
-		mail.Send(sendlogAction->text());
+        MailSender mail;
+        mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".log");
+        mail.Send(sendlogAction->text());
 	}
 #endif
 }
@@ -614,7 +610,7 @@ void MainWindow::handleLoadFinished(bool ok)
     {
         disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
         view->LoadInternalPage("disconnected");
-        qWarning() << "MainWindow:" << __FUNCTION__ << " : La page n'est pas accessible %p" << m_session;
+        qWarning() << "MainWindow:" << __FUNCTION__ << " : The url page is not accessible";
         return;
     }
     else
@@ -658,6 +654,15 @@ void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
 {
     m_currentNetworkState = state;
     qDebug() << "Network state changed: from [" << m_lastNetworkState << "] to [" << m_currentNetworkState << "]";
+
+    if ( m_currentNetworkState == QNetworkSession::Connected )
+    {
+        qDebug() << "Network is accessible";
+    }
+    else
+    {
+        qDebug() << "Network is not accessible";
+    }
 
     // Restart the service when a network reconection occured after display the local disconnected page:
     if (    m_currentNetworkState == QNetworkSession::Connected &&

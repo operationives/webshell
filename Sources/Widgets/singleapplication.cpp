@@ -79,7 +79,7 @@ SingleApplication::SingleApplication(int &argc, char *argv[])
     : QAPPLICATION_CLASS(argc, argv), d_ptr(new SingleApplicationPrivate(this))
 {
     QApplication::setApplicationName(QString("Webshell"));
-    QApplication::setOrganizationName(QString("IVèS"));
+    QApplication::setOrganizationName(QString("IVeS"));
 
     QString serverName = QAPPLICATION_CLASS::organizationName() + QAPPLICATION_CLASS::applicationName();
     serverName.replace(QRegExp("[^\\w\\-. ]"), "");
