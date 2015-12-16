@@ -14,19 +14,20 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
-    m_currentNetworkState = QNetworkSession::Invalid;
-    m_lastNetworkState = m_currentNetworkState;
-
     QNetworkConfiguration cfg = m_networkConfigurationManager.defaultConfiguration();
     if (!cfg.isValid())
     {
         m_session = NULL;
         qWarning() << "Invalid network configuration at start. The app won't be able to handle automatic reconnection";
+        m_currentNetworkState = QNetworkSession::Invalid;
+        m_lastNetworkState = m_currentNetworkState;
     }
     else
     {
         m_session = new QNetworkSession(cfg);
         connect(m_session, SIGNAL(stateChanged(QNetworkSession::State)), this,  SLOT(handleNetworkStateChanged(QNetworkSession::State))/*SLOT(stateChanged(QNetworkSession::State))*/);
+        m_currentNetworkState = m_session->state();
+        m_lastNetworkState = m_currentNetworkState;
     }
 
     QNetworkProxyFactory::setUseSystemConfiguration(true);
@@ -608,10 +609,13 @@ void MainWindow::handleLoadFinished(bool ok)
 
     if (!ok)
     {
-        disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
-        view->LoadInternalPage("disconnected");
-        qWarning() << "MainWindow:" << __FUNCTION__ << " : The url page is not accessible";
-        return;
+        if (m_currentNetworkState != QNetworkSession::Connected)
+        {
+            disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+            view->LoadInternalPage("disconnected");
+            qWarning() << "MainWindow:" << __FUNCTION__ << " : The url page is not accessible";
+            return;
+        }
     }
     else
     {
