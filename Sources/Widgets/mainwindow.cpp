@@ -310,14 +310,20 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	ConfigManager &config = ConfigManager::Instance();
 	if(fullscreen)
 	{
+        m_windowSizeBeforeFullscreen = QSize(config.GetUserWidth(),config.GetUserHeight());
 		this->showFullScreen();
+        config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
 	}
 	else
 	{
-		this->showNormal();
-		this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
-        this->resize(config.GetUserWidth(),config.GetUserHeight());
-		this->CenterScreen();
+        this->showNormal();
+        this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
+        // We get back to the size before the fullscreen mode.
+        // We use the variable m_windowSizeBeforeFullscreen to avoid erroneous values from the resize event.
+        oldSize = m_windowSizeBeforeFullscreen;
+        config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
+        this->resize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
+        this->CenterScreen();
 	}
 	config.SetScreenMode(fullscreen);
 }
@@ -561,8 +567,11 @@ void MainWindow::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
    ConfigManager &config = ConfigManager::Instance();
 
-   if (!this->isFullScreen())
-    config.SetUserSize(event->size().width(),event->size().height());
+   if (this->windowState() == Qt::WindowNoState && !this->isFullScreen() && event->spontaneous() == true)
+   {
+        config.SetUserSize(event->size().width(),event->size().height());
+        qDebug() << "Set User size "  << event->size().width() << " " << event->size().height();
+   }
 
    oldSize = event->oldSize(); //Used to retrieve the old size after maximising event
 }
@@ -579,6 +588,8 @@ void MainWindow::changeEvent( QEvent* e )
         else*/
         if( event->oldState() == Qt::WindowNoState && this->windowState() == Qt::WindowMaximized )
         {
+            // Window restored to maximised state
+            // The window size is not stored. The previous one is stored
             ConfigManager &config = ConfigManager::Instance();
             if (oldSize.width() && oldSize.height())
                 config.SetUserSize(oldSize.width(),oldSize.height());

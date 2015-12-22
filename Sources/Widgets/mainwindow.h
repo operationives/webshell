@@ -55,6 +55,7 @@ private:
     QNetworkSession::State m_currentNetworkState;
     QNetworkSession::State m_lastNetworkState;
     QTranslator *m_translator;
+    QSize m_windowSizeBeforeFullscreen;
 
 	bool windowIconSpecified;
 	bool stayOpen;
