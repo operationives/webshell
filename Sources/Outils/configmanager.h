@@ -20,6 +20,13 @@
 #define FORCED_REFRESH_TICK_TIMER 100
 #define FORCED_REFRESH_DURATION 3000
 
+enum SCREEN_MODE
+{
+    MAXIMIZED = 0,
+    WINDOWED,
+    FULLSCREEN
+};
+
 class ConfigManager : public QObject
 {
 	Q_OBJECT
@@ -33,7 +40,7 @@ public:
 	QString GetSavedAdress();
 
 	//Getters pour attributs appli
-	bool GetScreenMode();
+    SCREEN_MODE GetScreenMode();
 	bool GetDeveloperToolsMode();
 	bool GetCloseButtonBehaviour();
 	bool GetMenuBarPresent();
@@ -58,7 +65,7 @@ public slots:
 	void SetSavedAdress(QString savedAdress);
 
 	//Setters pour attributs appli
-	void SetScreenMode(bool fullscreen);
+    void SetScreenMode(SCREEN_MODE screenMode);
 	void SetDeveloperToolsMode(bool developerToolsActivated);
 	void SetCloseButtonBehaviour(bool minimization);
 	void SetMenuBarPresent(bool menuBarPresent);
@@ -93,7 +100,7 @@ private:
 	QString savedAdress;
 
 	//Attributs application
-	bool fullscreen;
+    SCREEN_MODE screenMode;
 	bool developerToolsActivated;
 	bool minimization;
 	bool menuBarPresent;

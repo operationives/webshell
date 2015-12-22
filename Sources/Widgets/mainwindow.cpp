@@ -138,6 +138,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
     if (config.GetUserWidth() < config.GetMinWidth() || config.GetUserHeight() < config.GetMinHeight())
     {
+        config.SetUserSize(config.GetDefaultWidth(),config.GetDefaultHeight());
         this->resize(config.GetDefaultWidth(),config.GetDefaultHeight());
         connect(&config,SIGNAL(defaultSize(int,int)),this,SLOT(changeDefaultSize(int,int)));
     }
@@ -189,8 +190,19 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     }
 #endif
 
-    if(config.GetScreenMode())
-        this->showFullScreen();
+    switch(config.GetScreenMode())
+    {
+        case FULLSCREEN:
+            changeScreenMode(true);
+        break;
+        case MAXIMIZED:
+            oldSize = QSize(config.GetUserWidth(),config.GetUserHeight());
+            this->showMaximized();
+            break;
+        case WINDOWED:
+        default:
+            break;
+    }
 
 }
 
@@ -312,12 +324,14 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	ConfigManager &config = ConfigManager::Instance();
 	if(fullscreen)
 	{
+        config.SetScreenMode(FULLSCREEN);
         m_windowSizeBeforeFullscreen = QSize(config.GetUserWidth(),config.GetUserHeight());
 		this->showFullScreen();
         config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
 	}
 	else
 	{
+        config.SetScreenMode(WINDOWED);
         this->showNormal();
         this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
         // We get back to the size before the fullscreen mode.
@@ -327,7 +341,7 @@ void MainWindow::changeScreenMode(bool fullscreen)
         this->resize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
         this->CenterScreen();
 	}
-	config.SetScreenMode(fullscreen);
+
 }
 
 /**
@@ -359,11 +373,12 @@ void MainWindow::changeMinSize(int minWidth, int minHeight)
  */
 void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 {
-	if(!this->isFullScreen())
+    if(!this->isFullScreen() && this->windowState() != Qt::WindowMaximized)
 	{
 		this->resize(defaultWidth,defaultHeight);
         this->CenterScreen();
 	}
+
 }
 
 /**
@@ -583,16 +598,25 @@ void MainWindow::changeEvent( QEvent* e )
     if( e->type() == QEvent::WindowStateChange )
     {
         QWindowStateChangeEvent* event = static_cast< QWindowStateChangeEvent* >( e );
+        ConfigManager &config = ConfigManager::Instance();
         /*if( event->oldState() & Qt::WindowMinimized )
         {
             qDebug() << "Window restored (to normal or maximized state)!";
         }
         else*/
-        if( event->oldState() == Qt::WindowNoState && this->windowState() == Qt::WindowMaximized )
+        if( this->windowState() == Qt::WindowNoState )
+        {
+            config.SetScreenMode(WINDOWED);
+        }
+        else if( this->windowState() == Qt::WindowFullScreen )
+        {
+            config.SetScreenMode(FULLSCREEN);
+        }
+        else if( event->oldState() == Qt::WindowNoState && this->windowState() == Qt::WindowMaximized )
         {
             // Window restored to maximised state
             // The window size is not stored. The previous one is stored
-            ConfigManager &config = ConfigManager::Instance();
+            config.SetScreenMode(MAXIMIZED);
             if (oldSize.width() && oldSize.height())
                 config.SetUserSize(oldSize.width(),oldSize.height());
         }

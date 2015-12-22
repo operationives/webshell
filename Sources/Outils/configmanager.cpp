@@ -111,7 +111,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	this->launchUrl = launchUrl;
 
 	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
-	fullscreen = false;
+    screenMode = WINDOWED;
 	developerToolsActivated = false;
 	minimization = false;
 	menuBarPresent = false;
@@ -154,8 +154,8 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 		while(!n.isNull())
 		{
 			QDomElement e = n.toElement();
-			if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "fullscreen")
-				fullscreen = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
+            if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "screenMode")
+                screenMode = (SCREEN_MODE) e.attribute(CHILDREN_VALUE_ATTRIBUTE).toInt();
 
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "developerToolsActivated")
 				developerToolsActivated = (e.attribute(CHILDREN_VALUE_ATTRIBUTE) == "true" ? true : false);
@@ -276,8 +276,8 @@ void ConfigManager::StoreParametersAppli()
 	QDomElement domElem = dom.createElement(PARENT_TAG_NAME);
 	dom.appendChild(domElem);
 
-	//Insertion du paramètre fullscreen
-	AppendNode("fullscreen",fullscreen,domElem);
+    //Insertion du paramètre screenMode
+    AppendNode("screenMode",screenMode,domElem);
 
 	//Insertion du paramètre developerToolsActivated
 	AppendNode("developerToolsActivated",developerToolsActivated,domElem);
@@ -350,7 +350,6 @@ void ConfigManager::StoreParametersAppli()
  */
 void ConfigManager::AppendNode(const QString &name, const QVariant &value, QDomElement &domElem)
 {
-	//Insertion du paramètre fullscreen
 	QDomDocument dom;
 	QDomElement write_elem;
 
@@ -427,21 +426,21 @@ void ConfigManager::SetSavedAdress(QString savedAdress)
 }
 
 /**
- * @brief Indique si l'utilisateur doit être en plein écran ou non
- * @return fullscreen
+ * @brief Indique le mode d'écran par défaut : plein écran, fenêtré, maximisé
+ * @return screenMode
  */
-bool ConfigManager::GetScreenMode()
+SCREEN_MODE ConfigManager::GetScreenMode()
 {
-	return fullscreen;
+    return screenMode;
 }
 
 /**
- * @brief Met à jour le paramètre "fullscreen"
- * @param fullscreen	Nouvelle valeur de this->fullscreen
+ * @brief Met à jour le paramètre "screenMode"
+ * @param screenMode	Nouvelle valeur de this->screenMode
  */
-void ConfigManager::SetScreenMode(bool fullscreen)
+void ConfigManager::SetScreenMode(SCREEN_MODE screenMode)
 {
-	this->fullscreen = fullscreen;
+    this->screenMode = screenMode;
 	StoreParametersAppli();
 }
 
