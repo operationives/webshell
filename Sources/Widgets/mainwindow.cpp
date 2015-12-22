@@ -148,8 +148,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     }
 
     //this->setWindowTitle("Chargement en cours");
-	if(config.GetScreenMode())
-		this->showFullScreen();
 
     setCentralWidget(view);
 	setUnifiedTitleAndToolBarOnMac(true);
@@ -190,6 +188,10 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         m_taskbarProgress   = NULL;
     }
 #endif
+
+    if(config.GetScreenMode())
+        this->showFullScreen();
+
 }
 
 /**
