@@ -54,6 +54,7 @@ private:
     QNetworkSession *m_session;
     QNetworkSession::State m_currentNetworkState;
     QNetworkSession::State m_lastNetworkState;
+    QTranslator *m_translator;
 
 	bool windowIconSpecified;
 	bool stayOpen;
@@ -75,6 +76,7 @@ private slots:
 	void changeMinSize(int minWidth, int minHeight);
 	void changeDefaultSize(int defaultWidth, int defaultHeight);
 	void changeActionNames(QString lang);
+    void loadTranslator(QString lang);
 	void quit();
 	void changeIcon(const QIcon &icon);
     void loadFinished(bool ok);

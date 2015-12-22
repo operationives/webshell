@@ -14,6 +14,8 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
+    m_translator = NULL;
+
     QNetworkConfiguration cfg = m_networkConfigurationManager.defaultConfiguration();
     if (!cfg.isValid())
     {
@@ -36,6 +38,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(&config,SIGNAL(toolsMode(bool)),this,SLOT(changeToolsMode(bool)));
 	connect(&config,SIGNAL(minSize(int,int)),this,SLOT(changeMinSize(int,int)));
     connect(&config,SIGNAL(newLanguage(QString)),this,SLOT(changeActionNames(QString)));
+    connect(&config,SIGNAL(newLanguage(QString)),this,SLOT(loadTranslator(QString)));
 
 	stayOpen = true;
 	infos = new Informations();
@@ -353,6 +356,34 @@ void MainWindow::changeDefaultSize(int defaultWidth, int defaultHeight)
 		this->resize(defaultWidth,defaultHeight);
         this->CenterScreen();
 	}
+}
+
+/**
+ * @brief Charge le dictionnaire de traduction lié à la lagnue selectionnée
+ * @param lang	Langue cible pour la traduction
+ */
+void MainWindow::loadTranslator(QString lang)
+{
+    if (m_translator)
+    {
+        QApplication::instance()->removeTranslator(m_translator);
+        delete m_translator;
+        m_translator = NULL;
+    }
+
+    if (lang == "en") return; //No need of translator
+
+    m_translator = new QTranslator();
+
+    if ( m_translator->load(QLatin1String("qt_") + lang, QApplication::instance()->applicationDirPath() + QLatin1String("/translations")) )
+    {
+        qDebug() << "Load a new translator for [" << lang << "] language";
+        QApplication::instance()->installTranslator(m_translator);
+    }
+    else
+    {
+        qDebug() << "Failed to install a translator for the language [" << lang << "] in path [" << QApplication::instance()->applicationDirPath() + QLatin1String("/translations/qt_")  + lang + ".qm" << "]";
+    }
 }
 
 /**

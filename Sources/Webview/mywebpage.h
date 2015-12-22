@@ -13,8 +13,11 @@ class MyWebPage : public QWebPage
 public:
     MyWebPage(QObject* parent = 0) : QWebPage(parent) {}
 
-//signals:
+protected:
+    bool javaScriptConfirm(QWebFrame * frame, const QString & msg);
+    void javaScriptAlert(QWebFrame * frame, const QString & msg);
 
+//signals:
 
 private:
     bool acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest & request, NavigationType type);

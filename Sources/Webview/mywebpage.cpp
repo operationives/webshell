@@ -53,3 +53,51 @@ bool MyWebPage::acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest
         return false;
     }
 }
+
+/**
+ * @brief Redéfinition de la popup de confirmation javascript
+ * @param frame	Fenêtre depuis laquelle le programme javascript est en cours
+ * @param msg	Message à afficher
+ */
+bool MyWebPage::javaScriptConfirm(QWebFrame * frame, const QString & msg)
+{
+    QMessageBox messageBox;
+    QPushButton *okButton = messageBox.addButton(QMessageBox::Ok);
+    QPushButton *cancelButton = messageBox.addButton(QMessageBox::Cancel);
+    messageBox.setIcon(QMessageBox::Question);
+    if(ConfigManager::Instance().GetLanguage() == FR)
+        messageBox.setWindowTitle(QObject::tr("Demande de confirmation"));
+    else
+        messageBox.setWindowTitle(QObject::tr("Confirmation"));
+    messageBox.setText("\n" + msg + "\n");
+    messageBox.setDefaultButton(okButton);
+    messageBox.exec();
+
+    if (messageBox.clickedButton() == okButton)
+    {
+        return true;
+    }
+    else if (messageBox.clickedButton() == cancelButton)
+    {
+        return false;
+    }
+}
+
+/**
+ * @brief Redéfinition de la popup d'alert javascript
+ * @param frame	Fenêtre depuis laquelle le programme javascript est en cours
+ * @param msg	Message à afficher
+ */
+void MyWebPage::javaScriptAlert(QWebFrame * frame, const QString & msg)
+{
+    QMessageBox messageBox;
+    QPushButton *okButton = messageBox.addButton(QMessageBox::Ok);
+    messageBox.setIcon(QMessageBox::Information);
+    if(ConfigManager::Instance().GetLanguage() == FR)
+        messageBox.setWindowTitle(QObject::tr("Information"));
+    else
+        messageBox.setWindowTitle(QObject::tr("Information"));
+    messageBox.setText("\n" + msg + "\n");
+    messageBox.setDefaultButton(okButton);
+    messageBox.exec();
+}
