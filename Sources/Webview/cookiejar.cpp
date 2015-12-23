@@ -267,7 +267,7 @@ bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const
 					cookie.setExpirationDate(soon);
 			}
 			lst += cookie;
-			if (QNetworkCookieJar::setCookiesFromUrl(lst, url)) {
+            if ( QNetworkCookieJar::setCookiesFromUrl(lst, url) || (cookie.expirationDate() <= QDateTime::currentDateTime()) ) {
 				addedCookies = true;
 			} else {
 				// finally force it in if wanted
