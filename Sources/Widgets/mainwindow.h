@@ -56,6 +56,8 @@ private:
     QNetworkSession::State m_lastNetworkState;
     QTranslator *m_translator;
     QSize m_windowSizeBeforeFullscreen;
+    QLabel *m_loadingLabel;
+    QMovie *m_loaderIcon;
 
 	bool windowIconSpecified;
 	bool stayOpen;

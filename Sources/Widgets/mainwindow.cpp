@@ -132,7 +132,9 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
     connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
-	view->LoadInternalPage("loader");
+    view->LoadInternalPage("loader");
+
+
 
     // Size configuration:
 	this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
@@ -168,6 +170,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     m_progressBar->setTextVisible(true);
     m_progressBar->hide();
     m_progressBar->setTextVisible(false);
+    m_progressBar->resize(QSize(this->size().width(),10));
     //QString style = "QProgressBar::chunk {background: QLinearGradient( x1: 0, y1: 0, x2: 1, y2: 0,stop: 0 #2978FF,stop: 0.4999 #FF78FF,stop: 0.5 #2978FF,stop: 1 #FF78FF );}";
     QString style = "QProgressBar::chunk {background-color: #2978FF;}";
     m_progressBar->setStyleSheet(style);
@@ -204,6 +207,22 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
             break;
     }
 
+    m_loadingLabel = new QLabel(this);
+    m_loadingLabel->setAlignment(Qt::AlignCenter);
+    m_loadingLabel->setGeometry(QRect(0, 0, this->size().width(), this->size().height()-m_progressBar->height()));
+    //m_loadingLabel->setAttribute(Qt::WA_TranslucentBackground);
+    m_loadingLabel->setStyleSheet("background-color: rgba(255, 255, 255, 90);");
+    m_loaderIcon = new QMovie(QApplication::applicationDirPath()+"/loader.gif");
+    m_loaderIcon->setScaledSize(QSize(100,100));
+    if (!m_loaderIcon->isValid())
+    {
+        qDebug() << "Invalid loader movie";
+    }
+    else
+    {
+        m_loadingLabel->setMovie(m_loaderIcon);
+    }
+    m_loadingLabel->hide();
 }
 
 /**
@@ -227,6 +246,8 @@ MainWindow::~MainWindow()
     if (m_taskbarButton) delete m_taskbarButton;
 #endif
     delete m_session;
+    delete m_loaderIcon;
+    delete m_loadingLabel;
 }
 
 /**
@@ -491,6 +512,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
     {
         //view->page()->mainFrame()->evaluateJavaScript("window.onbeforeunload();");
         view->LoadInternalPage("loader");
+        disconnect(view,SIGNAL(loadProgress(bool)),this,SLOT(handleLoadProgress(bool)));
         MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
         CookieJar *cookieJar = m_WebCtrl->getCookieJar();
         connect(cookieJar,SIGNAL(cookieSaved()),this,SLOT(quit()));
@@ -591,6 +613,17 @@ void MainWindow::resizeEvent(QResizeEvent* event)
    }
 
    oldSize = event->oldSize(); //Used to retrieve the old size after maximising event
+
+   if (m_loadingLabel)
+   {
+       m_loadingLabel->setGeometry(QRect(0, 0, this->size().width(), this->size().height()-m_progressBar->height()));
+   }
+
+   if (m_progressBar)
+   {
+        m_progressBar->resize(QSize(this->size().width(),10));
+        m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
+   }
 }
 
 void MainWindow::changeEvent( QEvent* e )
@@ -657,6 +690,12 @@ void MainWindow::handleLoadProgress(int progress)
     m_progressBar->resize(QSize(this->size().width(),10));
     m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
 
+    if ( (m_loadingLabel) && (view->url().url().contains("/client/")) )
+    {
+        m_loaderIcon->start();
+        m_loadingLabel->show();
+    }
+
 #ifdef Q_OS_WIN
     if (m_taskbarProgress)
     {
@@ -669,6 +708,11 @@ void MainWindow::handleLoadProgress(int progress)
 void MainWindow::handleLoadFinished(bool ok)
 {
     m_progressBar->hide();
+    if (m_loadingLabel)
+    {
+        m_loaderIcon->stop();
+        m_loadingLabel->hide();
+    }
 
 #ifdef Q_OS_WIN
     if (m_taskbarProgress)
