@@ -58,6 +58,7 @@ private:
     QSize m_windowSizeBeforeFullscreen;
     QLabel *m_loadingLabel;
     QMovie *m_loaderIcon;
+    QTimer *m_loadingTimer;
 
 	bool windowIconSpecified;
 	bool stayOpen;
@@ -84,6 +85,7 @@ private slots:
 	void changeIcon(const QIcon &icon);
     void loadFinished(bool ok);
     void forceGuiUpdate();
+    void displayLoader();
     void stopForceGuiUpdate();
     void startForceGuiUpdate();
     void handleLoadProgress(int progress);

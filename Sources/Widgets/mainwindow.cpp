@@ -224,6 +224,10 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         m_loadingLabel->setMovie(m_loaderIcon);
     }
     m_loadingLabel->hide();
+    m_loadingTimer = new QTimer(this);
+    m_loadingTimer->setSingleShot(true);
+    m_loadingTimer->setInterval(LOADER_TRIGGER_TIME);
+    connect(m_loadingTimer, SIGNAL(timeout()), this, SLOT(displayLoader()));
 }
 
 /**
@@ -242,6 +246,9 @@ MainWindow::~MainWindow()
     if (stopRefreshTimer->isActive())
         stopRefreshTimer->stop();
     delete stopRefreshTimer;
+    if (m_loadingTimer->isActive())
+        m_loadingTimer->stop();
+    delete m_loadingTimer;
 
 #ifdef Q_OS_WIN
     if (m_taskbarButton) delete m_taskbarButton;
@@ -691,10 +698,9 @@ void MainWindow::handleLoadProgress(int progress)
     m_progressBar->resize(QSize(this->size().width(),10));
     m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
 
-    if ( (m_loadingLabel) && (view->url().url().contains("/client/")) )
+    if (view->url().url().contains("/client/"))
     {
-        m_loaderIcon->start();
-        m_loadingLabel->show();
+        m_loadingTimer->start(LOADER_TRIGGER_TIME);
     }
 
 #ifdef Q_OS_WIN
@@ -706,11 +712,21 @@ void MainWindow::handleLoadProgress(int progress)
 #endif
 }
 
+void MainWindow::displayLoader()
+{
+    if (m_loadingLabel)
+    {
+        m_loaderIcon->start();
+        m_loadingLabel->show();
+    }
+}
+
 void MainWindow::handleLoadFinished(bool ok)
 {
     m_progressBar->hide();
     if (m_loadingLabel)
     {
+        m_loadingTimer->stop();
         m_loaderIcon->stop();
         m_loadingLabel->hide();
     }
