@@ -27,7 +27,7 @@ MyNetworkAccessManager::MyNetworkAccessManager()
 	m_webCache = new QNetworkDiskCache(this);
 	ConfigManager &config = ConfigManager::Instance();
     m_webCache->setCacheDirectory(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+config.GetAppName());
-	m_webCache->setMaximumCacheSize(10*1024*1024); // 10Mo
+    m_webCache->setMaximumCacheSize(50*1024*1024); // 50Mo
 	this->setCache(m_webCache);
 	connect(this,SIGNAL(finished(QNetworkReply*)),this,SLOT(getLanguage(QNetworkReply*)));
     m_pending_login = "";

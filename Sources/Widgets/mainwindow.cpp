@@ -64,6 +64,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
 	QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, config.GetDeveloperToolsMode());
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::AutoLoadImages, true);
 
 	connect (quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 	QMenu *trayIconMenu = new QMenu(this);
