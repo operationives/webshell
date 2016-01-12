@@ -29,6 +29,11 @@ bool MyWebPage::acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest
         }
     }
 
+    /*if (type == QWebPage::NavigationTypeFormSubmitted)
+    {
+        //TODO: handle GET request cancellation after POST request
+    }*/
+
     view = (MyWebView* )this->parent();
     is_authorized_url = view->getWebApp()->IsPageInApplication(request.url());
 
