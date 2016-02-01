@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.3"));
+    app.setApplicationVersion(QString("1.0.4 \t[" + QDateTime::currentDateTime().toString("yyyy/MM/dd") + " - " + QTime::currentTime().toString()+ "]" ));
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
