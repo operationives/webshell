@@ -14,7 +14,16 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
-    m_translator = NULL;
+    m_translator        = NULL;
+    m_loadingLabel      = NULL;
+    m_loaderIcon        = NULL;
+    m_loadingTimer      = NULL;
+    refreshTimer        = NULL;
+    stopRefreshTimer    = NULL;
+    trayIcon            = NULL;
+    inspector           = NULL;
+    infos               = NULL;
+    m_progressBar       = NULL;
 
     QNetworkConfiguration cfg = m_networkConfigurationManager.defaultConfiguration();
     if (!cfg.isValid())
@@ -176,6 +185,27 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     QString style = "QProgressBar::chunk {background-color: #2978FF;}";
     m_progressBar->setStyleSheet(style);
 
+    m_loadingLabel = new QLabel(this);
+    m_loadingLabel->setAlignment(Qt::AlignCenter);
+    m_loadingLabel->setGeometry(QRect(0, 0, this->size().width(), this->size().height()-m_progressBar->height()));
+    //m_loadingLabel->setAttribute(Qt::WA_TranslucentBackground);
+    m_loadingLabel->setStyleSheet("background-color: rgba(255, 255, 255, 90);");
+    m_loaderIcon = new QMovie(QApplication::applicationDirPath()+"/loader.gif");
+    m_loaderIcon->setScaledSize(QSize(100,100));
+    if (!m_loaderIcon->isValid())
+    {
+        qDebug() << "Invalid loader movie";
+    }
+    else
+    {
+        m_loadingLabel->setMovie(m_loaderIcon);
+    }
+    m_loadingLabel->hide();
+    m_loadingTimer = new QTimer(this);
+    m_loadingTimer->setSingleShot(true);
+    m_loadingTimer->setInterval(LOADER_TRIGGER_TIME);
+    connect(m_loadingTimer, SIGNAL(timeout()), this, SLOT(displayLoader()));
+
 #ifdef Q_OS_WIN
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
     {
@@ -207,27 +237,6 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
         default:
             break;
     }
-
-    m_loadingLabel = new QLabel(this);
-    m_loadingLabel->setAlignment(Qt::AlignCenter);
-    m_loadingLabel->setGeometry(QRect(0, 0, this->size().width(), this->size().height()-m_progressBar->height()));
-    //m_loadingLabel->setAttribute(Qt::WA_TranslucentBackground);
-    m_loadingLabel->setStyleSheet("background-color: rgba(255, 255, 255, 90);");
-    m_loaderIcon = new QMovie(QApplication::applicationDirPath()+"/loader.gif");
-    m_loaderIcon->setScaledSize(QSize(100,100));
-    if (!m_loaderIcon->isValid())
-    {
-        qDebug() << "Invalid loader movie";
-    }
-    else
-    {
-        m_loadingLabel->setMovie(m_loaderIcon);
-    }
-    m_loadingLabel->hide();
-    m_loadingTimer = new QTimer(this);
-    m_loadingTimer->setSingleShot(true);
-    m_loadingTimer->setInterval(LOADER_TRIGGER_TIME);
-    connect(m_loadingTimer, SIGNAL(timeout()), this, SLOT(displayLoader()));
 }
 
 /**
@@ -353,20 +362,26 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	ConfigManager &config = ConfigManager::Instance();
 	if(fullscreen)
 	{
-        config.SetScreenMode(FULLSCREEN);
+        if (&config != NULL)
+        {
+            config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
+            config.SetScreenMode(FULLSCREEN);
+        }
         m_windowSizeBeforeFullscreen = QSize(config.GetUserWidth(),config.GetUserHeight());
 		this->showFullScreen();
-        config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
 	}
 	else
 	{
-        config.SetScreenMode(WINDOWED);
+        if (&config != NULL)
+        {
+            config.SetScreenMode(WINDOWED);
+            config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
+        }
         this->showNormal();
         this->setMinimumSize(config.GetMinWidth(),config.GetMinHeight());
         // We get back to the size before the fullscreen mode.
         // We use the variable m_windowSizeBeforeFullscreen to avoid erroneous values from the resize event.
         oldSize = m_windowSizeBeforeFullscreen;
-        config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
         this->resize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
         this->CenterScreen();
 	}
@@ -520,7 +535,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
     {
         //view->page()->mainFrame()->evaluateJavaScript("window.onbeforeunload();");
         view->LoadInternalPage("loader");
-        disconnect(view,SIGNAL(loadProgress(bool)),this,SLOT(handleLoadProgress(bool)));
+        disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
         MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
         CookieJar *cookieJar = m_WebCtrl->getCookieJar();
         connect(cookieJar,SIGNAL(cookieSaved()),this,SLOT(quit()));
@@ -640,6 +655,7 @@ void MainWindow::changeEvent( QEvent* e )
     {
         QWindowStateChangeEvent* event = static_cast< QWindowStateChangeEvent* >( e );
         ConfigManager &config = ConfigManager::Instance();
+        if (&config == NULL) return;
         /*if( event->oldState() & Qt::WindowMinimized )
         {
             qDebug() << "Window restored (to normal or maximized state)!";
@@ -668,8 +684,11 @@ void MainWindow::changeEvent( QEvent* e )
 
 void MainWindow::startForceGuiUpdate()
 {
-    refreshTimer->start(FORCED_REFRESH_TICK_TIMER);       // Refresh UI every 200ms...
-    stopRefreshTimer->start(FORCED_REFRESH_DURATION);    // ...during 3s to avoid visual artifacts!
+    if (refreshTimer && stopRefreshTimer)
+    {
+        refreshTimer->start(FORCED_REFRESH_TICK_TIMER);       // Refresh UI every 200ms...
+        stopRefreshTimer->start(FORCED_REFRESH_DURATION);    // ...during 3s to avoid visual artifacts!
+    }
 }
 
 void MainWindow::forceGuiUpdate()
@@ -693,12 +712,15 @@ void MainWindow::showEvent(QShowEvent *e)
 
 void MainWindow::handleLoadProgress(int progress)
 {
-    m_progressBar->setValue(progress);
-    m_progressBar->show();
-    m_progressBar->resize(QSize(this->size().width(),10));
-    m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
+    if (m_progressBar)
+    {
+        m_progressBar->setValue(progress);
+        m_progressBar->show();
+        m_progressBar->resize(QSize(this->size().width(),10));
+        m_progressBar->move(0,this->size().height()-m_progressBar->size().height());
+    }
 
-    if (view->url().url().contains("/client/"))
+    if (view->url().url().contains("/client/") && m_loadingTimer)
     {
         m_loadingTimer->start(LOADER_TRIGGER_TIME);
     }
@@ -723,7 +745,7 @@ void MainWindow::displayLoader()
 
 void MainWindow::handleLoadFinished(bool ok)
 {
-    m_progressBar->hide();
+    if (m_progressBar) m_progressBar->hide();
     if (m_loadingLabel)
     {
         m_loadingTimer->stop();
@@ -755,7 +777,7 @@ void MainWindow::handleLoadFinished(bool ok)
 
 void MainWindow::handleDownloadFinished()
 {
-    m_progressBar->hide();
+    if (m_progressBar) m_progressBar->hide();
 
 #ifdef Q_OS_WIN
     if (m_taskbarProgress)
