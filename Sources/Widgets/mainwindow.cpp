@@ -93,6 +93,17 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 
 	view = new MyWebView(this);
 
+    //DPI awareness
+#ifdef Q_OS_WIN
+    int horizontalDpi = QApplication::desktop()->screen()->logicalDpiX();
+    float zoom_factor = horizontalDpi / 96.0;
+    if(zoom_factor!=1.0)
+    {
+        view->setZoomFactor(zoom_factor);
+        qWarning() << "Apply [ x" << zoom_factor << "] zoom factor for [" <<  horizontalDpi << "dpi ] high resolution adaptation";
+    }
+#endif
+
 	//On indique qu'on utilise un menu personnalisé
 	view->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(view,SIGNAL(customContextMenuRequested(const QPoint&)),this,SLOT(showContextMenu(const QPoint&)));
