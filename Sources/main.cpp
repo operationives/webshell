@@ -67,15 +67,12 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
  */
 int main(int argc, char** argv)
 {
-    //QApplication app(argc, argv);
-    //QApplication::setApplicationName(QString("Webshell"));
-    //QApplication::setOrganizationName(QString("IVèS"));
-    //QApplication::setApplicationVersion(QString("1.0.1"));
-
-
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.4 \t[" + QDateTime::currentDateTime().toString("yyyy/MM/dd") + " - " + QTime::currentTime().toString()+ "]" ));
+    app.setApplicationVersion(QString("1.0.4"));
+
+    qDebug() << "Webshell v1.0.4 is starting";
+    qDebug() << "Build date: " << __DATE__ << " at " << __TIME__;
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
