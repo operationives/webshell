@@ -65,6 +65,7 @@ public:
     void SetUpdatingStatus(bool updatingStatus){isUpdating = updatingStatus;}
     bool IsUpdating() {return isUpdating;}
     WebApp* getWebApp() {return wapp;}
+    QWebView *createWindow(QWebPage::WebWindowType type);
 
 signals:
 	void changeIcon(const QIcon &icon);
@@ -84,6 +85,7 @@ private:
     QList<DownloadItem*> m_downloads;
     QProgressBar * m_progressBar;
     QWinTaskbarProgress * m_winTaskBarProgress;
+    QWebView *m_current_popup;
 
 private slots:
 	void updateTitle();
@@ -91,6 +93,7 @@ private slots:
 	void updateJavaScriptObjects();
 	void updateConnectivity();
     void downloadContent(QNetworkReply *reply);
+    void handleClosePopup();
     //void downloadFinished(DownloadItem *item);
     /*void handleLoadProgress(int progress);
     void handleLoadFinished(bool ok);*/

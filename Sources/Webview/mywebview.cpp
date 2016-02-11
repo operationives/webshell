@@ -16,6 +16,8 @@
  */
 MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 {
+    m_current_popup = NULL;
+
     this->setPage(new MyWebPage(this));
     this->page()->setForwardUnsupportedContent(true);
     //On enlève les barres de défilement inutiles dans le cadre du webshell
@@ -78,6 +80,7 @@ MyWebView::~MyWebView()
 	delete navigatorplugins;
     qDeleteAll(m_downloads.begin(), m_downloads.end());
     m_downloads.clear();
+    if (m_current_popup) m_current_popup->close();
 }
 
 /**
@@ -313,6 +316,35 @@ void MyWebView::downloadContent(QNetworkReply *reply)
 
 }
 
+QWebView *MyWebView::createWindow(QWebPage::WebWindowType type)
+{
+    Q_UNUSED(type);
+
+    if (m_current_popup)
+    {
+        m_current_popup->close();
+        delete m_current_popup;
+        m_current_popup = NULL;
+    }
+
+    QWebView *web_view = new QWebView();
+    QWebPage *new_webPage = new QWebPage(web_view);
+    m_current_popup = web_view;
+    connect(web_view, SIGNAL(destroyed()), this, SLOT(handleClosePopup()));
+    web_view->setAttribute(Qt::WA_DeleteOnClose, true);
+    web_view->setPage(new_webPage);
+    web_view->resize(QSize(400,400));
+    web_view->show();
+
+
+    return web_view;
+}
+
+void MyWebView::handleClosePopup()
+{
+    m_current_popup = NULL;
+}
+
 /*void MyWebView::downloadFinished(DownloadItem* item)
 {
     if (item == NULL) return;
@@ -403,3 +435,4 @@ void DownloadItem::abortDownload()
     emit downloadFinished(this);
     disconnect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this->parent()->parent(), SLOT(handleDownloadProgress(qint64, qint64)));
 }
+
