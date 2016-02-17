@@ -374,6 +374,11 @@ void CookieJar::setAllowForSessionCookies(const QStringList &list)
 	m_saveTimer->changeOccurred();
 }
 
+void CookieJar::saveNow()
+{
+    save();
+}
+
 CookieModel::CookieModel(CookieJar *cookieJar, QObject *parent)
 	: QAbstractTableModel(parent)
 	, m_cookieJar(cookieJar)

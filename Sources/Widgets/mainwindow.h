@@ -50,18 +50,26 @@ private:
     QWinTaskbarButton *m_taskbarButton;
     QWinTaskbarProgress * m_taskbarProgress;
 #endif
-    QNetworkConfigurationManager m_networkConfigurationManager;
+    QNetworkConfigurationManager *m_networkConfigurationManager;
     QNetworkSession *m_session;
     QNetworkSession::State m_currentNetworkState;
     QNetworkSession::State m_lastNetworkState;
     QTranslator *m_translator;
     QSize m_windowSizeBeforeFullscreen;
     QLabel *m_loadingLabel;
+    QLabel *m_notificationLabel;
+    QWidget *m_notification;
     QMovie *m_loaderIcon;
     QTimer *m_loadingTimer;
+    QTimer *m_checkInternetStatusTimer;
+    QPropertyAnimation *m_showNotificationAnimation;
+    QPropertyAnimation *m_hideNotificationAnimation;
 
 	bool windowIconSpecified;
 	bool stayOpen;
+    bool m_is_started;
+    bool m_is_everything_saved_before_exiting;
+
 	void DisplayInfos();
 	void CenterScreen();
 	void keyPressEvent(QKeyEvent *event);
@@ -69,6 +77,7 @@ private:
     void resizeEvent(QResizeEvent* event);
     void changeEvent( QEvent* event );
     void showEvent(QShowEvent *event);
+    void createNotification();
 
 signals:
 	void clearAll();
@@ -93,6 +102,9 @@ private slots:
     void handleDownloadFinished();
     void handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void handleNetworkStateChanged(QNetworkSession::State);
+    void hideNotification();
+    void handleNetworkConfigurationUpdated();
+    void checkNetworkConfiguration();
 };
 
 #endif

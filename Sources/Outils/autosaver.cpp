@@ -38,7 +38,7 @@
 #include <QtCore/QMetaObject>
 #include <QtDebug>
 
-#define AUTOSAVE_IN  1000 * 1  // seconds
+#define AUTOSAVE_IN  1000 * 3  // seconds
 #define MAXWAIT	  1000 * 15 // seconds
 
 AutoSaver::AutoSaver(QObject *parent) : QObject(parent)

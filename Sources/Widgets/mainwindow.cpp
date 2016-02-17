@@ -14,24 +14,40 @@
 MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	:QMainWindow(parent)
 {
-    m_translator        = NULL;
-    m_loadingLabel      = NULL;
-    m_loaderIcon        = NULL;
-    m_loadingTimer      = NULL;
-    refreshTimer        = NULL;
-    stopRefreshTimer    = NULL;
-    trayIcon            = NULL;
-    inspector           = NULL;
-    infos               = NULL;
-    m_progressBar       = NULL;
+    m_translator                = NULL;
+    m_loadingLabel              = NULL;
+    m_loaderIcon                = NULL;
+    m_loadingTimer              = NULL;
+    refreshTimer                = NULL;
+    stopRefreshTimer            = NULL;
+    trayIcon                    = NULL;
+    inspector                   = NULL;
+    infos                       = NULL;
+    m_progressBar               = NULL;
+    m_checkInternetStatusTimer  = NULL;
+    m_notification              = NULL;
+    m_notificationLabel         = NULL;
+    m_showNotificationAnimation = NULL;
+    m_hideNotificationAnimation = NULL;
 
-    QNetworkConfiguration cfg = m_networkConfigurationManager.defaultConfiguration();
+    m_is_everything_saved_before_exiting = false;
+
+    // NETWORK CONFIGURATION:
+    m_networkConfigurationManager = new QNetworkConfigurationManager();
+    QNetworkConfiguration cfg = m_networkConfigurationManager->defaultConfiguration();
     if (!cfg.isValid())
-    {
+    {   
+        qWarning() << "Invalid network configuration at start.";
         m_session = NULL;
-        qWarning() << "Invalid network configuration at start. The app won't be able to handle automatic reconnection";
         m_currentNetworkState = QNetworkSession::Invalid;
         m_lastNetworkState = m_currentNetworkState;
+        delete m_networkConfigurationManager;
+        m_networkConfigurationManager = NULL;
+
+        m_checkInternetStatusTimer = new QTimer(this);
+        m_checkInternetStatusTimer->setInterval(CHECK_INTERNET_STATUS_TICK_TIMER);
+        connect(m_checkInternetStatusTimer, SIGNAL(timeout()), this, SLOT(checkNetworkConfiguration()));
+        m_checkInternetStatusTimer->start(CHECK_INTERNET_STATUS_TICK_TIMER);
     }
     else
     {
@@ -217,6 +233,8 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     m_loadingTimer->setInterval(LOADER_TRIGGER_TIME);
     connect(m_loadingTimer, SIGNAL(timeout()), this, SLOT(displayLoader()));
 
+    createNotification();
+
 #ifdef Q_OS_WIN
     if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
     {
@@ -276,6 +294,65 @@ MainWindow::~MainWindow()
     delete m_session;
     delete m_loaderIcon;
     delete m_loadingLabel;
+    delete m_notificationLabel;
+    delete m_showNotificationAnimation;
+    delete m_hideNotificationAnimation;
+    delete m_notification;
+}
+
+/**
+ * @brief Creer une fenêtre de notifcation avec animation
+ */
+void MainWindow::createNotification()
+{
+    // NOTIFICATION WIDGET CREATION
+
+    m_notification = new QWidget(this);
+    m_notification->setGeometry(QRect(-NOTIFICATION_WIDTH, 0, NOTIFICATION_WIDTH, NOTIFICATION_HEIGHT));
+
+    // NOTIFICATION STYLE
+    QString notification_style = "color:#FFFFFF; font-size: 14px; font-weight: bold; font-family: Arial, sans-serif;";
+
+    // NOTIFICATION ICON CREATION
+
+    QLabel *notification_icon = new QLabel(m_notification);
+    notification_icon->setGeometry(QRect(0, 0, NOTIFICATION_HEIGHT, NOTIFICATION_HEIGHT));
+    notification_icon->setStyleSheet(notification_style + "background-color: rgba(0, 0, 0, 0)");
+
+    QPixmap notification_pixmap(QString(QApplication::applicationDirPath()+"./icon_notification.png"));
+    notification_icon->setPixmap(notification_pixmap);
+    notification_icon->show();
+
+    // NOTIFICATION LABEL CREATION
+
+    m_notificationLabel = new QLabel(m_notification);
+    m_notificationLabel->setAlignment(Qt::AlignCenter);
+    m_notificationLabel->setGeometry(QRect(0, 0, NOTIFICATION_WIDTH-notification_icon->width(), NOTIFICATION_HEIGHT));
+    m_notificationLabel->setStyleSheet(notification_style + "background-color: rgba(0, 0, 0, 0);");
+    m_notificationLabel->show();
+
+    QHBoxLayout *layout = new QHBoxLayout(m_notification);
+    layout->addWidget(notification_icon);
+    layout->addWidget(m_notificationLabel);
+
+    m_notification->setStyleSheet(notification_style + "background-color: rgba(0, 0, 0, 0.9);");
+    m_notification->setLayout(layout);
+    m_notification->show();
+
+    // SHOW/HIDE ANIMATIONS
+
+    m_showNotificationAnimation = new QPropertyAnimation(m_notification , "geometry");
+    m_showNotificationAnimation->setDuration(NOTIFICATION_ANIMATION_DURATION);
+    m_showNotificationAnimation->setStartValue(QRect(-NOTIFICATION_WIDTH, NOTIFICATION_YPOS, NOTIFICATION_WIDTH, NOTIFICATION_HEIGHT));
+    m_showNotificationAnimation->setEndValue(QRect(NOTIFICATION_XPOS, NOTIFICATION_YPOS, NOTIFICATION_WIDTH, NOTIFICATION_HEIGHT));
+
+    m_hideNotificationAnimation = new QPropertyAnimation(m_notification , "geometry");
+    m_hideNotificationAnimation->setDuration(NOTIFICATION_ANIMATION_DURATION);
+    m_hideNotificationAnimation->setStartValue(QRect(NOTIFICATION_XPOS, NOTIFICATION_YPOS, NOTIFICATION_WIDTH, NOTIFICATION_HEIGHT));
+    m_hideNotificationAnimation->setEndValue(QRect(-NOTIFICATION_WIDTH, NOTIFICATION_YPOS, NOTIFICATION_WIDTH, NOTIFICATION_HEIGHT));
+
+    //m_showNotificationAnimation->start();
+    //m_notificationLabel->setText("Vous venez d'être déconnecté du réseau");
 }
 
 /**
@@ -302,7 +379,7 @@ void MainWindow::showContextMenu(const QPoint &pos)
     {
         myMenu.addAction(inspectAction);
     }
-    if (view->IsUpdating() == false)
+    if ( (view->IsUpdating() == false) && (m_currentNetworkState == QNetworkSession::Connected) )
         myMenu.addAction(reloadAction);
 	myMenu.addAction(clearAllAction);
 #ifdef Q_OS_WIN
@@ -334,6 +411,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
 	}
 	if (selectedItem->text()==reloadAction->text())
 	{
+        if (m_currentNetworkState != QNetworkSession::Connected) return;
+
         ConfigManager &config = ConfigManager::Instance();
         QUrl reloading_url;
         if ( m_currentNetworkState == QNetworkSession::Connected && view->url().url().startsWith("file:") )
@@ -361,6 +440,54 @@ void MainWindow::showContextMenu(const QPoint &pos)
         mail.Send(sendlogAction->text());
 	}
 #endif
+}
+
+void MainWindow::checkNetworkConfiguration()
+{
+    if(!m_session)
+    {
+        if (!m_networkConfigurationManager)
+            m_networkConfigurationManager = new QNetworkConfigurationManager();
+        if (m_networkConfigurationManager->isOnline())
+        {
+            m_checkInternetStatusTimer->stop();
+            m_networkConfigurationManager->updateConfigurations();
+            connect(m_networkConfigurationManager, SIGNAL(updateCompleted()), this, SLOT(handleNetworkConfigurationUpdated()));
+        }
+    }
+}
+
+void MainWindow::handleNetworkConfigurationUpdated()
+{
+    qDebug() << "Network configuration updated. Ready to reconnect the app.";
+    disconnect(m_networkConfigurationManager, SIGNAL(updateCompleted()), this, SLOT(handleNetworkConfigurationUpdated()));
+    QNetworkConfiguration cfg = m_networkConfigurationManager->defaultConfiguration();
+    if (!cfg.isValid())
+    {
+        qWarning() << "Network Configuration invalide";
+    }
+    else
+    {
+        if (!m_session)
+        {
+            m_session = new QNetworkSession(cfg);
+            m_session->open();
+            if (m_session->waitForOpened(1000))
+            {
+                qDebug() << "Network Session open.";
+                connect(m_session, SIGNAL(stateChanged(QNetworkSession::State)), this,  SLOT(handleNetworkStateChanged(QNetworkSession::State))/*SLOT(stateChanged(QNetworkSession::State))*/);
+            }
+        }
+    }
+    m_currentNetworkState = m_session->state();
+    m_lastNetworkState = m_currentNetworkState;
+
+    if ( view->url().url().startsWith("file:") )
+    {
+        QUrl reloading_url = QUrl(ConfigManager::Instance().GetSavedAdress());
+        view->load(reloading_url);
+        connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+    }
 }
 
 /**
@@ -480,7 +607,7 @@ void MainWindow::changeActionNames(QString lang)
 		inspectAction->setText("Inspecter");
 		fullscreenAction->setText("Plein écran");
 		normalscreenAction->setText("Fenêtré");
-		reloadAction->setText("Recharger");
+        reloadAction->setText("Recharger");
 		infoAction->setText("Informations");
 #ifdef Q_OS_WIN
 		sendlogAction->setText("Envoi de logs");
@@ -495,7 +622,7 @@ void MainWindow::changeActionNames(QString lang)
 		inspectAction->setText("Inspect");
 		fullscreenAction->setText("Fullscreen");
 		normalscreenAction->setText("Show normal");
-		reloadAction->setText("Reload");
+        reloadAction->setText("Reload");
 		infoAction->setText("Informations");
 #ifdef Q_OS_WIN
 		sendlogAction->setText("Send logs");
@@ -542,19 +669,22 @@ void MainWindow::closeEvent (QCloseEvent *event)
 		event->ignore();
 		this->setWindowState(Qt::WindowMinimized);
 	}
-    else if (view->page()->mainFrame()->evaluateJavaScript("(typeof onbeforeunload == 'function');") == true)
+    else if (!m_is_everything_saved_before_exiting)
     {
-        //view->page()->mainFrame()->evaluateJavaScript("window.onbeforeunload();");
         view->LoadInternalPage("loader");
         disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
         MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
         CookieJar *cookieJar = m_WebCtrl->getCookieJar();
+        cookieJar->saveNow();
+        m_is_everything_saved_before_exiting = true;
         connect(cookieJar,SIGNAL(cookieSaved()),this,SLOT(quit()));
         event->ignore();
-        QTimer::singleShot(3000, this, SLOT(quit()));
+        QTimer::singleShot(EXITING_TIMEOUT, this, SLOT(quit()));
     }
 	else
 	{
+        qDebug() << "End of session";
+        qDebug() << "------------------------------------------";
 		this->deleteLater();
 		event->accept();
 	}
@@ -607,6 +737,7 @@ void MainWindow::loadFinished(bool ok)
     connect(view,SIGNAL(loadFinished(bool)),this,SLOT(handleLoadFinished(bool)));
     connect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
 
+    m_is_started = false;
 	view->load(QUrl(config.GetLaunchUrl()));
 
 }
@@ -639,6 +770,9 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 {
    QMainWindow::resizeEvent(event);
    ConfigManager &config = ConfigManager::Instance();
+
+   // Clear the progress bar:
+   if (m_progressBar->value() == 100) m_progressBar->hide();
 
    if (this->windowState() == Qt::WindowNoState && !this->isFullScreen() && event->spontaneous() == true)
    {
@@ -704,6 +838,9 @@ void MainWindow::startForceGuiUpdate()
 
 void MainWindow::forceGuiUpdate()
 {
+    // Clear the progress bar:
+    if (m_progressBar)
+        if (m_progressBar->value() == 100) m_progressBar->hide();
     view->update();
 }
 
@@ -771,11 +908,17 @@ void MainWindow::handleLoadFinished(bool ok)
 
     if (!ok)
     {
-        if (m_currentNetworkState != QNetworkSession::Connected)
+        qDebug() << "The launch url can't be reached: " << view->url();
+        // The launch url is not in cache.
+        // So we show the error page if the launch url (login or index page) can't be reached.
+        // m_is_started takes the value 'true' if the launch url is reached
+        if ( m_is_started == false )/*||
+             view->url().url().contains("index.php") ||
+             view->url().url().contains("login.php") )*/
         {
             disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
             view->LoadInternalPage("disconnected");
-            qWarning() << "MainWindow:" << __FUNCTION__ << " : The url page is not accessible";
+            qWarning() << "MainWindow:" << __FUNCTION__ << " : The base url can't be reached";
             return;
         }
     }
@@ -783,6 +926,7 @@ void MainWindow::handleLoadFinished(bool ok)
     {
         qDebug() << "Save current page: " << view->url().toString();
         ConfigManager::Instance().SetSavedAdress(view->url().toString());
+        m_is_started = true;
     }
 }
 
@@ -816,19 +960,73 @@ void MainWindow::handleDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 #endif
 }
 
+void MainWindow::hideNotification()
+{
+    if (m_hideNotificationAnimation)
+        m_hideNotificationAnimation->start();
+}
+
 void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
 {
+    QString notification_text;
+    QString notification_title;
+
+    if (ConfigManager::Instance().GetDisplayName() == "")
+        notification_title = ConfigManager::Instance().GetAppName();
+    else
+        notification_title = ConfigManager::Instance().GetDisplayName();
+
     m_currentNetworkState = state;
     qDebug() << "Network state changed: from [" << m_lastNetworkState << "] to [" << m_currentNetworkState << "]";
 
     if ( m_currentNetworkState == QNetworkSession::Connected )
     {
         qDebug() << "Network is accessible";
+
+        if(ConfigManager::Instance().GetLanguage() == FR)
+        {
+            notification_text   = "Vous utilisez le service en ligne";
+        }
+        else
+        {
+            notification_text   = "The application is inline";
+        }
     }
     else
     {
         qDebug() << "Network is not accessible";
+
+        if(ConfigManager::Instance().GetLanguage() == FR)
+        {
+            notification_text   = "Vous utilisez l'application hors ligne";
+        }
+        else
+        {
+            notification_text   = "The application is offline";
+        }
+
+        //if (QSysInfo::windowsVersion() <= QSysInfo::WV_WINDOWS7)
+        if (USE_IN_APP_NOTIFICATIONS)
+        {
+            if (m_notificationLabel && m_hideNotificationAnimation)
+            {
+                m_notificationLabel->setText(notification_text);
+                m_showNotificationAnimation->start();
+                QTimer::singleShot(NOTIFICATION_DURATION, this, SLOT(hideNotification()));
+            }
+        }
+
+        if ( view->url().url().contains("index.php") ||
+             view->url().url().contains("login.php") ||
+             (m_progressBar->value() > 0 && m_progressBar->value() < 100 && m_progressBar->isVisible()) )
+        {
+            disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
+            view->LoadInternalPage("disconnected");
+            qWarning() << "MainWindow:" << __FUNCTION__ << " : The base url can't be reached";
+        }
     }
+
+    trayIcon->showMessage(notification_title,notification_text);
 
     // Restart the service when a network reconection occured after display the local disconnected page:
     if (    m_currentNetworkState == QNetworkSession::Connected &&

@@ -98,6 +98,7 @@ public:
 	void setBlockedCookies(const QStringList &list);
 	void setAllowedCookies(const QStringList &list);
 	void setAllowForSessionCookies(const QStringList &list);
+    void saveNow();
 
 public slots:
 	void clear();
