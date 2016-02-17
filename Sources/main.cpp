@@ -69,12 +69,13 @@ int main(int argc, char** argv)
 {
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.4"));
+    app.setApplicationVersion(QString("1.0.5"));
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
 
-    qDebug() << "Webshell v1.0.4 is starting";
+    qDebug() << "------------------------------------------";
+    qDebug() << QCoreApplication::applicationName() << " version "<< QCoreApplication::applicationVersion() << " is starting";
     qDebug() << "Build date: " << __DATE__ << " at " << __TIME__;
 
 	QDir appdata(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
