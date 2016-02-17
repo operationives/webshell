@@ -33,7 +33,8 @@ void WNavigator::InitWebshellAPI()
 	m_webView->page()->mainFrame()->evaluateJavaScript(\
 	"navigator.UpdateSoftware = wnavigator.UpdateSoftware;\
 	navigator.webshellParameters = webshellParameters;\
-	navigator.Close = wnavigator.Close;\
+    navigator.LoadLaunchUrl = wnavigator.LoadLaunchUrl;\
+    navigator.Close = wnavigator.Close;\
 	navigator.GetWebshellVersion = wnavigator.GetWebshellVersion;");
 }
 
@@ -43,6 +44,15 @@ void WNavigator::InitWebshellAPI()
 void WNavigator::Close()
 {
 	emit close();
+}
+
+/**
+ * @brief Charge la page de lancement
+ */
+void WNavigator::LoadLaunchUrl()
+{
+    ConfigManager &config = ConfigManager::Instance();
+    m_webView->load(QUrl(config.GetLaunchUrl()));
 }
 
 /**

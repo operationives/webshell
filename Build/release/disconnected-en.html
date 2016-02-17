@@ -2,12 +2,22 @@
 	<title>Connection lost</title>
 	<meta charset="utf-8" />
     <body>
+        <script type="text/javascript">
+            wnavigator.InitWebshellAPI();
+        </script>
+
        <div style="text-align:center;" >
         <img src="icon_sad_claude.png" alt="Déconnxion" style="width:300px; height:300px;">
         <div style="font-family: Arial,sans-serif; font-size: 18px; font-weight: bold; height:30px; color:#888888;">
         	<p>Sorry, the service seems unreachable.</p>
         	<p style="color:#c5c5c5">If you are unable to load any pages from your computer,<br>
          	please check your network connection.</p>
-        </div>
+            <p style="color:#c5c5c5">If everything is ok,<br>
+            please retry by pressing the button below.</p>
+            <button style="width:120 ; heigth:40 ; color:#888888;" onclick="navigator.LoadLaunchUrl()">
+                Retry
+            </button>
+    </div>
+        
     </body>
 </html>
