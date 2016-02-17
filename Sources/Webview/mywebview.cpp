@@ -334,8 +334,9 @@ QWebView *MyWebView::createWindow(QWebPage::WebWindowType type)
     web_view->setAttribute(Qt::WA_DeleteOnClose, true);
     web_view->setPage(new_webPage);
     web_view->resize(QSize(400,400));
+    web_view->setWindowTitle(ConfigManager::Instance().GetDisplayName());
+    web_view->setWindowFlags(Qt::WindowStaysOnTopHint);
     web_view->show();
-
 
     return web_view;
 }
