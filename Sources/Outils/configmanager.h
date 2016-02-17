@@ -20,6 +20,17 @@
 #define FORCED_REFRESH_TICK_TIMER 100
 #define FORCED_REFRESH_DURATION 3000
 #define LOADER_TRIGGER_TIME 2000
+#define CHECK_INTERNET_STATUS_TICK_TIMER 3000
+
+#define USE_IN_APP_NOTIFICATIONS        0
+#define NOTIFICATION_XPOS               0
+#define NOTIFICATION_YPOS               10
+#define NOTIFICATION_WIDTH              350 // picture + label
+#define NOTIFICATION_HEIGHT             60
+#define NOTIFICATION_DURATION           5000 // ms
+#define NOTIFICATION_ANIMATION_DURATION 500 // ms
+
+#define EXITING_TIMEOUT 3000 // ms
 
 enum SCREEN_MODE
 {
@@ -58,7 +69,8 @@ public:
 	QStringList GetBaseUrl();
     QStringList GetLoginList();
     QString GetLastLogin();
-	QString GetAppName();
+    QString GetAppName();
+    QString GetDisplayName();
 
 public slots:
 	//Setters pour attributs webshell
@@ -76,6 +88,7 @@ public slots:
 	void SetLaunchUrl(QString launchUrl);
 	void SetIcon(QString icon);
 	void SetInfos(QString infosAppli);
+    void SetDisplayName(QString displayName);
 	void SetLanguage(QString lang);
 	void SetBaseUrl(QStringList baseUrl);
     void SetLoginList(QStringList loginList);
@@ -114,6 +127,7 @@ private:
 	QString launchUrl;
 	QString icon;
 	QString infosAppli;
+    QString displayName;
 	QString lang;
     QString lastLogin;
 	QStringList baseUrl;

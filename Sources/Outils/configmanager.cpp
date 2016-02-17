@@ -122,6 +122,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	defaultHeight = 3*rec.height()/4;
 	icon = "";
 	infosAppli = "";
+    displayName = "";
 	lang = QLocale::system().uiLanguages().first();
     qDebug() << "Detected system language: " << lang;
 	lang.truncate(2);
@@ -189,6 +190,9 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "infos")
 				infosAppli = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
+
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "displayName")
+                displayName = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "lang")
 				lang = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
@@ -659,6 +663,15 @@ QString ConfigManager::GetInfos()
 }
 
 /**
+ * @brief Indique le nom à afficher du service
+ * @return displayName
+ */
+QString ConfigManager::GetDisplayName()
+{
+    return displayName;
+}
+
+/**
  * @brief Met à jour les infos service
  * @param infosAppli Nouvelle valeur des infos service
  */
@@ -666,6 +679,16 @@ void ConfigManager::SetInfos(QString infosAppli)
 {
 	this->infosAppli = infosAppli;
 	StoreParametersAppli();
+}
+
+/**
+ * @brief Met à jour le nom affiché de l'application
+ * @param displayName Nouvelle valeur du nom de l'app
+ */
+void ConfigManager::SetDisplayName(QString displayName)
+{
+    this->displayName = displayName;
+    StoreParametersAppli();
 }
 
 /**

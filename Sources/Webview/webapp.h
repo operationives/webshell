@@ -13,7 +13,8 @@ class WebApp : public QObject, public DownloadProgressListener
 	Q_PROPERTY(QStringList baseUrl READ GetBaseUrl WRITE SetBaseUrl)
 	Q_PROPERTY(QString icon READ Icon WRITE SetIcon)
 	Q_PROPERTY(QString infos READ Infos WRITE SetInfos)
-	Q_PROPERTY(QString target READ Target WRITE SetTarget)
+    Q_PROPERTY(QString display_name READ Infos WRITE SetDisplayName)
+    Q_PROPERTY(QString target READ Target WRITE SetTarget)
 
 public:
 	WebApp(MyWebView *view);
@@ -43,7 +44,9 @@ private:
 	QString Icon() const;
 	void SetIcon(const QString &icon);
 	QString Infos() const;
-	void SetInfos(const QString &infos);
+    void SetInfos(const QString &infos);
+    QString DisplayName() const;
+    void SetDisplayName(const QString &displayName);
 	QStringList GetBaseUrl() const;
 	void SetBaseUrl(const QStringList &value);
 	QString Target() const;

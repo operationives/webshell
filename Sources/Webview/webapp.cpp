@@ -109,8 +109,28 @@ QString WebApp::Infos() const
  */
 void WebApp::SetInfos(const QString &infos)
 {
-	ConfigManager &config = ConfigManager::Instance();
-	config.SetInfos(infos);
+    ConfigManager &config = ConfigManager::Instance();
+    config.SetInfos(infos);
+}
+
+/**
+ * @brief Accesseur du nom à afficher
+ * @return config.GetDisplayName()
+ */
+QString WebApp::DisplayName() const
+{
+    ConfigManager &config = ConfigManager::Instance();
+    return config.GetDisplayName();
+}
+
+/**
+ * @brief Change le nom du service enregistré dans le gestionnaire de fichier XML et modifie le fichier xml de l'application
+ * @param infos
+ */
+void WebApp::SetDisplayName(const QString &displayName)
+{
+    ConfigManager &config = ConfigManager::Instance();
+    config.SetDisplayName(displayName);
 }
 
 /**
