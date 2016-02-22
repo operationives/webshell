@@ -169,6 +169,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
     connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
+    connect (clearAllAction, SIGNAL(triggered()), this, SLOT(showClearAllNotification()));
     view->LoadInternalPage("loader");
 
 
@@ -964,6 +965,24 @@ void MainWindow::hideNotification()
 {
     if (m_hideNotificationAnimation)
         m_hideNotificationAnimation->start();
+}
+
+void MainWindow::showClearAllNotification()
+{
+    QString notification_text;
+
+    if(ConfigManager::Instance().GetLanguage() == FR)
+    {
+        notification_text   = "Les données sont supprimées du cache";
+    }
+    else
+    {
+        notification_text   = "Web cache cleared";
+    }
+
+    m_notificationLabel->setText(notification_text);
+    m_showNotificationAnimation->start();
+    QTimer::singleShot(NOTIFICATION_DURATION, this, SLOT(hideNotification()));
 }
 
 void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
