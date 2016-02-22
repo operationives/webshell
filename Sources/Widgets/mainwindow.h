@@ -105,6 +105,7 @@ private slots:
     void hideNotification();
     void handleNetworkConfigurationUpdated();
     void checkNetworkConfiguration();
+    void showClearAllNotification();
 };
 
 #endif
