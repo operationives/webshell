@@ -503,11 +503,11 @@ void MainWindow::changeScreenMode(bool fullscreen)
 	{
         if (&config != NULL)
         {
-            config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
             config.SetScreenMode(FULLSCREEN);
+            m_windowSizeBeforeFullscreen = QSize(config.GetUserWidth(),config.GetUserHeight());
+            this->showFullScreen();
+            config.SetUserSize(m_windowSizeBeforeFullscreen.width(), m_windowSizeBeforeFullscreen.height());
         }
-        m_windowSizeBeforeFullscreen = QSize(config.GetUserWidth(),config.GetUserHeight());
-		this->showFullScreen();
 	}
 	else
 	{
