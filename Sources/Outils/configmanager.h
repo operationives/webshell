@@ -32,7 +32,8 @@
 #define NOTIFICATION_ANIMATION_DURATION 500 // ms
 
 #define EXITING_TIMEOUT 3000 // ms
-#define KEY_CODE Q_UINT64_C(0x0c2ad4a4acb9f023)
+#define KEY_CODE Q_UINT64_C(0x0c1ad5b4acb8e184)
+
 enum SCREEN_MODE
 {
     MAXIMIZED = 0,

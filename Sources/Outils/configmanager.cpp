@@ -622,7 +622,7 @@ void ConfigManager::SetUserSize(int userWidth, int userHeight)
  */
 QString ConfigManager::GetLaunchUrl()
 {
-    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
+    SimpleCrypt crypto(KEY_CODE);
     return crypto.decryptToString(launchUrl);
     //return  this->launchUrl;
 }
@@ -634,7 +634,7 @@ QString ConfigManager::GetLaunchUrl()
 void ConfigManager::SetLaunchUrl(QString launchUrl)
 {
     QString encoded_launch_url;
-    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
+    SimpleCrypt crypto(KEY_CODE);
     encoded_launch_url = crypto.encryptToString(launchUrl);
     this->launchUrl = encoded_launch_url;
     // this->launchUrl = launchUrl;

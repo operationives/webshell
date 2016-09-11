@@ -159,7 +159,7 @@ int main(int argc, char** argv)
     QString launch_url;
     QString encoded_launch_url;
 
-    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
+    SimpleCrypt crypto(KEY_CODE);
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
     app.setApplicationVersion(QString("1.0.6"));

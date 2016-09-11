@@ -46,13 +46,13 @@ void Informations::UpdateValues()
 	QString disconnectedText;
 	if(config.GetLanguage() == FR)
 	{
-        webshellText = "Version du logiciel :\n";
+        webshellText = "Version du logiciel : ";
         appText = "\nInformations complémentaires :\n";
 		disconnectedText = "L'application est déconnectée";
 	}
 	else
 	{
-        webshellText = "Software version:\n";
+        webshellText = "Software version: ";
 		appText = "\nAdditional informations:\n";
 		disconnectedText = "The application is disconnected";
 	}
