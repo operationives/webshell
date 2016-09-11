@@ -108,7 +108,8 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
 	}
 
 	confFilePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/"+appName+".xml";
-	this->launchUrl = launchUrl;
+    //this->launchUrl = launchUrl;
+    SetLaunchUrl(launchUrl);
 
 	//On place les attributs par défaut pouvant être remplacés par les valeurs du fichier xml
     screenMode = WINDOWED;
@@ -621,7 +622,9 @@ void ConfigManager::SetUserSize(int userWidth, int userHeight)
  */
 QString ConfigManager::GetLaunchUrl()
 {
-	return launchUrl;
+    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
+    return crypto.decryptToString(launchUrl);
+    //return  this->launchUrl;
 }
 
 /**
@@ -630,7 +633,11 @@ QString ConfigManager::GetLaunchUrl()
  */
 void ConfigManager::SetLaunchUrl(QString launchUrl)
 {
-	this->launchUrl = launchUrl;
+    QString encoded_launch_url;
+    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
+    encoded_launch_url = crypto.encryptToString(launchUrl);
+    this->launchUrl = encoded_launch_url;
+    // this->launchUrl = launchUrl;
 	StoreParametersAppli();
 }
 

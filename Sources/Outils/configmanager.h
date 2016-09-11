@@ -2,6 +2,7 @@
 #define CONFIGMANAGER_H
 
 #include <QtXml>
+#include "Outils/simplecrypt.h"
 
 //On définit la taille des bordures de l'écran
 #ifdef Q_OS_WIN
@@ -31,7 +32,7 @@
 #define NOTIFICATION_ANIMATION_DURATION 500 // ms
 
 #define EXITING_TIMEOUT 3000 // ms
-
+#define KEY_CODE Q_UINT64_C(0x0c2ad4a4acb9f023)
 enum SCREEN_MODE
 {
     MAXIMIZED = 0,

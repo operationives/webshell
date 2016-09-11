@@ -29,6 +29,7 @@ private:
     QTimer *stopRefreshTimer;
 	QMenu *fileMenu;
 	QAction *clearAllAction;
+    QAction *clearPointUrlAction;
 	QAction *quitAction;
 	QAction *inspectAction;
 	QAction *fullscreenAction;
@@ -106,6 +107,8 @@ private slots:
     void handleNetworkConfigurationUpdated();
     void checkNetworkConfiguration();
     void showClearAllNotification();
+    void showClearPointUrlNotification();
+    void clearPointUrl();
 };
 
 #endif

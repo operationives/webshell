@@ -33,30 +33,119 @@
 void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const QString & msg)
 {
 	Q_UNUSED(logcontext);
+    QString filteredMsg= "";
+    filteredMsg.append(msg);
 	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".log");
 	file.open(QIODevice::WriteOnly | QIODevice::Append);
 	file.write(QString("[").toLatin1()+QDateTime::currentDateTime().toString().toLatin1()+QString("]\t").toLatin1());
-	std::string text = msg.toLatin1().constData();
+
+    // hash info deletion:
+
+    // Remove hash infos in logs messages
+    // Case 1: www.domain.com/index.php?hash=xxx => www.domain.com/index.php
+    // Case 2: www.domain.com/index.php?hash=xxx&variable1=xxx => www.domain.com/index.php?variable1=xxx
+    // Case 3: www.domain.com/index.php?variable1=xxx&hash=xxx => www.domain.com/index.php?variable1=xxx
+    // Case 4: www.domain.com/index.php?variable1=xxx&hash=xxx&variable2=xxx => www.domain.com/index.php?variable1=xxx&variable2=xxx
+
+    int hash_end    = -1;
+    int hash_start  = -1;
+
+    hash_start  = msg.indexOf("?hash");
+
+    if (hash_start != -1) // cases 1 and 2
+    {
+        hash_end = msg.indexOf("&",hash_start);
+        if (hash_end == -1) // case 1: deletes ?hash=xxx
+        {
+            hash_end = msg.length();
+            filteredMsg.remove(hash_start,hash_end-hash_start);
+        }
+        else // case 2: deletes hash=xxx&
+        {
+            filteredMsg.remove(hash_start+1,hash_end-hash_start); // excludes '?' character
+        }
+    }
+    else if ((hash_start = msg.indexOf("&hash")) != -1) // cases 3 and 4
+    {
+        hash_end = msg.indexOf("\&",hash_start+1);
+
+        if (hash_end == -1) // case 3: deletes &hash=xxx in end of url
+        {
+            hash_end = msg.length();
+            filteredMsg.remove(hash_start,hash_end-hash_start);
+        }
+        else // case 4: deletes &hash=xxx
+        {
+            filteredMsg.remove(hash_start,hash_end-hash_start);
+        }
+    }
+    else
+    {
+        // Nothing to do
+    }
+
+    std::string text = filteredMsg.toLatin1().constData();
 	std::cout << text << "\n";
 	std::cout.flush();
+
 	switch (type)
-	{
+	{       
 	case QtDebugMsg:
-		file.write(QString("Debug:\t\t").toLatin1()+msg.toLatin1()+QString("\r\n").toLatin1());
+        file.write(QString("Debug:\t\t").toLatin1()+filteredMsg.toLatin1()+QString("\r\n").toLatin1());
 		break;
 	case QtWarningMsg:
-		file.write(QString("Warning:\t").toLatin1()+msg.toLatin1()+QString("\r\n").toLatin1());
+        file.write(QString("Warning:\t").toLatin1()+filteredMsg.toLatin1()+QString("\r\n").toLatin1());
 		break;
 	case QtCriticalMsg:
-		file.write(QString("Critical:\t").toLatin1()+msg.toLatin1()+QString("\r\n").toLatin1());
+        file.write(QString("Critical:\t").toLatin1()+filteredMsg.toLatin1()+QString("\r\n").toLatin1());
 		break;
 	case QtFatalMsg:
-		file.write(QString("Fatal:\t\t").toLatin1()+msg.toLatin1()+QString("\r\n").toLatin1());
+        file.write(QString("Fatal:\t\t").toLatin1()+filteredMsg.toLatin1()+QString("\r\n").toLatin1());
 		abort();
 	default:
-		file.write(QString("Other:\t\t").toLatin1()+msg.toLatin1()+QString("\r\n").toLatin1());
+        file.write(QString("Other:\t\t").toLatin1()+filteredMsg.toLatin1()+QString("\r\n").toLatin1());
 		break;
 	}
+}
+
+void askLaunchUrl(QString & launchUrl)
+{
+    QEventLoop loop;
+    QDialog dialog;
+    QDialogButtonBox url_window(QDialogButtonBox::Save | QDialogButtonBox::Abort);
+    QVBoxLayout layout;
+    QLabel Label;
+    QLineEdit lineEdit;
+    ConfigManager &config = ConfigManager::Instance();
+
+    url_window.setGeometry(0, 0, 400, 20);
+    layout.addWidget(&Label);
+    layout.addWidget(&lineEdit);
+    layout.addWidget(&url_window);
+
+    //Qt::WindowFlags flags = url_window->windowFlags();
+    //url_window->setWindowFlags(flags | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+
+    dialog.setLayout(&layout);
+    dialog.show();
+    dialog.setMinimumSize(400,80);
+
+    if (config.GetLanguage() == FR)
+    {
+        dialog.setWindowTitle("Configuration de l'URL du service");
+        Label.setText("Entrez l'URL d'accès au service : ");
+    }
+    else
+    {
+        dialog.setWindowTitle("Service address");
+        Label.setText("Enter the address service: ");
+    }
+
+    QObject::connect(&url_window,SIGNAL(accepted()),&loop,SLOT(quit()));
+    QObject::connect(&url_window,SIGNAL(rejected()),&loop,SLOT(quit()));
+    loop.exec();
+
+    launchUrl = lineEdit.text();
 }
 
 /**
@@ -67,9 +156,15 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
  */
 int main(int argc, char** argv)
 {
+    QString launch_url;
+    QString encoded_launch_url;
+
+    SimpleCrypt crypto(Q_UINT64_C(0x0c2ad4a4acb9f023));
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.5"));
+    app.setApplicationVersion(QString("1.0.6"));
+    QSettings settings;
+    ConfigManager &config = ConfigManager::Instance();
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
@@ -93,39 +188,65 @@ int main(int argc, char** argv)
 	parser.addOption(urlOption);
 	parser.process(app);
 
-	if(!parser.isSet(urlOption))
-	{
-		qWarning() << "Pas d'url fournie en paramètre. Fin de l'application.\nExemple d'utilisation: webshell.exe -u http://www.google.fr/";
-		return 1;
-	}
+    if(!parser.isSet(urlOption))
+    {
+#ifdef POINT_URL
+        if ((launch_url = QString(POINT_URL)).isEmpty() == false)
+        {
+            qDebug() << "Url point defined by preprocessor variable: " << launch_url;
+        }
+#else
 
-	QString launch = parser.value(urlOption);
-	//On remplace webshell:// par http:// et webshells:// par https://
-	if(launch.startsWith("webshell://") || launch.startsWith("webshells://"))
-	{
-		launch.replace(0,8,"http");
-	}
-	//On remplace webshellf:// par file:///
-	if(launch.startsWith("webshellf://"))
-	{
-		launch.replace(0,12,"file:///");
-	}
-	QUrl url = QUrl(launch);
-	//Si les conditions de validation de l'url en paramètre sont remplies, on continue l'exécution
-	if(!url.isValid() || launch.endsWith("//"))
-	{
-		qWarning() << "URL invalide: On arrête l'application";
-		return 1;
-	}
+        /*if ((launch_url = config.GetLaunchUrl()).isEmpty() == false)
+        {
+             qDebug() << "Launch url retrieved in configuration file: " << launch_url;
+        }
+        else */if (QString(settings.value("config/point").toString()).isEmpty())
+        {
+            askLaunchUrl(launch_url);
+            qDebug() << "Url point defined: " << launch_url;
 
-	ConfigManager &config = ConfigManager::Instance();
-	config.InitApplicationParameters(launch);
+            encoded_launch_url = crypto.encryptToString(launch_url);
+            settings.setValue("config/point", encoded_launch_url);
+            //settings.setValue("config/point", launch_url);
+        }
+        else
+            launch_url = crypto.decryptToString(settings.value("config/point").toString());
+            //launch_url = settings.value("config/point").toString();
+#endif
+    }
+    else
+    {
+        launch_url = parser.value(urlOption);
+    }
 
-	if(!config.GetInstallationFileToRemove().isEmpty())
-	{
-		QFile::remove(config.GetInstallationFileToRemove());
-		config.SetInstallationFileToRemove("");
-	}
+    //On remplace webshell:// par http:// et webshells:// par https://
+    if(launch_url.startsWith("webshell://") || launch_url.startsWith("webshells://"))
+    {
+        launch_url.replace(0,8,"http");
+    }
+    //On remplace webshellf:// par file:///
+    if(launch_url.startsWith("webshellf://"))
+    {
+        launch_url.replace(0,12,"file:///");
+    }
+    QUrl url = QUrl(launch_url);
+    //Si les conditions de validation de l'url en paramètre sont remplies, on continue l'exécution
+
+    if(!url.isValid() || launch_url.endsWith("//"))
+    {
+        qWarning() << "URL invalide: On arrête l'application";
+        askLaunchUrl(launch_url);
+        //return 1;
+    }
+
+    config.InitApplicationParameters(launch_url);
+
+    if(!config.GetInstallationFileToRemove().isEmpty())
+    {
+        QFile::remove(config.GetInstallationFileToRemove());
+        config.SetInstallationFileToRemove("");
+    }
 
     //QWebSecurityOrigin::addLocalScheme("about");
 

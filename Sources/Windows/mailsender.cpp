@@ -80,8 +80,18 @@ bool MailSender::Send(QString szSubject)
 		}
 	}
 
+    /*char toField[] = "support@ives.fr";
+    char nameField[] = "IVèS Support";
+
+    MapiRecipDesc recipient[1] = { 0 };
+    recipient[0].ulRecipClass = MAPI_TO;
+    recipient[0].lpszAddress = toField;
+    recipient[0].lpszName = nameField;*/
+
 	MapiMessage message;
 	ZeroMemory(&message, sizeof(message));
+    //message.lpRecips = recipient;
+    //message.nRecipCount = 1;
 	message.lpszSubject = (LPSTR) subject.toStdString().c_str();
 	message.nFileCount = filedesc.size();
 	message.lpFiles = (lpMapiFileDesc)  &filedesc[0];

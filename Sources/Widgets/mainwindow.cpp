@@ -76,6 +76,8 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	normalscreenAction = new QAction(this);
 	reloadAction = new QAction(this);
 	infoAction = new QAction(this);
+    //clearPointUrlAction = new QAction(this);
+
 #ifdef Q_OS_WIN
 	sendlogAction = new QAction(this);
 #endif
@@ -102,6 +104,8 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	fileMenu = menuBar()->addMenu(tr("&Fichier"));
 	fileMenu->addAction(quitAction);
 	fileMenu->addAction(clearAllAction);
+    //fileMenu->addAction(clearPointUrlAction);
+
 	menuBar()->setVisible(config.GetMenuBarPresent());
 	connect(&config,SIGNAL(menuBarPresence(bool)),menuBar(),SLOT(setVisible(bool)));
 
@@ -168,6 +172,8 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
 	connect(view,SIGNAL(changeTitle(QString)),this,SLOT(setWindowTitle(QString)));
 	connect(view,SIGNAL(close()),this,SLOT(quit()));
     connect(view,SIGNAL(loadFinished(bool)),this,SLOT(loadFinished(bool)));
+    //connect (clearPointUrlAction, SIGNAL(triggered()), this, SLOT(clearPointUrl()));
+    //connect (clearPointUrlAction, SIGNAL(triggered()), this, SLOT(showClearPointUrlNotification()));
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
     connect (clearAllAction, SIGNAL(triggered()), this, SLOT(showClearAllNotification()));
     view->LoadInternalPage("loader");
@@ -382,6 +388,8 @@ void MainWindow::showContextMenu(const QPoint &pos)
     }
     if ( (view->IsUpdating() == false) && (m_currentNetworkState == QNetworkSession::Connected) )
         myMenu.addAction(reloadAction);
+    //myMenu.addAction(clearPointUrlAction);
+
 	myMenu.addAction(clearAllAction);
 #ifdef Q_OS_WIN
 	myMenu.addAction(sendlogAction);
@@ -603,6 +611,7 @@ void MainWindow::changeActionNames(QString lang)
 	{
 		//Valeurs françaises
 		fileMenu->setTitle("Fichier");
+        //clearPointUrlAction->setText("Effacer l'url du service");
 		clearAllAction->setText("Vider le cache");
         quitAction->setText("Quitter");
 		inspectAction->setText("Inspecter");
@@ -618,7 +627,8 @@ void MainWindow::changeActionNames(QString lang)
 	{
 		//Valeurs anglaises
 		fileMenu->setTitle("File");
-		clearAllAction->setText("Clear cache");
+        clearAllAction->setText("Clear cache");
+        //clearPointUrlAction->setText("Delete service url");
 		quitAction->setText("Quit");
 		inspectAction->setText("Inspect");
 		fullscreenAction->setText("Fullscreen");
@@ -637,13 +647,19 @@ void MainWindow::changeActionNames(QString lang)
  */
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-	if (event->key() == Qt::Key_Escape)
+    if (event->key() == Qt::Key_Asterisk && event->modifiers() & Qt::ControlModifier && event->modifiers() & Qt::AltModifier)
+    {
+        clearPointUrl();
+        showClearPointUrlNotification();
+    }
+
+    if (event->key() == Qt::Key_Escape)
 	{
 		if(this->isFullScreen())
 			this->changeScreenMode(false);
 		QMainWindow::keyPressEvent(event); // call the default implementation
 	}
-    if (event->key() == Qt::Key_F5)
+    else if (event->key() == Qt::Key_F5)
     {
         ConfigManager &config = ConfigManager::Instance();
         QString savedAdress(config.GetSavedAdress());
@@ -967,22 +983,52 @@ void MainWindow::hideNotification()
         m_hideNotificationAnimation->start();
 }
 
-void MainWindow::showClearAllNotification()
+void MainWindow::showClearPointUrlNotification()
 {
     QString notification_text;
+    QString notification_title;
+
+    if (ConfigManager::Instance().GetDisplayName() == "")
+        notification_title = ConfigManager::Instance().GetAppName();
+    else
+        notification_title = ConfigManager::Instance().GetDisplayName();
 
     if(ConfigManager::Instance().GetLanguage() == FR)
     {
-        notification_text   = "Les données sont supprimées du cache";
+        notification_text   = "La configuration de l'url du service a été corretement supprimée";
     }
     else
     {
-        notification_text   = "Web cache cleared";
+        notification_text   = "Url service successfully cleared";
     }
 
-    m_notificationLabel->setText(notification_text);
+    trayIcon->showMessage(notification_title,notification_text);
+}
+
+void MainWindow::showClearAllNotification()
+{
+    QString notification_text;
+    QString notification_title;
+
+    if (ConfigManager::Instance().GetDisplayName() == "")
+        notification_title = ConfigManager::Instance().GetAppName();
+    else
+        notification_title = ConfigManager::Instance().GetDisplayName();
+
+    if(ConfigManager::Instance().GetLanguage() == FR)
+    {
+        notification_text   = "Les données ont été supprimées du cache";
+    }
+    else
+    {
+        notification_text   = "Web cache successfully cleared";
+    }
+
+    /*m_notificationLabel->setText(notification_text);
     m_showNotificationAnimation->start();
-    QTimer::singleShot(NOTIFICATION_DURATION, this, SLOT(hideNotification()));
+    QTimer::singleShot(NOTIFICATION_DURATION, this, SLOT(hideNotification()));*/
+
+    trayIcon->showMessage(notification_title,notification_text);
 }
 
 void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
@@ -1059,4 +1105,10 @@ void MainWindow::handleNetworkStateChanged(QNetworkSession::State state)
 
     }
     m_lastNetworkState = m_currentNetworkState;
+}
+
+void MainWindow::clearPointUrl()
+{
+    QSettings settings;
+    settings.remove("config/point");
 }
