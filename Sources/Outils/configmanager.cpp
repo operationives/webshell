@@ -126,7 +126,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
     displayName = "";
 	lang = QLocale::system().uiLanguages().first();
     qDebug() << "Detected system language: " << lang;
-	lang.truncate(2);
+    lang.truncate(2);
 	baseUrl = QStringList();
 
 	QDomDocument dom("appli_xml");
@@ -195,7 +195,7 @@ void ConfigManager::InitApplicationParameters(QString launchUrl)
             else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "displayName")
                 displayName = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 
-			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "lang")
+            else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "lang" && e.attribute(CHILDREN_VALUE_ATTRIBUTE) != "")
 				lang = e.attribute(CHILDREN_VALUE_ATTRIBUTE);
 
 			else if(e.attribute(CHILDREN_NAME_ATTRIBUTE) == "baseUrl")
@@ -321,7 +321,7 @@ void ConfigManager::StoreParametersAppli()
 	AppendNode("infos",infosAppli,domElem);
 
 	//Insertion du lang lang
-	AppendNode("lang",lang,domElem);
+    AppendNode("lang",lang,domElem);
 
 	//Insertion du paramètre baseUrl
 	AppendNode("baseUrl",baseUrl,domElem);
@@ -714,7 +714,7 @@ QString ConfigManager::GetLanguage()
 void ConfigManager::SetLanguage(QString lang)
 {
 	this->lang = lang;
-	emit newLanguage(lang);
+    emit newLanguage(lang);
 	StoreParametersAppli();
 }
 
