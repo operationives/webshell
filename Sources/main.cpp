@@ -12,6 +12,8 @@
 #endif
 
 
+class UrlDialog;
+
 /** @mainpage Webshell
  *
  * Le webshell est un logiciel permettant d'ouvrir des applications web HTML5 de façon à ce qu'elles réagissent de la même manière que si elles étaient dans un navigateur web supportant les NPAPI Plugins. Le webshell contenant une application spécifique peut s'exécuter de manière similaire à une application de bureau standard.
@@ -111,7 +113,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
 void askLaunchUrl(QString & launchUrl)
 {
     QEventLoop loop;
-    QDialog dialog;
+    UrlDialog dialog;
     QDialogButtonBox url_window(QDialogButtonBox::Save | QDialogButtonBox::Abort);
     QVBoxLayout layout;
     QLabel Label;
@@ -137,12 +139,13 @@ void askLaunchUrl(QString & launchUrl)
     }
     else
     {
-        dialog.setWindowTitle("Service address");
-        Label.setText("Enter the address service: ");
+        dialog.setWindowTitle("Service URL Configuration");
+        Label.setText("Enter the service URL: ");
     }
 
     QObject::connect(&url_window,SIGNAL(accepted()),&loop,SLOT(quit()));
     QObject::connect(&url_window,SIGNAL(rejected()),&loop,SLOT(quit()));
+    QObject::connect(&dialog,SIGNAL(dialogClosed()),&loop,SLOT(quit()));
     loop.exec();
 
     launchUrl = lineEdit.text();
@@ -206,8 +209,8 @@ int main(int argc, char** argv)
             askLaunchUrl(launch_url);
             qDebug() << "Url point defined: " << launch_url;
 
-            encoded_launch_url = crypto.encryptToString(launch_url);
-            settings.setValue("config/point", encoded_launch_url);
+            //encoded_launch_url = crypto.encryptToString(launch_url);
+            //settings.setValue("config/point", encoded_launch_url);
             //settings.setValue("config/point", launch_url);
         }
         else
@@ -236,8 +239,13 @@ int main(int argc, char** argv)
     if(!url.isValid() || launch_url.endsWith("//"))
     {
         qWarning() << "URL invalide: On arrête l'application";
-        askLaunchUrl(launch_url);
-        //return 1;
+        //askLaunchUrl(launch_url);
+        return 1;
+    }
+    else
+    {
+        encoded_launch_url = crypto.encryptToString(launch_url);
+        settings.setValue("config/point", encoded_launch_url);
     }
 
     config.InitApplicationParameters(launch_url);

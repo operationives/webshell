@@ -12,6 +12,27 @@
     #include <QtWinExtras>
 #endif
 
+// Class creted to reimplement CloseEvent of the Qdialog
+class UrlDialog : public QDialog
+{
+    Q_OBJECT
+
+signals:
+    void dialogClosed();
+
+public:
+    UrlDialog(QWidget * parent=0, Qt::WindowFlags f = 0) : QDialog(parent,f) {}
+
+    void closeEvent(QCloseEvent *event)
+    {
+        emit dialogClosed();
+    };
+
+private slots:
+
+private:
+
+};
 
 class MainWindow : public QMainWindow
 {

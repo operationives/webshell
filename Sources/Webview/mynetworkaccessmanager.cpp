@@ -42,6 +42,7 @@ void MyNetworkAccessManager::cookieLoaded(QString name, QString value)
     if (name == "langue")
     {
         ConfigManager &config = ConfigManager::Instance();
+        if (value != "")
         config.SetLanguage(value);
     }
 }
@@ -151,6 +152,7 @@ void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
 		langue.replace(0,index+7,"");
 		langue.truncate(2);
         ConfigManager &config = ConfigManager::Instance();
+        if (langue != "")
 		config.SetLanguage(langue);
 	}
 }
