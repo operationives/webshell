@@ -118,7 +118,7 @@ void askLaunchUrl(QString & launchUrl)
     QVBoxLayout layout;
     QLabel Label;
     QLineEdit lineEdit;
-    ConfigManager &config = ConfigManager::Instance();
+    QString os_language = QLocale::system().uiLanguages().first();
 
     url_window.setGeometry(0, 0, 400, 20);
     layout.addWidget(&Label);
@@ -132,7 +132,8 @@ void askLaunchUrl(QString & launchUrl)
     dialog.show();
     dialog.setMinimumSize(400,80);
 
-    if (config.GetLanguage() == FR)
+    os_language.truncate(2);
+    if (os_language == FR)
     {
         dialog.setWindowTitle("Configuration de l'URL du service");
         Label.setText("Entrez l'URL d'accès au service : ");
