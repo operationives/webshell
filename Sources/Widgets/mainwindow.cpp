@@ -995,7 +995,7 @@ void MainWindow::showClearPointUrlNotification()
 
     if(ConfigManager::Instance().GetLanguage() == FR)
     {
-        notification_text   = "La configuration de l'url du service a été corretement supprimée";
+        notification_text   = "La configuration de l'url a été réinitialisée";
     }
     else
     {
