@@ -869,6 +869,7 @@ void MainWindow::stopForceGuiUpdate()
 void MainWindow::showEvent(QShowEvent *e)
 {
 #ifdef Q_OS_WIN32
+    if (m_taskbarButton)
     m_taskbarButton->setWindow(windowHandle());
 #endif
 
