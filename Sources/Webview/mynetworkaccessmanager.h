@@ -6,6 +6,8 @@
 #include <QNetworkDiskCache>
 #include "cookiejar.h"
 
+#define NTLM_AUTH_MAX_TRY_COUNT 5
+
 class MyNetworkAccessManager : public QNetworkAccessManager
 {
 	Q_OBJECT
@@ -30,12 +32,16 @@ private:
 	QNetworkDiskCache *m_webCache;
 	CookieJar *m_cookieJar;
     QString m_pending_login;
+    bool m_isFirstAuthentication;
+    bool m_didNtlmAuthenticationTried;
+    int m_NtlmAuthenticationTryCount;
 
 //signals:
 //    void cancelRequest();
 
 private slots:
 	void getLanguage(QNetworkReply *reply);
+    void onProxyAuthenticationRequired(const QNetworkProxy &prox, QAuthenticator *auth);
     //void handlReplyError(QNetworkReply::NetworkError error);
 };
 

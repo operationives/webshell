@@ -9,7 +9,6 @@
 #include "Outils/configmanager.h"
 
 
-
 /**
  * @brief Constructeur de notre webview et des objets à intégrer dans l'application
  * @param parent	Widget parent, dans le cas présent il s'agit de la MainWindow
@@ -49,6 +48,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 
 	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
+    connect(m_WebCtrl,SIGNAL(finished(QNetworkReply*)),this,SLOT(handleNetworkAccess(QNetworkReply*)));
 
 	connectionLost = false;
 
@@ -125,6 +125,7 @@ void MyWebView::updateLogin()
                 user_auth_field.setAttribute("onfocus",onfocus_attribute);
 
                 // Reduce the width of the login field:
+                // FIXME: don't change the size: it's done by the service!
                 int arrow_width = 35;
                 QString width_css_property = user_auth_field.styleProperty("width",QWebElement::ComputedStyle);
                 width_css_property.replace(QString("px"),QString(""));
@@ -345,6 +346,16 @@ void MyWebView::handleClosePopup()
 {
     m_current_popup = NULL;
 }
+
+void MyWebView::handleNetworkAccess(QNetworkReply* reply)
+{
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 407) // Proxy Authentification required
+    {
+        qDebug() << "Proxy Authentification required";
+    }
+}
+
 
 /*void MyWebView::downloadFinished(DownloadItem* item)
 {

@@ -94,6 +94,7 @@ private slots:
 	void updateConnectivity();
     void downloadContent(QNetworkReply *reply);
     void handleClosePopup();
+    void handleNetworkAccess(QNetworkReply* reply);
     //void downloadFinished(DownloadItem *item);
     /*void handleLoadProgress(int progress);
     void handleLoadFinished(bool ok);*/

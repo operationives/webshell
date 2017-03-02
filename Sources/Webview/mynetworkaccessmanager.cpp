@@ -2,7 +2,9 @@
 #include "Outils/configmanager.h"
 #include <QNetworkReply>
 #include <QStandardPaths>
-
+#include <QAuthenticator>
+#include <QNetworkProxy>
+#include <QtWidgets>
 
 MyNetworkAccessManager* MyNetworkAccessManager::m_instance=NULL;
 
@@ -21,6 +23,8 @@ MyNetworkAccessManager* MyNetworkAccessManager::Instance()
 MyNetworkAccessManager::MyNetworkAccessManager()
 	:QNetworkAccessManager()
 {
+    m_isFirstAuthentication = true;
+    m_NtlmAuthenticationTryCount = 0;
 	m_cookieJar = new CookieJar();
     connect(m_cookieJar,SIGNAL(cookieLoaded(QString,QString)),this,SLOT(cookieLoaded(QString,QString)));
 	this->setCookieJar(m_cookieJar);
@@ -30,8 +34,96 @@ MyNetworkAccessManager::MyNetworkAccessManager()
     m_webCache->setMaximumCacheSize(50*1024*1024); // 50Mo
 	this->setCache(m_webCache);
 	connect(this,SIGNAL(finished(QNetworkReply*)),this,SLOT(getLanguage(QNetworkReply*)));
+    connect(this, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), this, SLOT(onProxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)));
     m_pending_login = "";
 }
+
+
+void MyNetworkAccessManager::onProxyAuthenticationRequired(const QNetworkProxy &prox, QAuthenticator *auth)
+{
+    qDebug() << "[AUTH] On Proxy Authentication Required Event:";
+
+    // Configuring QAuthenticator for Windows Integrated Authentication with NTLM protocol:
+    auth->setUser("");
+    //auth->setPassword("");
+
+    if (m_NtlmAuthenticationTryCount <= NTLM_AUTH_MAX_TRY_COUNT)
+    {
+        qDebug() << "[AUTH] > Try NTLM authentication:  " << m_NtlmAuthenticationTryCount << " on " << NTLM_AUTH_MAX_TRY_COUNT;
+        m_NtlmAuthenticationTryCount++;
+        return;
+    }
+
+    qDebug() << "[AUTH] > NTLM Authentication failed. " << (m_isFirstAuthentication ? "First authentication." : "Additional authentication try");
+    m_didNtlmAuthenticationTried = true;
+
+    QDialog dialog(NULL,Qt::WindowCloseButtonHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::MSWindowsFixedSizeDialogHint);
+    QDialogButtonBox authentication_window(QDialogButtonBox::Ok | QDialogButtonBox::Close);
+    QFormLayout layout;
+    QLabel infoLabel, UserNameLabel, PasswordLabel, incorrectPassword;
+    QLineEdit UserNameEdit, PasswordEdit;
+    QString os_language = QLocale::system().uiLanguages().first();
+
+    authentication_window.setGeometry(0, 0, 320, 150);
+    UserNameEdit.setFixedWidth(150);
+    PasswordEdit.setFixedWidth(150);
+    infoLabel.setWordWrap(true);
+    incorrectPassword.setWordWrap(true);
+    PasswordEdit.setEchoMode(QLineEdit::Password);
+
+    layout.addRow(&infoLabel);
+    layout.setVerticalSpacing(20);
+    layout.addRow(&UserNameLabel, &UserNameEdit);
+    layout.addRow(&PasswordLabel, &PasswordEdit);
+    if (m_isFirstAuthentication == false) layout.addRow(&incorrectPassword);
+
+    authentication_window.layout()->setSizeConstraint( QLayout::SetFixedSize );
+    layout.addWidget(&authentication_window);
+
+    dialog.setLayout(&layout);
+
+    QString proxyName = prox.hostName() + ":" + QString::number(prox.port());
+    os_language.truncate(2);
+    if (os_language == FR)
+    {
+        dialog.setWindowTitle("Authentification requise");
+        infoLabel.setText("Le proxy " + proxyName + " demande un nom d'utilisateur et un mot de passe pour établir la connexion.");
+        UserNameLabel.setText("Nom d'utilisateur : ");
+        PasswordLabel.setText("Mot de passe : ");
+        incorrectPassword.setText("<font color='red'>L'authentification a échoué. Veuillez entrer à nouveau vos coordonnées.</font>");
+    }
+    else
+    {
+        dialog.setWindowTitle("Authentication required");
+        infoLabel.setText("The proxy " + proxyName + " requires a user name and a password.");
+        UserNameLabel.setText("User name: ");
+        PasswordLabel.setText("Password: ");
+        incorrectPassword.setText("<font color='red'>Authentication failed. Please verify your login and your password.</font>");
+    }
+
+    QObject::connect(&authentication_window,SIGNAL(accepted()),&dialog,SLOT(accept()));
+    QObject::connect(&authentication_window,SIGNAL(rejected()),&dialog,SLOT(reject()));
+
+    int dialogCode = dialog.exec();
+
+    switch(dialogCode)
+    {
+        case QDialog::Accepted:
+            qDebug() << "[AUTH] > Proxy authentication accepted.";
+            if (!UserNameEdit.text().isEmpty()) auth->setUser(UserNameEdit.text());
+            else qDebug() << "[AUTH] > Proxy user name is empty.";
+            if (!PasswordEdit.text().isEmpty()) auth->setPassword(PasswordEdit.text());
+            else qDebug() << "[AUTH] > Proxy password is empty.";
+            m_isFirstAuthentication = false;
+        break;
+        default:
+        case QDialog::Rejected:
+            qDebug() << "[AUTH] > Proxy authentication rejected. Quit application.";
+            QApplication::quit();
+        break;
+    }
+}
+
 
 /**
  * @brief Intercepte les cookies chargés depuis le disque

@@ -166,9 +166,11 @@ int main(int argc, char** argv)
     SimpleCrypt crypto(KEY_CODE);
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.6"));
+    app.setApplicationVersion(QString("1.0.7"));
     QSettings settings;
     ConfigManager &config = ConfigManager::Instance();
+
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
 
 	//Permet de placer dans un fichier .log ce qui est affiché dans la console
 	qInstallMessageHandler(myMessageOutput);
