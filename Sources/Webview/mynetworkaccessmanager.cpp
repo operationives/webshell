@@ -44,17 +44,16 @@ void MyNetworkAccessManager::onProxyAuthenticationRequired(const QNetworkProxy &
     qDebug() << "[AUTH] On Proxy Authentication Required Event:";
 
     // Configuring QAuthenticator for Windows Integrated Authentication with NTLM protocol:
-    auth->setUser("");
-    //auth->setPassword("");
+    /*auth->setUser("");
 
     if (m_NtlmAuthenticationTryCount <= NTLM_AUTH_MAX_TRY_COUNT)
     {
         qDebug() << "[AUTH] > Try NTLM authentication:  " << m_NtlmAuthenticationTryCount << " on " << NTLM_AUTH_MAX_TRY_COUNT;
         m_NtlmAuthenticationTryCount++;
-        return;
-    }
+        //return;
+    }*/
 
-    qDebug() << "[AUTH] > NTLM Authentication failed. " << (m_isFirstAuthentication ? "First authentication." : "Additional authentication try");
+    qDebug() << "[AUTH] > NO NTLM Authentication. " << (m_isFirstAuthentication ? "First authentication." : "Additional authentication try");
     m_didNtlmAuthenticationTried = true;
 
     QDialog dialog(NULL,Qt::WindowCloseButtonHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::MSWindowsFixedSizeDialogHint);
@@ -110,9 +109,15 @@ void MyNetworkAccessManager::onProxyAuthenticationRequired(const QNetworkProxy &
     {
         case QDialog::Accepted:
             qDebug() << "[AUTH] > Proxy authentication accepted.";
-            if (!UserNameEdit.text().isEmpty()) auth->setUser(UserNameEdit.text());
+            if (!UserNameEdit.text().isEmpty())
+            {
+                auth->setUser(UserNameEdit.text());
+            }
             else qDebug() << "[AUTH] > Proxy user name is empty.";
-            if (!PasswordEdit.text().isEmpty()) auth->setPassword(PasswordEdit.text());
+            if (!PasswordEdit.text().isEmpty())
+            {
+                auth->setPassword(PasswordEdit.text());
+            }
             else qDebug() << "[AUTH] > Proxy password is empty.";
             m_isFirstAuthentication = false;
         break;
@@ -149,7 +154,7 @@ void MyNetworkAccessManager::cookieLoaded(QString name, QString value)
 QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData)
 {
     QNetworkRequest request(req);
-
+    //qDebug() << "[TEST] Creating request: " << req.url();
     if (outgoingData)
     {
 
@@ -170,8 +175,8 @@ QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetwo
             values = parameter.split("=");
             if (values.at(0) == QString("email"))
             {
-                qDebug() << "Potential login detected: [" << values[1] << "]";
-                m_pending_login = values[1];
+                //qDebug() << "Potential login detected: [" << QUrl::fromPercentEncoding(values[1].toUtf8()) << "]";
+                m_pending_login = QUrl::fromPercentEncoding(values[1].toUtf8());
             }
         }
     }
@@ -216,7 +221,17 @@ void MyNetworkAccessManager::clearAll()
 void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
 {
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 302) // redirection detected
+
+    if (statusCode == 301)// Permanent redirection detected
+    {
+        ConfigManager &config = ConfigManager::Instance();
+        QString redirect = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+        QStringList list = config.GetBaseUrl();
+        list.append(redirect);
+        config.SetBaseUrl(list);
+        qDebug() << "Permanent redirection detected: store the url: " << config.GetBaseUrl();
+    }
+    else if (statusCode == 302) // redirection detected
     {
         if (m_pending_login != "")
         {
@@ -227,7 +242,7 @@ void MyNetworkAccessManager::getLanguage(QNetworkReply *reply)
             QStringList login_list(config.GetLoginList());
             if (!login_list.contains(m_pending_login))
             {
-                qDebug() << "Storage of the new login: [" << m_pending_login << "]";
+                qDebug() << "Storing the new login: [" << m_pending_login << "]";
                 login_list.append(m_pending_login);
                 config.SetLoginList(login_list);
             }

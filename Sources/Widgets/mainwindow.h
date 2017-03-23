@@ -129,6 +129,7 @@ private slots:
     void checkNetworkConfiguration();
     void showClearAllNotification();
     void showClearPointUrlNotification();
+    void showReportLogNotification();
     void clearPointUrl();
 };
 

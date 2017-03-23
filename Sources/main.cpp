@@ -25,7 +25,7 @@ class UrlDialog;
  */
 
 
-//A faire: gestion de la taille maximale du fichier .log
+//A améliorer: gestion de la taille maximale du fichier .log
 /**
  * @brief Gestion des sorties consoles à placer dans les logs
  * @param type			Catégorie de message
@@ -38,7 +38,11 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext & logcontext,const
     QString filteredMsg= "";
     filteredMsg.append(msg);
 	QFile file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".log");
-	file.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    // Delete file if too big:
+    if (file.size() > 3000000) file.resize(0);
+
+    file.open(QIODevice::WriteOnly | QIODevice::Append);
 	file.write(QString("[").toLatin1()+QDateTime::currentDateTime().toString().toLatin1()+QString("]\t").toLatin1());
 
     // hash info deletion:

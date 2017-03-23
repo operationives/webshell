@@ -444,9 +444,51 @@ void MainWindow::showContextMenu(const QPoint &pos)
 #ifdef Q_OS_WIN
 	if (selectedItem->text()==sendlogAction->text())
 	{
+        showReportLogNotification();
+
         MailSender mail;
-        mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".log");
-        mail.Send(sendlogAction->text());
+
+        QFile webshell_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".log");
+        if (webshell_log_file.exists())
+        {
+            QFile zipped_webshell_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".zip");
+            webshell_log_file.open(QIODevice::ReadOnly);
+            zipped_webshell_log_file.open(QIODevice::WriteOnly);
+            zipped_webshell_log_file.resize(0);
+            QByteArray uncompressed_data = webshell_log_file.readAll();
+            QByteArray compressed_data = qCompress(uncompressed_data, 9);
+            zipped_webshell_log_file.write(compressed_data);
+            webshell_log_file.close();
+            zipped_webshell_log_file.close();
+            mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".zip");
+        }
+
+        // Add LiveVideoPlugin.log
+        QString liveVideoPluginLogPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/../../Temp/LiveVideoPlugin/");
+        if (QDir(liveVideoPluginLogPath).exists())
+        {
+            QFile lvp_log_file(liveVideoPluginLogPath + "LiveVideoPlugin.log");
+            if ( lvp_log_file.exists())
+            {
+                QFile zipped_lvp_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/LiveVideoPlugin.zip");
+                lvp_log_file.open(QIODevice::ReadOnly);
+                zipped_lvp_log_file.open(QIODevice::WriteOnly);
+                zipped_lvp_log_file.resize(0);
+                QByteArray uncompressed_data = lvp_log_file.readAll();
+                QByteArray compressed_data = qCompress(uncompressed_data, 9);
+                zipped_lvp_log_file.write(compressed_data);
+                lvp_log_file.close();
+                zipped_lvp_log_file.close();
+                mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "LiveVideoPlugin.zip");
+            }
+        }
+
+        // Send email:
+        if (ConfigManager::Instance().GetLanguage() == FR)
+            mail.Send("["+QApplication::applicationName()+ " " + QApplication::applicationVersion() + "] Rapport d'erreurs");
+        else
+            mail.Send("["+QApplication::applicationName()+ " " + QApplication::applicationVersion() + "] Log Report");
+
 	}
 #endif
 }
@@ -620,7 +662,7 @@ void MainWindow::changeActionNames(QString lang)
         reloadAction->setText("Recharger");
 		infoAction->setText("Informations");
 #ifdef Q_OS_WIN
-		sendlogAction->setText("Envoi de logs");
+        sendlogAction->setText("Envoi de logs");
 #endif
 	}
 	else
@@ -636,7 +678,7 @@ void MainWindow::changeActionNames(QString lang)
         reloadAction->setText("Reload");
 		infoAction->setText("Informations");
 #ifdef Q_OS_WIN
-		sendlogAction->setText("Send logs");
+        sendlogAction->setText("Send logs");
 #endif
 	}
 }
@@ -691,6 +733,17 @@ void MainWindow::closeEvent (QCloseEvent *event)
         view->LoadInternalPage("loader");
         disconnect(view,SIGNAL(loadProgress(int)),this,SLOT(handleLoadProgress(int)));
         MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
+
+        // Clean zip files:
+        QString app_data_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        QDir app_data_dir(app_data_path);
+        app_data_dir.setNameFilters(QStringList() << "*.zip" << "*.exe");
+        app_data_dir.setFilter(QDir::Files);
+        foreach(QString file_dir, app_data_dir.entryList())
+        {
+            app_data_dir.remove(file_dir);
+        }
+
         CookieJar *cookieJar = m_WebCtrl->getCookieJar();
         cookieJar->saveNow();
         m_is_everything_saved_before_exiting = true;
@@ -926,7 +979,7 @@ void MainWindow::handleLoadFinished(bool ok)
 
     if (!ok)
     {
-        qDebug() << "The launch url can't be reached: " << view->url();
+        qDebug() << "Launch url can't be reached: " << ConfigManager::Instance().GetLaunchUrl();
         // The launch url is not in cache.
         // So we show the error page if the launch url (login or index page) can't be reached.
         // m_is_started takes the value 'true' if the launch url is reached
@@ -1001,6 +1054,28 @@ void MainWindow::showClearPointUrlNotification()
     else
     {
         notification_text   = "Url service successfully cleared";
+    }
+
+    trayIcon->showMessage(notification_title,notification_text);
+}
+
+void MainWindow::showReportLogNotification()
+{
+    QString notification_text;
+    QString notification_title;
+
+    if (ConfigManager::Instance().GetDisplayName() == "")
+        notification_title = ConfigManager::Instance().GetAppName();
+    else
+        notification_title = ConfigManager::Instance().GetDisplayName();
+
+    if(ConfigManager::Instance().GetLanguage() == FR)
+    {
+        notification_text   = "E-mail de rapport d'erreurs en préparation.\nVérifiez votre logiciel de messagerie.";
+    }
+    else
+    {
+        notification_text   = "Report log e-mail in preparation.\n Check your email software.";
     }
 
     trayIcon->showMessage(notification_title,notification_text);

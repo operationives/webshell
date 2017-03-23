@@ -46,7 +46,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	if(!icon.isEmpty())
 		wapp->setProperty("icon",icon);
 
-	MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
+    MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
     connect(m_WebCtrl,SIGNAL(finished(QNetworkReply*)),this,SLOT(handleNetworkAccess(QNetworkReply*)));
 
