@@ -95,6 +95,7 @@ private slots:
     void downloadContent(QNetworkReply *reply);
     void handleClosePopup();
     void handleNetworkAccess(QNetworkReply* reply);
+    void handleSslErrors(QNetworkReply* reply,QList<QSslError> errors);
     //void downloadFinished(DownloadItem *item);
     /*void handleLoadProgress(int progress);
     void handleLoadFinished(bool ok);*/

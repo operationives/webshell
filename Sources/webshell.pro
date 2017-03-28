@@ -2,7 +2,8 @@ QT += webkitwidgets core network xml
 win32 {
     QT += winextras
 }
-
+INCLUDEPATH += ..\Thirdparties\include\quazip
+LIBS += -L..\Thirdparties\lib\quazip -lquazip
 CONFIG += warn_off
 
 QMAKE_CXXFLAGS_WARN_OFF += -Wunused-parameter

@@ -154,7 +154,9 @@ void MyNetworkAccessManager::cookieLoaded(QString name, QString value)
 QNetworkReply *MyNetworkAccessManager::createRequest( Operation op, const QNetworkRequest & req, QIODevice * outgoingData)
 {
     QNetworkRequest request(req);
+
     //qDebug() << "[TEST] Creating request: " << req.url();
+
     if (outgoingData)
     {
 

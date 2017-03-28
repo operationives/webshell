@@ -4,6 +4,7 @@
 #include "Outils/configmanager.h"
 #ifdef Q_OS_WIN
 #include "Windows/mailsender.h"
+#include <JlCompress.h>
 #endif
 
 /**
@@ -448,10 +449,11 @@ void MainWindow::showContextMenu(const QPoint &pos)
 
         MailSender mail;
 
-        QFile webshell_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".log");
+        QString webshell_log_file_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".log";
+        QFile webshell_log_file(webshell_log_file_path);
         if (webshell_log_file.exists())
         {
-            QFile zipped_webshell_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".zip");
+            /*QFile zipped_webshell_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".zip");
             webshell_log_file.open(QIODevice::ReadOnly);
             zipped_webshell_log_file.open(QIODevice::WriteOnly);
             zipped_webshell_log_file.resize(0);
@@ -460,17 +462,20 @@ void MainWindow::showContextMenu(const QPoint &pos)
             zipped_webshell_log_file.write(compressed_data);
             webshell_log_file.close();
             zipped_webshell_log_file.close();
+            */
+            QString zipped_webshell_log_file_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + qAppName() + ".zip";
+            JlCompress::compressFile(zipped_webshell_log_file_path, webshell_log_file_path);
             mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), qAppName() + ".zip");
         }
 
         // Add LiveVideoPlugin.log
-        QString liveVideoPluginLogPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/../../Temp/LiveVideoPlugin/");
-        if (QDir(liveVideoPluginLogPath).exists())
+        QString lvp_log_dir(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/../../Temp/LiveVideoPlugin/");
+        if (QDir(lvp_log_dir).exists())
         {
-            QFile lvp_log_file(liveVideoPluginLogPath + "LiveVideoPlugin.log");
+            QFile lvp_log_file(lvp_log_dir + "LiveVideoPlugin.log");
             if ( lvp_log_file.exists())
             {
-                QFile zipped_lvp_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/LiveVideoPlugin.zip");
+                /*QFile zipped_lvp_log_file(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/LiveVideoPlugin.zip");
                 lvp_log_file.open(QIODevice::ReadOnly);
                 zipped_lvp_log_file.open(QIODevice::WriteOnly);
                 zipped_lvp_log_file.resize(0);
@@ -479,6 +484,9 @@ void MainWindow::showContextMenu(const QPoint &pos)
                 zipped_lvp_log_file.write(compressed_data);
                 lvp_log_file.close();
                 zipped_lvp_log_file.close();
+                */
+                QString zipped_lvp_log_file_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/LiveVideoPlugin.zip";
+                JlCompress::compressFile(zipped_lvp_log_file_path, lvp_log_file.fileName());
                 mail.AddFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "LiveVideoPlugin.zip");
             }
         }

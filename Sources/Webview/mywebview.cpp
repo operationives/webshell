@@ -49,7 +49,7 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
     MyNetworkAccessManager *m_WebCtrl = MyNetworkAccessManager::Instance();
 	this->page()->setNetworkAccessManager(m_WebCtrl);
     connect(m_WebCtrl,SIGNAL(finished(QNetworkReply*)),this,SLOT(handleNetworkAccess(QNetworkReply*)));
-
+    connect(m_WebCtrl,SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),this,SLOT(handleSslErrors(QNetworkReply*,QList<QSslError>)));
 	connectionLost = false;
 
 	connect(parent,SIGNAL(clearAll()),m_WebCtrl,SLOT(clearAll()));
@@ -346,6 +346,17 @@ void MyWebView::handleClosePopup()
 {
     m_current_popup = NULL;
 }
+
+void MyWebView::handleSslErrors(QNetworkReply* reply,QList<QSslError> errors)
+{
+    qDebug() << "SSL errors: ";
+    foreach(QSslError error, errors) {
+        qDebug() << error.errorString();
+    }
+    // Uncomment the following line to ignore SSL errors:
+    //reply->ignoreSslErrors();
+}
+
 
 void MyWebView::handleNetworkAccess(QNetworkReply* reply)
 {
