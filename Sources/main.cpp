@@ -194,6 +194,13 @@ int main(int argc, char** argv)
 	QCommandLineOption iconOption(QStringList() << "i" << "icon", "Chemin d'accès vers l'icône de l'application <confFile>.", "Icône");
 	QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "Url");
 
+    boolean plugin_path_status;
+    plugin_path_status = qputenv("QTWEBKIT_PLUGIN_PATH", QDir::currentPath().toUtf8());
+    if (plugin_path_status)
+        qDebug() << "Adding plugin path: "<< QDir::currentPath().toUtf8();
+    else
+        qDebug() << "Failed to add plugin path: "<< QDir::currentPath().toUtf8();
+
 	parser.addOption(iconOption);
 	parser.addOption(urlOption);
 	parser.process(app);
