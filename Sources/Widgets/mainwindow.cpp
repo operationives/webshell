@@ -31,6 +31,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     m_showNotificationAnimation = NULL;
     m_hideNotificationAnimation = NULL;
 
+    m_currentScreen = 0;
     m_is_everything_saved_before_exiting = false;
 
     // NETWORK CONFIGURATION:
@@ -177,6 +178,7 @@ MainWindow::MainWindow(const QString &iconPath, QWidget *parent)
     //connect (clearPointUrlAction, SIGNAL(triggered()), this, SLOT(showClearPointUrlNotification()));
 	connect (clearAllAction, SIGNAL(triggered()), this, SIGNAL(clearAll()));
     connect (clearAllAction, SIGNAL(triggered()), this, SLOT(showClearAllNotification()));
+
     view->LoadInternalPage("loader");
 
 
@@ -872,6 +874,28 @@ void MainWindow::resizeEvent(QResizeEvent* event)
    }
 }
 
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    int currentScreen = QApplication::desktop()->screenNumber(this);
+    if (currentScreen != m_currentScreen)
+    {
+        qDebug() << "Screen change detected: "<< m_currentScreen << "->" << currentScreen << " " << QApplication::desktop()->screen(currentScreen)->geometry();
+        m_currentScreen = currentScreen;
+        // Start to force UI update to take into the account a potential new resolution.
+        startForceGuiUpdate();
+    }
+
+    int horizontalDpi = view->logicalDpiX();
+    float zoom_factor = horizontalDpi / 96.0;
+    if (view->zoomFactor() != zoom_factor)
+    {
+        qDebug() << "DPI change detected: [" << view->logicalDpiX() << "]dpi. Adapt zoom factor: [" << zoom_factor <<"]";
+        //if (ConfigManager::Instance().GetScreenMode()==WINDOWED)
+        //    this->resize(this->size().width()/view->zoomFactor(),this->size().height()/view->zoomFactor());
+        view->setZoomFactor(zoom_factor);
+    }
+}
+
 void MainWindow::changeEvent( QEvent* e )
 {
     if( e->type() == QEvent::WindowStateChange )
@@ -920,6 +944,16 @@ void MainWindow::forceGuiUpdate()
     if (m_progressBar)
         if (m_progressBar->value() == 100) m_progressBar->hide();
     view->update();
+    int horizontalDpi = view->logicalDpiX();
+    float zoom_factor = horizontalDpi / 96.0;
+    if (view->zoomFactor() != zoom_factor)
+    {
+        qDebug() << "DPI change detected: [" << view->logicalDpiX() << "]dpi. Adapt zoom factor: [" << zoom_factor <<"]";
+        //if (ConfigManager::Instance().GetScreenMode()==WINDOWED)
+        //    this->resize(this->size().width()/view->zoomFactor(),this->size().height()/view->zoomFactor());
+        view->setZoomFactor(zoom_factor);
+
+    }
 }
 
 void MainWindow::stopForceGuiUpdate()

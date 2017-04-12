@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     SimpleCrypt crypto(KEY_CODE);
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.7"));
+    app.setApplicationVersion(QString("1.0.8"));
     QSettings settings;
     ConfigManager &config = ConfigManager::Instance();
 
@@ -193,6 +193,8 @@ int main(int argc, char** argv)
 	//Compléter la gestion de l'option Icône
 	QCommandLineOption iconOption(QStringList() << "i" << "icon", "Chemin d'accès vers l'icône de l'application <confFile>.", "Icône");
 	QCommandLineOption urlOption(QStringList() << "u" << "url", "Write generated data into <url>.", "Url");
+
+    //qputenv("QT_DEVICE_PIXEL_RATIO",QByteArray("auto"));
 
     boolean plugin_path_status;
     plugin_path_status = qputenv("QTWEBKIT_PLUGIN_PATH", QDir::currentPath().toUtf8());

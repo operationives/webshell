@@ -92,6 +92,8 @@ private:
     bool m_is_started;
     bool m_is_everything_saved_before_exiting;
 
+    int m_currentScreen;
+
 	void DisplayInfos();
 	void CenterScreen();
 	void keyPressEvent(QKeyEvent *event);
@@ -99,6 +101,7 @@ private:
     void resizeEvent(QResizeEvent* event);
     void changeEvent( QEvent* event );
     void showEvent(QShowEvent *event);
+    void moveEvent(QMoveEvent *event);
     void createNotification();
 
 signals:
