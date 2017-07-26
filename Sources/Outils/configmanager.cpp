@@ -716,6 +716,17 @@ void ConfigManager::SetLanguage(QString lang)
 	this->lang = lang;
     emit newLanguage(lang);
 	StoreParametersAppli();
+
+    if (lang == "he" || lang == "ar")
+    {
+        qDebug() << "Set Layout Direction: Right to Left";
+        QApplication::setLayoutDirection( Qt::RightToLeft );
+    }
+    else
+    {
+        qDebug() << "Set Layout Direction: Left to Right";
+        QApplication::setLayoutDirection( Qt::LeftToRight );
+    }
 }
 
 /**
