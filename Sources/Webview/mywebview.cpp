@@ -96,7 +96,18 @@ void MyWebView::updateTitle()
  */
 void MyWebView::updateLogin()
 {
+    QMultiMap<QString, QString> map;
+    QMap<QString, QString>::iterator it;
     QWebFrame* frame = this->page()->currentFrame();
+    map = frame->metaData();
+    for (it = map.begin(); it != map.end(); ++it) {
+        if (it.value() == "he" || it.value() == "ar")
+        {
+            qDebug() << "He or Ar language detected via metadata";
+            ConfigManager::Instance().SetLanguage(it.value());
+        }
+    }
+
     QWebElementCollection login_button = frame->findAllElements("input[name=loginbutton]");
     if (login_button.count() != 0)
     {
