@@ -22,7 +22,10 @@ Informations::Informations(QWidget *parent)
 	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);
 
-	setWindowTitle(tr("Informations"));
+    if(ConfigManager::Instance().GetLanguage() == FR)
+        setWindowTitle(tr("Informations"));
+    else
+        setWindowTitle(tr("Information"));
 }
 
 Informations::~Informations()
@@ -44,17 +47,20 @@ void Informations::UpdateValues()
 	QString webshellText;
 	QString appText;
 	QString disconnectedText;
+
 	if(config.GetLanguage() == FR)
 	{
         webshellText = "Version du logiciel : ";
         appText = "\nInformations complémentaires :\n";
 		disconnectedText = "L'application est déconnectée";
+        setWindowTitle(tr("Informations"));
 	}
 	else
 	{
         webshellText = "Software version: ";
-		appText = "\nAdditional informations:\n";
+        appText = "\nAdditional information:\n";
 		disconnectedText = "The application is disconnected";
+        setWindowTitle(tr("Information"));
 	}
 	MyNetworkAccessManager *manager = MyNetworkAccessManager::Instance();
 	if(manager->networkAccessible() == QNetworkAccessManager::Accessible)

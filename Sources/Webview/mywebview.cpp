@@ -36,7 +36,6 @@ MyWebView::MyWebView(QWidget *parent) : QWebView(parent)
 	connect(wapp,SIGNAL(changeIcon(QIcon)),this,SIGNAL(changeIcon(QIcon)));
 	connect(wnavigator,SIGNAL(close()),this,SIGNAL(close()));
 	connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateTitle()));
-    connect(this,SIGNAL(loadFinished(bool)),this,SLOT(updateLogin()));
 	connect(this->page()->mainFrame(),SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(updateJavaScriptObjects()));
     connect(this->page(),SIGNAL(unsupportedContent(QNetworkReply*)),this,SLOT(downloadContent(QNetworkReply*)));
 

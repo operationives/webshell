@@ -686,7 +686,7 @@ void MainWindow::changeActionNames(QString lang)
 		fullscreenAction->setText("Fullscreen");
 		normalscreenAction->setText("Show normal");
         reloadAction->setText("Reload");
-		infoAction->setText("Informations");
+        infoAction->setText("Information");
 #ifdef Q_OS_WIN
         sendlogAction->setText("Send logs");
 #endif
