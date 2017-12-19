@@ -170,7 +170,7 @@ int main(int argc, char** argv)
     SimpleCrypt crypto(KEY_CODE);
     SingleApplication app(argc, argv);
     app.setApplicationName(QString("Webshell"));
-    app.setApplicationVersion(QString("1.0.9"));
+    app.setApplicationVersion(QString("1.0.10"));
 
     QSettings settings;
     ConfigManager &config = ConfigManager::Instance();
